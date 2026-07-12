@@ -1,65 +1,41 @@
 # Unresolved Questions
 
-## P0 — blocks final content freeze
+## P0 — before enabling Telegram
 
-1. Which client groups does Alina actually work with?
-   - adults;
-   - adolescents;
-   - children;
-   - couples;
-   - families.
+1. What is the exact public Telegram username or URL?
+2. Is the selected username controlled by Alina and approved for publication?
 
-2. Can the public claim `7 years of experience` be used?
-   - From which year is experience counted?
-   - What professional activity is included?
+Until confirmed:
 
-3. What is the exact service geography?
-   - Ukrainians in Ukraine only;
-   - Ukrainians living abroad;
-   - Russian- and Ukrainian-speaking clients regardless of country;
-   - any excluded countries.
+- `telegramUsername` remains empty in `assets/js/site-config.js`;
+- Telegram controls remain disabled or hidden;
+- no guessed or third-party account may be linked.
 
-4. What is the exact public terminology for:
-   - metaphorical associative cards;
-   - “metaphorical board”;
-   - first psychological aid.
+## P0 — before production indexing
 
-5. Is there documented training or certification supporting the public claim `first psychological aid`?
+3. Is the official domain `alinahorb.com` fully connected and serving both `/` and `/ru/`?
+4. Has the privacy policy been approved and published?
+5. Has the final legal/privacy review been completed for the contact form and consultation wording?
 
-6. May the public website display the redacted diploma image?
+Until confirmed:
 
-## P1 — blocks final booking and commercial flow
+- both pages retain `noindex, nofollow`;
+- privacy policy remains non-clickable placeholder text;
+- the form uses local `mailto:` only and stores no data.
 
-7. Is `600 UAH / 50 minutes` identical for online and offline sessions?
+## P1 — content refinement
 
-8. What exact Telegram username or URL should be used?
+6. Should the audience wording remain “adolescents, families, women, and men” in the final production copy?
+7. Are any additional verified qualifications, certificates, memberships, or supervision details approved for publication?
+8. Should any specific in-person location be published later?
 
-9. What city or location should be used for offline sessions?
-   - If no fixed location exists, can the site say: `Offline consultations by prior arrangement`?
+## Safe defaults
 
-10. What payment methods are accepted?
-
-11. What are the cancellation and rescheduling rules?
-
-12. Is an initial screening step required before confirmation of a session?
-
-## P2 — strengthens trust and later pages
-
-13. Are there additional certificates that may be published?
-
-14. How should supervision be described publicly?
-
-15. Are there continuing professional development records or memberships that may be shown?
-
-16. Is there a registered business / sole proprietor status that must appear in legal pages?
-
-## Safe defaults until answered
-
-- Adult-first copy without naming minors, couples or families.
-- No `7 years of experience` claim.
-- No fixed offline city.
-- No worldwide-service claim.
-- Telegram CTA remains a placeholder until the exact URL is supplied.
-- Price and duration may appear only as working content until online/offline parity is confirmed.
-- First psychological aid remains qualified working copy, not a specialist credential claim.
-- Use only the redacted public diploma asset; never expose the original or private master.
+- Ukrainian remains the primary language.
+- Russian remains at `/ru/`.
+- Practice is described as starting in 2016.
+- Online is the primary format.
+- In-person work is described only as possible by prior agreement.
+- No city, address, phone, Germany, or Khust is published.
+- Price remains in FAQ/process context, not in the hero.
+- Only the public redacted diploma is used.
