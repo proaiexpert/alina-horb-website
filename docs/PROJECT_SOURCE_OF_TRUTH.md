@@ -26,16 +26,29 @@ Every statement must be classified as one of:
 - Degree: Master's in Psychology
 - Institution: Oles Honchar Dnipro National University
 - Year: 2024
-- Public diploma versions must hide the diploma number and other private identifiers.
+- Public diploma display is permitted only as the title page.
+- The diploma number and other personal/private identifiers must not appear publicly.
+- The original PDF, unredacted diploma and private masters must never be committed or published.
+
+## Confirmed professional experience
+
+- Professional experience is counted from 2019.
+- Preferred durable public wording: `практикует с 2019 года` or `профессиональный опыт с 2019 года`.
+- Avoid hard-coding `7 лет опыта`, because the number becomes stale and may depend on the exact start month.
 
 ## Confirmed service information
 
 - Format: online and offline
+- Offline city: Хуст
+- Approved format wording: `Очные и онлайн-консультации — по предварительному согласованию.`
 - Languages of consultation: Russian and Ukrainian
-- Primary audience statement: Ukrainians
+- Client groups reported by Alina: adolescents, families, women and men
+- Core audience: Ukrainians regardless of their country of residence
 - Session duration: 50 minutes
 - Price: 600 UAH
+- Price and duration are identical for online and offline consultations
 - Booking channel: Telegram
+- Exact Telegram username/URL is still missing and must not be invented
 - Supervision: yes
 
 ## Confirmed approaches reported by Alina
@@ -67,7 +80,7 @@ These remain working copy until the final claims matrix is approved.
 
 Germany must not be used as positioning, market, business location or specialist niche.
 
-Alina is currently physically in Germany and expects to return to Ukraine. The website is intended for Russian- and Ukrainian-speaking Ukrainians. Cross-border service wording remains subject to final legal/privacy review.
+The confirmed audience wording may state that Alina works with Ukrainians regardless of their country of residence. The offline location is Хуст. Do not broaden this into a generic `worldwide` claim.
 
 ## Locked visual decisions
 
@@ -77,9 +90,9 @@ The desktop design is approved and must not be redesigned during implementation.
 
 ## Asset source of truth
 
-Private source files and Cowork input materials are stored in Google Drive.
+Private source files and production masters are stored in Google Drive.
 
-Approved public production assets may later be committed to GitHub after QA.
+Approved public production assets may be committed to GitHub after QA.
 
 Never commit:
 
