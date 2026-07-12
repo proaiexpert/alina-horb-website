@@ -2,31 +2,30 @@
 
 ## Current stage
 
-Homepage implementation imported to a review branch.
+Bilingual UA/RU GitHub Pages preview is implemented in feature branch `feat/bilingual-ua-ru-v3` and awaiting pull-request review.
 
 ## Completed
 
-- Final Desktop Visual Direction v1.0 approved.
-- Domain selected: `alinahorb.com`.
-- Google Drive project structure created.
-- Portrait, logo and diploma assets prepared.
-- Public and private diploma versions separated.
-- Private GitHub repository initialized.
-- Static RU homepage implemented from the approved visual direction.
-- High-resolution portrait derivative integrated.
-- Responsive QA completed at 320–1440 px.
-- GitHub-ready package verified with no private assets.
+- Final Desktop Visual Direction v1.0 approved and retained.
+- Approved public portrait, localized logos, and redacted diploma assets are in the repository.
+- Ukrainian primary homepage implemented at `/`.
+- Russian homepage implemented at `/ru/`.
+- Relative asset and language-switch paths prepared for the GitHub Pages project URL.
+- Shared contact configuration and localized temporary `mailto:` form implemented.
+- Telegram remains disabled until the exact username is confirmed.
+- GitHub Pages workflow updated to publish `index.html`, `ru/`, and `assets/` directly from the repository.
+- Preview pages use `noindex, nofollow`.
+- Responsive QA completed at 320, 360, 375, 390, 430, 768, 1024, 1280, and 1440 px for both languages.
 
-## In progress
+## Pending review
 
-- Pull-request review of the homepage implementation.
-- Final content confirmation with Alina.
-- Production typography and visual review.
+- Review and approve the bilingual pull request.
+- Merge only after desktop/mobile visual review.
+- Verify the deployed GitHub Pages preview after merge.
 
-## Not started
+## Not ready for production indexing
 
-- Approved Ukrainian homepage and `/ua/` route.
-- Privacy-policy page.
-- Final Telegram booking integration.
-- Deployment configuration.
-- Production launch and DNS connection.
+- Exact Telegram username is pending.
+- Privacy policy and legal review are pending.
+- Official domain connection is pending.
+- Preview `noindex, nofollow` must remain until the official domain is connected and verified.
