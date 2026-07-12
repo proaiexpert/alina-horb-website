@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 560" role="img" aria-labelledby="title desc">
+  <title id="title">Декоративная композиция с вазой, ветвью и книгами</title>
+  <desc id="desc">Спокойная редакционная композиция в тёплой каменной палитре.</desc>
+  <defs>
+    <filter id="soft" x="-30%" y="-30%" width="160%" height="160%">
+      <feGaussianBlur stdDeviation="14"/>
+    </filter>
+  </defs>
+  <rect width="900" height="560" fill="#e8dfd5"/>
+  <path d="M690 0h98L578 560h-98z" fill="#f5efe8" opacity=".72"/>
+  <path d="M806 0h44L642 560h-44z" fill="#f8f3ed" opacity=".82"/>
+  <ellipse cx="440" cy="476" rx="330" ry="34" fill="#756a60" opacity=".14" filter="url(#soft)"/>
+  <ellipse cx="308" cy="452" rx="102" ry="24" fill="#6e6258" opacity=".17" filter="url(#soft)"/>
+  <path d="M222 442c3-108 25-176 82-183 57 7 79 75 82 183-16 28-54 43-82 43s-66-15-82-43z" fill="#f7f2eb" stroke="#cfc4b8" stroke-width="2"/>
+  <path d="M276 258c0-27 9-45 28-45s28 18 28 45" fill="#f7f2eb" stroke="#cfc4b8" stroke-width="2"/>
+  <path d="M304 214C318 151 352 97 397 50" fill="none" stroke="#596450" stroke-width="4" stroke-linecap="round"/>
+  <path d="M332 169c35-32 74-52 118-62M350 132c-5-39 2-74 20-105M374 104c36-23 73-34 112-35" fill="none" stroke="#596450" stroke-width="3" stroke-linecap="round"/>
+  <g fill="#76816d" stroke="#596450" stroke-width="1.4">
+    <path d="M374 105c22-22 45-25 63-11-15 21-38 26-63 11z"/>
+    <path d="M408 76c18-20 38-25 55-14-12 20-31 27-55 14z"/>
+    <path d="M337 166c-23-21-42-24-57-10 13 20 32 24 57 10z"/>
+    <path d="M355 137c21-22 42-27 60-16-13 22-33 29-60 16z"/>
+    <path d="M385 87c-19-24-21-45-7-61 19 16 22 36 7 61z"/>
+    <path d="M441 106c21-17 40-18 54-4-15 18-33 20-54 4z"/>
+    <path d="M410 49c19-18 37-20 51-7-13 19-31 22-51 7z"/>
+  </g>
+  <g stroke="#b6a38f" stroke-width="2">
+    <rect x="488" y="345" width="262" height="56" rx="2" fill="#f4eee6"/>
+    <rect x="464" y="401" width="300" height="53" rx="2" fill="#d8c5ae"/>
+    <rect x="508" y="454" width="276" height="45" rx="2" fill="#eee5da"/>
+    <path d="M504 359h230M481 416h264M525 467h242" opacity=".65"/>
+    <path d="M518 346v54M484 402v51M525 455v43" opacity=".55"/>
+  </g>
+  <path d="M114 514h690" stroke="#c8bbb0" stroke-width="2"/>
+</svg>

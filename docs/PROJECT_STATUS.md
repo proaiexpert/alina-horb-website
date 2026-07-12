@@ -2,38 +2,31 @@
 
 ## Current stage
 
-Ready to start Cowork homepage implementation.
+Homepage implementation imported to a review branch.
 
 ## Completed
 
 - Final Desktop Visual Direction v1.0 approved.
-- Final desktop mockup stored in Google Drive.
-- Domain selected: alinahorb.com.
+- Domain selected: `alinahorb.com`.
 - Google Drive project structure created.
-- Private GitHub repository initialized.
-- Portrait assets prepared and stored in Google Drive.
-- Diploma assets prepared and stored in Google Drive.
+- Portrait, logo and diploma assets prepared.
 - Public and private diploma versions separated.
-- Asset manifest created.
-- Four RU/UA logo variants verified.
-- Logo transparency and dimensions verified.
-- Logo source and web-ready files stored in Google Drive.
-- Logo asset manifest created in Google Drive and GitHub.
-- Visual direction document created and mirrored to Google Drive.
-- Project source of truth created and mirrored to Google Drive.
-- Content status document created and mirrored to Google Drive.
-- Unresolved client questions documented and mirrored to Google Drive.
-- Cowork homepage implementation brief created.
+- Private GitHub repository initialized.
+- Static RU homepage implemented from the approved visual direction.
+- High-resolution portrait derivative integrated.
+- Responsive QA completed at 320–1440 px.
+- GitHub-ready package verified with no private assets.
 
 ## In progress
 
+- Pull-request review of the homepage implementation.
 - Final content confirmation with Alina.
-- Cowork input package readback.
-- Cowork homepage implementation.
+- Production typography and visual review.
 
 ## Not started
 
-- GitHub import of approved implementation code.
-- Final responsive QA.
+- Approved Ukrainian homepage and `/ua/` route.
+- Privacy-policy page.
+- Final Telegram booking integration.
 - Deployment configuration.
-- Production launch.
+- Production launch and DNS connection.
