@@ -40,10 +40,11 @@ jobs:
 
           touch _site/.nojekyll
 
+          test -f _site/index.html
+          test -f _site/ru/index.html
+
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
       - name: Upload Pages artifact
         uses: actions/upload-pages-artifact@v3
