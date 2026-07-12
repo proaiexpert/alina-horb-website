@@ -5,6 +5,7 @@
   .support-grid { grid-template-columns: 1.3fr .7fr; }
   .support-content { padding-right: 28px; }
   .support-index li { padding-inline: 11px; }
+  .contact-heading { gap: 40px; }
   .footer-row { grid-template-columns: 150px repeat(3, auto); white-space: normal; }
   .footer-row > :nth-child(n+5) { margin-top: 4px; }
   .maker-credit { justify-self: start; text-align: left; }
@@ -43,6 +44,9 @@
   .principles-panel, .faq-panel { min-height: auto; padding: 42px 48px; }
   .principles-panel li { padding-block: 10px; }
   .faq-list summary { min-height: 48px; padding-block: 11px; }
+  .contact-heading { grid-template-columns: 1fr; gap: 12px; }
+  .contact-methods { grid-template-columns: 1fr; }
+  .contact-card + .contact-card { border-top: 1px solid var(--line); border-left: 0; }
   .final-cta { padding-block: 50px; }
   .cta-inner { min-height: 240px; }
   .cta-vase { right: 4%; bottom: -43px; width: 140px; }
@@ -105,6 +109,11 @@
   .principles-panel h2, .faq-panel h2 { font-size: 34px; }
   .principles-panel li { grid-template-columns: 1fr; gap: 3px; padding: 8px 0; font-size: 15px; }
   .faq-list summary { min-height: 45px; font-size: 15px; }
+  .contact-form-wrap { padding: 24px 18px; }
+  .contact-form { grid-template-columns: 1fr; }
+  .form-field-full, .form-consent, .form-actions { grid-column: auto; }
+  .form-actions { align-items: stretch; }
+  .form-actions .button { width: 100%; }
   .final-cta { padding-block: 34px; }
   .cta-inner { min-height: 210px; place-items: start; text-align: left; }
   .final-cta h2 { max-width: 86%; font-size: 34px; }
@@ -118,10 +127,11 @@
 @media (max-width: 350px) {
   :root { --page-shell: calc(100% - 24px); }
   .brand { width: 145px; }
-  .hero-copy h1 { font-size: 43px; }
+  .hero-copy h1 { font-size: 41px; }
   .hero-intro { font-size: 15px; }
   .button { width: 100%; }
   .principles-panel, .faq-panel { padding-inline: 18px; }
+  .contact-card { padding-inline: 18px; }
   .footer-row { grid-template-columns: 1fr; }
 }
 
