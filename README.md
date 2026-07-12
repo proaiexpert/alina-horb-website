@@ -1,63 +1,60 @@
 # Alina Horb Website
 
-Production website project for psychologist Alina Horb.
+Bilingual static website for psychologist Alina Horb.
 
-## Status
+## Current preview architecture
 
-Approved static homepage package imported for review.
+- Ukrainian primary page: `/` (`index.html`)
+- Russian page: `/ru/` (`ru/index.html`)
+- Preview target after merge: `https://proaiexpert.github.io/alina-horb-website/`
+- Future production domain: `https://alinahorb.com/`
 
-No deployment, GitHub Pages, DNS, or production launch has been configured.
-
-## Official domain
-
-alinahorb.com
-
-## Project workflow
-
-1. Source assets and private originals are stored in Google Drive.
-2. The homepage implementation is prepared as a reviewed static package.
-3. Approved code is imported through a GitHub feature branch and pull request.
-4. Technical and visual QA is completed before merge.
-5. Deployment is configured only after content and legal review.
+The preview pages currently use `noindex, nofollow`. Remove that directive only in a separate production commit after the official domain is connected and verified.
 
 ## Stack
 
 - semantic HTML5;
-- modern CSS;
+- shared modern CSS;
 - minimal vanilla JavaScript;
-- no framework, npm dependencies, CMS, database, or build step.
+- no framework, CMS, database, npm dependency, or build step.
 
 ## Local launch
-
-From this directory:
 
 ```bash
 python3 -m http.server 8080
 ```
 
-Open `http://127.0.0.1:8080/`.
+Open:
 
-## Production assets
+- `http://127.0.0.1:8080/`
+- `http://127.0.0.1:8080/ru/`
 
-Only approved public website assets are included. The portrait uses an optimized JPEG production derivative created from the private high-resolution master; the master itself is not included.
+## Contact configuration
 
-Only the public redacted diploma is included.
+Shared contact settings are stored in:
 
-## Fonts
+`assets/js/site-config.js`
 
-The prototype loads Cormorant Garamond and Manrope from Google Fonts with `display=swap` and fallback stacks. Self-hosting/privacy should be decided before production launch. Font files are not included.
+The Telegram username is intentionally empty until confirmed. The temporary form prepares a localized `mailto:` message and does not transmit or store form data.
 
-## Current limitations
+## Assets
 
-- exact Telegram URL is pending, so CTAs use `mailto:alinahorb1991@gmail.com`;
-- approved Ukrainian copy and UA route are not yet available;
-- privacy policy is shown as inactive text to avoid a broken link;
-- some working homepage copy is pending final client confirmation.
+Only approved public production assets are committed:
 
-## Important
+- localized RU/UA logos;
+- optimized public portrait derivatives;
+- public redacted diploma derivatives;
+- decorative SVG files.
 
-Private source assets, original diploma files and archives must never be committed to this repository.
+Never commit original/private portrait files, original or unredacted diploma files, private masters, credentials, cookies, tokens, or ZIP archives.
 
-## QA evidence
+## Deployment
 
-Full-page responsive screenshots are retained in the verified Google Drive delivery package rather than committed to the production repository.
+GitHub Pages deploys directly from the repository through `.github/workflows/deploy-pages.yml`. The workflow copies `index.html`, `ru/`, and `assets/` into the Pages artifact. It does not use Google Drive or external ZIP files.
+
+## Pending before production launch
+
+- exact Telegram username;
+- privacy policy and legal review;
+- removal of preview `noindex, nofollow` after the official domain is connected;
+- final production SEO and Open Graph verification.
