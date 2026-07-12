@@ -1,6 +1,5 @@
 name: Deploy Alina Horb website
 
-# Repository is public; publish directly from main.
 on:
   push:
     branches:
@@ -31,10 +30,14 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+
           rm -rf _site
           mkdir -p _site
+
           cp index.html _site/
+          cp -R ru _site/
           cp -R assets _site/
+
           touch _site/.nojekyll
 
       - name: Configure GitHub Pages

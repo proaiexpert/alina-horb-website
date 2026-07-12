@@ -2,63 +2,46 @@
 
 ## Status
 
-PARTIALLY CONFIRMED — NOT YET FROZEN
+BILINGUAL UA/RU PREVIEW IMPLEMENTED — PENDING PR REVIEW
 
-The approved desktop mockup remains the visual source of truth. Its current text is working copy unless marked confirmed below.
+## Approved for the current preview
 
-## Confirmed
+- Ukrainian is the primary language at `/`.
+- Russian is available at `/ru/`.
+- Practice wording: since 2016.
+- Consultation languages: Ukrainian and Russian.
+- Primary format: online.
+- In-person consultation: possible by prior agreement.
+- Neutral cross-border wording without country restrictions.
+- Audience wording: adolescents, families, women, and men.
+- Duration and price: 50 minutes / 600 UAH.
+- Public redacted diploma title page.
+- Temporary email: `alinahorb1991@gmail.com`.
+- Localized contact form using a temporary `mailto:` flow.
 
-- Name: Алина Горб / Аліна Горб
-- Descriptor: практикующий психолог
-- Languages: Russian and Ukrainian
-- Format: online and offline
-- Audience: Ukrainians
-- Session duration: 50 minutes
-- Price: 600 UAH
-- Booking channel: Telegram
-- Supervision: yes
-- Education: Master's in Psychology, Oles Honchar Dnipro National University, 2024
-- Domain: `alinahorb.com`
-- Temporary email: `alinahorb1991@gmail.com`
+## Not published
 
-## Confirmed with terminology still to normalize
+- Khust;
+- Germany;
+- any city or office address;
+- phone or WhatsApp;
+- unconfirmed Telegram username;
+- original or unredacted diploma;
+- private portrait master;
+- “7 years”, “8 years”, or “10 years” experience claims;
+- children, couples, organizations, groups, or clinical categories;
+- guarantees, medical treatment claims, testimonials, or ratings.
 
-- metaphorical associative cards;
-- metaphorical board;
-- Gestalt therapy;
-- Carl Rogers client-centered therapy;
-- psychological abuse;
-- first psychological aid.
+## Preview-only technical status
 
-## Working copy in the approved homepage
+- Canonical and hreflang target the future official domain `alinahorb.com`.
+- Preview uses `noindex, nofollow`.
+- Open Graph preview image uses the working GitHub Pages project URL.
+- GitHub Pages deployment copies the UA root page, `/ru/`, and shared assets directly from the repository.
 
-- Hero headline and subheadline;
-- support-needs list 01–05;
-- About text;
-- personal quote;
-- process steps;
-- principles of work;
-- FAQ questions;
-- final CTA.
+## Remaining production content work
 
-These may be implemented as editable content, but are not yet the final copy freeze.
-
-## Prohibited until confirmed
-
-- `7 years of experience`;
-- children, adolescents, couples or families as a public service scope;
-- trauma therapy as a specialized credential;
-- emergency psychological service claims;
-- worldwide service availability;
-- a fixed offline location;
-- exact cancellation and payment rules;
-- absolute confidentiality guarantees;
-- diagnoses, treatment claims or guaranteed outcomes.
-
-## Implementation rule
-
-Store homepage copy separately from layout/components so confirmed wording can be replaced without rebuilding the visual structure.
-
-## Next content milestone
-
-Create `CONTENT_SOURCE_OF_TRUTH_v1` after the remaining client questions are answered and the final RU/UA copy is approved.
+- confirm exact Telegram username;
+- prepare and approve privacy policy/legal wording;
+- remove preview robots directive after official-domain connection;
+- perform final production SEO and social-preview verification.
