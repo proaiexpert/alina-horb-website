@@ -1,5 +1,6 @@
 name: Deploy Alina Horb website
 
+# Repository is public; publish directly from main.
 on:
   push:
     branches:
