@@ -1,0 +1,202 @@
+name: Emergency restore binary assets
+
+on:
+  push:
+    branches:
+      - fix/pages-binary-assets-domain
+    paths:
+      - .asset-staging/READY
+
+permissions:
+  contents: write
+  pages: write
+
+jobs:
+  restore:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout emergency branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/pages-binary-assets-domain
+          fetch-depth: 0
+
+      - name: Reconstruct approved binary assets
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          mkdir -p assets/images/portrait assets/images/diploma assets/images/logos
+
+          cat .asset-staging/portrait-jpg/*.part | base64 --decode > assets/images/portrait/alina-horb-portrait-hero.jpg
+          cat .asset-staging/portrait-webp/*.part | base64 --decode > assets/images/portrait/alina-horb-portrait-hero.webp
+          cat .asset-staging/diploma-jpg/*.part | base64 --decode > assets/images/diploma/alina-horb-diploma-public-1600.jpg
+          cat .asset-staging/diploma-webp/*.part | base64 --decode > assets/images/diploma/alina-horb-diploma-public-1600.webp
+          cat .asset-staging/logo-ua-dark/*.part | base64 --decode > assets/images/logos/alina-horb-logo-ua-dark.png
+          cat .asset-staging/logo-ua-light/*.part | base64 --decode > assets/images/logos/alina-horb-logo-ua-light.png
+          cat .asset-staging/logo-ru-dark/*.part | base64 --decode > assets/images/logos/alina-horb-logo-ru-dark.png
+          cat .asset-staging/logo-ru-light/*.part | base64 --decode > assets/images/logos/alina-horb-logo-ru-light.png
+
+          cat > /tmp/assets.sha256 <<'EOF'
+          3c60c482f2a80ee6c8f3a70d83bd0c89f88fef286060aea0de53b0284484c9b3  assets/images/portrait/alina-horb-portrait-hero.jpg
+          1d4f6a2510d83a3a07c0669f3529d5486c904dd3b314644e6cc28276e10928f0  assets/images/portrait/alina-horb-portrait-hero.webp
+          75ea4b34261e6821f730d21bc052dfb81cc6c0920b7cf64c7b4b70e388bb88da  assets/images/diploma/alina-horb-diploma-public-1600.jpg
+          2697420cc9ffbda74436f8b9fcd026620c5338fd75246eed996a6a97f8d63d32  assets/images/diploma/alina-horb-diploma-public-1600.webp
+          aa76f6215d50aa853c6191987299c7031c98a3cd232c915999f47da2f842681a  assets/images/logos/alina-horb-logo-ua-dark.png
+          1a247427a5c563e31ef10904b2ad599519c686a37ac12dfac389915f78daa4dc  assets/images/logos/alina-horb-logo-ua-light.png
+          786ed533893ad29a9e060c65f276eded5b5072d4283f97db78abbaa2a4a88277  assets/images/logos/alina-horb-logo-ru-dark.png
+          f7987cc4892541152f81da66c4c2d7a233ed873f8ea373cef7d1b278848f0ec5  assets/images/logos/alina-horb-logo-ru-light.png
+          EOF
+          sha256sum --check /tmp/assets.sha256
+
+      - name: Decode and dimension validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m pip install --disable-pip-version-check pillow
+          python3 - <<'PY'
+          from pathlib import Path
+          from PIL import Image
+
+          expected = {
+              Path('assets/images/portrait/alina-horb-portrait-hero.jpg'): ('JPEG', (1600, 2000)),
+              Path('assets/images/portrait/alina-horb-portrait-hero.webp'): ('WEBP', (1600, 2000)),
+              Path('assets/images/diploma/alina-horb-diploma-public-1600.jpg'): ('JPEG', (1600, 2286)),
+              Path('assets/images/diploma/alina-horb-diploma-public-1600.webp'): ('WEBP', (1600, 2286)),
+              Path('assets/images/logos/alina-horb-logo-ua-dark.png'): ('PNG', (1600, 489)),
+              Path('assets/images/logos/alina-horb-logo-ua-light.png'): ('PNG', (1600, 492)),
+              Path('assets/images/logos/alina-horb-logo-ru-dark.png'): ('PNG', (1600, 489)),
+              Path('assets/images/logos/alina-horb-logo-ru-light.png'): ('PNG', (1600, 492)),
+          }
+
+          for path, (fmt, size) in expected.items():
+              if not path.is_file() or path.stat().st_size < 10_000:
+                  raise SystemExit(f'Missing or suspicious asset: {path}')
+              with Image.open(path) as image:
+                  image.verify()
+              with Image.open(path) as image:
+                  if image.format != fmt or image.size != size:
+                      raise SystemExit(f'Unexpected image metadata: {path}: {image.format} {image.size}')
+                  if path.suffix == '.png' and image.mode != 'RGBA':
+                      raise SystemExit(f'Logo lacks alpha channel: {path}: {image.mode}')
+                  print(path, image.format, image.size, image.mode)
+          PY
+
+      - name: Replace deployment workflow with binary validation
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > .github/workflows/deploy-pages.yml <<'YAML'
+          name: Deploy Alina Horb website
+
+          on:
+            push:
+              branches:
+                - main
+            workflow_dispatch:
+
+          permissions:
+            contents: read
+            pages: write
+            id-token: write
+
+          concurrency:
+            group: pages
+            cancel-in-progress: true
+
+          jobs:
+            deploy:
+              environment:
+                name: github-pages
+                url: ${{ steps.deployment.outputs.page_url }}
+              runs-on: ubuntu-latest
+
+              steps:
+                - name: Checkout repository
+                  uses: actions/checkout@v4
+
+                - name: Prepare public site artifact
+                  shell: bash
+                  run: |
+                    set -euo pipefail
+                    rm -rf _site
+                    mkdir -p _site
+                    cp index.html _site/
+                    cp -R ru _site/
+                    cp -R assets _site/
+                    touch _site/.nojekyll
+
+                - name: Validate production images
+                  shell: bash
+                  run: |
+                    set -euo pipefail
+                    python3 -m pip install --disable-pip-version-check pillow
+                    python3 - <<'PY'
+                    from pathlib import Path
+                    from PIL import Image
+
+                    expected = {
+                        Path('_site/assets/images/portrait/alina-horb-portrait-hero.jpg'): ('JPEG', (1600, 2000)),
+                        Path('_site/assets/images/portrait/alina-horb-portrait-hero.webp'): ('WEBP', (1600, 2000)),
+                        Path('_site/assets/images/diploma/alina-horb-diploma-public-1600.jpg'): ('JPEG', (1600, 2286)),
+                        Path('_site/assets/images/diploma/alina-horb-diploma-public-1600.webp'): ('WEBP', (1600, 2286)),
+                        Path('_site/assets/images/logos/alina-horb-logo-ua-dark.png'): ('PNG', (1600, 489)),
+                        Path('_site/assets/images/logos/alina-horb-logo-ru-dark.png'): ('PNG', (1600, 489)),
+                    }
+
+                    for path, (fmt, size) in expected.items():
+                        if not path.is_file() or path.stat().st_size < 10_000:
+                            raise SystemExit(f'Missing or suspicious asset: {path}')
+                        with Image.open(path) as image:
+                            image.verify()
+                        with Image.open(path) as image:
+                            if image.format != fmt or image.size != size:
+                                raise SystemExit(f'Unexpected image metadata: {path}: {image.format} {image.size}')
+                            print(path, image.format, image.size, image.mode)
+                    PY
+
+                - name: Configure GitHub Pages
+                  uses: actions/configure-pages@v5
+
+                - name: Upload Pages artifact
+                  uses: actions/upload-pages-artifact@v3
+                  with:
+                    path: _site
+
+                - name: Deploy to GitHub Pages
+                  id: deployment
+                  uses: actions/deploy-pages@v4
+          YAML
+
+          rm -f CNAME
+
+      - name: Clear incorrect Pages custom domain
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          status=$(curl --silent --show-error --output /tmp/pages-response.json --write-out '%{http_code}' \
+            --request PUT \
+            --header 'Accept: application/vnd.github+json' \
+            --header "Authorization: Bearer ${GH_TOKEN}" \
+            --header 'X-GitHub-Api-Version: 2022-11-28' \
+            "https://api.github.com/repos/${GITHUB_REPOSITORY}/pages" \
+            --data '{"cname":null}')
+          cat /tmp/pages-response.json || true
+          if [[ "$status" != "200" && "$status" != "204" ]]; then
+            echo "Unable to clear Pages custom domain with workflow token; HTTP $status" >&2
+            exit 1
+          fi
+
+      - name: Commit restored assets
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .asset-staging
+          rm -f .github/workflows/emergency-restore-assets.yml
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'fix: restore Pages assets and remove wrong domain'
+          git push origin HEAD:fix/pages-binary-assets-domain
