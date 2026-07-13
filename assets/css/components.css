@@ -73,11 +73,11 @@
 .faq-list details p { margin: 0; padding: 0 36px 14px 0; color: var(--muted); font-size: 15px; line-height: 1.55; }
 
 .contact-section { background: var(--ivory-deep); }
-.contact-section .page-shell { display: grid; grid-template-columns: minmax(280px, .75fr) minmax(0, 1.25fr); column-gap: clamp(32px, 4vw, 56px); align-items: start; }
-.contact-heading { grid-column: 1 / -1; display: grid; grid-template-columns: .8fr 1.2fr; gap: 70px; align-items: end; margin-bottom: 36px; }
+.contact-section .page-shell { display: grid; grid-template-columns: minmax(260px, 360px) minmax(0, 640px); justify-content: center; gap: 28px 48px; align-items: start; }
+.contact-heading { grid-column: 1; grid-row: 1; display: block; margin-bottom: 0; }
 .contact-heading h2 { margin-bottom: 0; }
-.contact-heading p { max-width: 650px; margin: 0; color: var(--muted); }
-.contact-methods { display: grid; grid-template-columns: 1fr; border: 1px solid var(--line-dark); background: var(--ivory); }
+.contact-heading p { max-width: 340px; margin: 16px 0 0; color: var(--muted); }
+.contact-methods { grid-column: 1; grid-row: 2; display: grid; grid-template-columns: 1fr; border: 1px solid var(--line-dark); background: var(--ivory); }
 .contact-card { min-width: 0; padding: 25px 26px; }
 .contact-card + .contact-card { border-top: 1px solid var(--line); }
 .contact-card h3 { margin: 0 0 12px; font-family: var(--sans); font-size: 14px; font-weight: 600; }
@@ -85,7 +85,7 @@
 .contact-action { display: inline-flex; min-height: 38px; align-items: center; color: var(--terracotta); font-family: var(--serif); font-size: 20px; line-height: 1.15; overflow-wrap: anywhere; }
 button.contact-action { padding: 0; border: 0; background: transparent; }
 .contact-action.is-disabled { color: var(--muted); cursor: not-allowed; opacity: .8; }
-.contact-form-wrap { width: 100%; max-width: 720px; justify-self: end; padding: 30px; border: 1px solid var(--line-dark); background: var(--stone-light); }
+.contact-form-wrap { grid-column: 2; grid-row: 1 / span 2; width: 100%; max-width: 640px; justify-self: start; padding: 28px; border: 1px solid var(--line-dark); background: var(--stone-light); }
 .contact-form-wrap h3 { margin: 0 0 22px; font-size: 28px; }
 .contact-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 22px; }
 .form-field { display: grid; gap: 7px; min-width: 0; }
