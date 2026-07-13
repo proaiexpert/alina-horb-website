@@ -27,8 +27,8 @@
   .mobile-navigation a + a { border-left: 1px solid var(--line); }
   .side-navigation { display: none; }
   .hero-grid { grid-template-columns: minmax(260px, 340px) 1fr; min-height: 530px; padding-bottom: 44px; }
-  .portrait-arch { max-width: 305px; aspect-ratio: .60; }
-  .portrait-arch img { height: 100%; object-fit: cover; object-position: 50% 42%; }
+  .portrait-arch { max-width: 305px; aspect-ratio: .52; }
+  .portrait-arch img { height: 100%; object-fit: cover; object-position: 50% 47%; }
   .portrait-arch::after { height: 12%; box-shadow: 0 -17px 28px 18px rgba(245,240,233,.86); }
   .hero-copy h1 { font-size: clamp(45px, 6.7vw, 58px); }
   .trust-grid p { font-size: 15px; }
@@ -44,9 +44,10 @@
   .principles-panel, .faq-panel { min-height: auto; padding: 42px 48px; }
   .principles-panel li { padding-block: 10px; }
   .faq-list summary { min-height: 48px; padding-block: 11px; }
-  .contact-heading { grid-template-columns: 1fr; gap: 12px; }
-  .contact-methods { grid-template-columns: 1fr; }
-  .contact-card + .contact-card { border-top: 1px solid var(--line); border-left: 0; }
+  .contact-section .page-shell { grid-template-columns: 1fr; row-gap: 28px; }
+  .contact-heading { grid-template-columns: 1fr; gap: 12px; margin-bottom: 0; }
+  .contact-methods, .contact-form-wrap { grid-column: 1; }
+  .contact-form-wrap { max-width: none; justify-self: stretch; }
   .final-cta { padding-block: 50px; }
   .cta-inner { min-height: 240px; }
   .cta-vase { right: 4%; bottom: -43px; width: 140px; }
@@ -67,8 +68,8 @@
   .mobile-navigation a:nth-child(3), .mobile-navigation a:nth-child(4) { border-top: 1px solid var(--line); }
   .mobile-navigation a:nth-child(3) { border-left: 0; }
   .hero-grid { grid-template-columns: minmax(0, 1fr); gap: 22px; min-height: auto; padding: 14px 0 34px; }
-  .portrait-arch { width: min(72vw, 285px); max-width: none; aspect-ratio: .62; }
-  .portrait-arch img { height: 100%; object-position: 50% 41%; }
+  .portrait-arch { width: min(68vw, 270px); max-width: none; aspect-ratio: .54; }
+  .portrait-arch img { height: 100%; object-position: 50% 47%; }
   .hero-copy { min-width: 0; padding: 0; }
   .eyebrow { margin-bottom: 8px; }
   .hero-copy h1 { margin-bottom: 18px; font-size: clamp(43px, 13.2vw, 56px); letter-spacing: -.035em; }
