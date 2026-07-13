@@ -63,10 +63,10 @@ p { margin-bottom: 15px; }
 .side-navigation b { color: var(--terracotta); font-weight: 500; }
 .side-navigation a:hover span { color: var(--terracotta); }
 
-.portrait-arch { position: relative; width: 100%; max-width: 310px; aspect-ratio: .50; justify-self: center; overflow: hidden; border-radius: 50% 50% 0 0 / 29% 29% 0 0; background: var(--stone); }
+.portrait-arch { position: relative; width: 100%; max-width: 310px; aspect-ratio: 1200 / 2538; justify-self: center; overflow: hidden; border-radius: 50% 50% 0 0 / 29% 29% 0 0; background: var(--stone); }
 .portrait-arch picture { display: block; height: 100%; }
-.portrait-arch img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 47%; }
-.portrait-arch::after { content: ""; position: absolute; left: -8%; right: -8%; bottom: 0; height: 13%; background: var(--ivory); box-shadow: 0 -18px 30px 20px rgba(245,240,233,.88); }
+.portrait-arch img { width: 100%; height: 100%; object-fit: contain; object-position: center top; }
+.portrait-arch::after { content: ""; position: absolute; left: -8%; right: -8%; bottom: 0; height: 4%; background: var(--ivory); box-shadow: 0 -5px 12px 4px rgba(245,240,233,.72); }
 
 .hero-copy { align-self: center; max-width: 570px; padding-top: 20px; }
 .eyebrow { margin-bottom: 12px; color: var(--terracotta); font-size: 11px; font-weight: 600; text-transform: uppercase; letter-spacing: .14em; }
