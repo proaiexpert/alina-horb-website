@@ -42,14 +42,14 @@ jobs:
 
           test -f _site/index.html
           test -f _site/ru/index.html
-          test -f _site/assets/images/portrait/alina-horb-portrait-hero.webp
-          test -f _site/assets/images/portrait/alina-horb-portrait-hero.jpg
-          test -f _site/assets/images/diploma/alina-horb-diploma-public-1600.webp
-          test -f _site/assets/images/diploma/alina-horb-diploma-public-1600.jpg
-          test -f _site/assets/images/logos/alina-horb-logo-ua-dark.png
-          test -f _site/assets/images/logos/alina-horb-logo-ua-light.png
-          test -f _site/assets/images/logos/alina-horb-logo-ru-dark.png
-          test -f _site/assets/images/logos/alina-horb-logo-ru-light.png
+          test -f _site/assets/images/portrait/alina-horb-portrait-hero-v3.webp
+          test -f _site/assets/images/portrait/alina-horb-portrait-hero-v3.jpg
+          test -f _site/assets/images/diploma/alina-horb-diploma-public-1600-v3.webp
+          test -f _site/assets/images/diploma/alina-horb-diploma-public-1600-v3.jpg
+          test -f _site/assets/images/logos/alina-horb-logo-ua-dark-v3.png
+          test -f _site/assets/images/logos/alina-horb-logo-ua-light-v3.png
+          test -f _site/assets/images/logos/alina-horb-logo-ru-dark-v3.png
+          test -f _site/assets/images/logos/alina-horb-logo-ru-light-v3.png
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
