@@ -40,32 +40,16 @@ jobs:
 
           touch _site/.nojekyll
 
-          # The portrait WebP is not present in the repository and some mobile
-          # browsers keep the selected <source> instead of falling back after
-          # an image error. Use the confirmed JPEG assets for both portrait and
-          # diploma in the deployed preview.
-          python3 - <<'PY'
-          from pathlib import Path
-          import re
-
-          for page in (Path("_site/index.html"), Path("_site/ru/index.html")):
-              html = page.read_text(encoding="utf-8")
-              html = re.sub(
-                  r'\n\s*<source\s+srcset="[^"]*(?:alina-horb-portrait-hero|alina-horb-diploma-public-1600)\.webp"\s+type="image/webp">',
-                  '',
-                  html,
-              )
-              html = html.replace(
-                  'alina-horb-portrait-hero.webp" type="image/webp"',
-                  'alina-horb-portrait-hero.jpg"',
-              )
-              page.write_text(html, encoding="utf-8")
-          PY
-
           test -f _site/index.html
           test -f _site/ru/index.html
+          test -f _site/assets/images/portrait/alina-horb-portrait-hero.webp
           test -f _site/assets/images/portrait/alina-horb-portrait-hero.jpg
+          test -f _site/assets/images/diploma/alina-horb-diploma-public-1600.webp
           test -f _site/assets/images/diploma/alina-horb-diploma-public-1600.jpg
+          test -f _site/assets/images/logos/alina-horb-logo-ua-dark.png
+          test -f _site/assets/images/logos/alina-horb-logo-ua-light.png
+          test -f _site/assets/images/logos/alina-horb-logo-ru-dark.png
+          test -f _site/assets/images/logos/alina-horb-logo-ru-light.png
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
