@@ -198,6 +198,56 @@
     });
   };
 
+  const initMobileBookingCta = () => {
+    const cta = document.querySelector("[data-mobile-booking-cta]");
+    const heroCta = document.querySelector(".hero-actions .button");
+    const contact = document.querySelector("#contact");
+    const footer = document.querySelector(".site-footer");
+    if (!cta || !heroCta || !contact) return;
+
+    const mobile = window.matchMedia("(max-width: 800px)");
+    let frame = 0;
+    let hideTimer = 0;
+
+    const setVisible = (visible) => {
+      window.clearTimeout(hideTimer);
+      if (visible) {
+        cta.hidden = false;
+        window.requestAnimationFrame(() => cta.classList.add("is-visible"));
+        cta.setAttribute("aria-hidden", "false");
+        return;
+      }
+      cta.classList.remove("is-visible");
+      cta.setAttribute("aria-hidden", "true");
+      hideTimer = window.setTimeout(() => { cta.hidden = true; }, reducedMotion ? 0 : 240);
+    };
+
+    const update = () => {
+      frame = 0;
+      if (!mobile.matches) {
+        setVisible(false);
+        return;
+      }
+      const heroBottom = heroCta.getBoundingClientRect().bottom;
+      const contactRect = contact.getBoundingClientRect();
+      const footerRect = footer?.getBoundingClientRect();
+      const contactVisible = contactRect.top < window.innerHeight && contactRect.bottom > 0;
+      const footerVisible = Boolean(footerRect && footerRect.top < window.innerHeight && footerRect.bottom > 0);
+      setVisible(heroBottom < 0 && !contactVisible && !footerVisible);
+    };
+
+    const requestUpdate = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(update);
+    };
+
+    window.addEventListener("scroll", requestUpdate, { passive: true });
+    window.addEventListener("resize", requestUpdate);
+    mobile.addEventListener?.("change", requestUpdate);
+    cta.addEventListener("click", () => setVisible(false));
+    update();
+  };
+
   const init = () => {
     initMobileNavigation();
     initReveals();
@@ -205,6 +255,7 @@
     initFaq();
     initTelegram();
     initContactForm();
+    initMobileBookingCta();
   };
 
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
