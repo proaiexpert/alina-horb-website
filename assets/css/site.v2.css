@@ -184,7 +184,7 @@ h3 { line-height: 1.05; }
   grid-area: portrait;
   align-self: center;
   width: 100%;
-  aspect-ratio: 900 / 1719;
+  aspect-ratio: 2 / 3;
   overflow: hidden;
   border-radius: 50% 50% 0 0 / 20% 20% 0 0;
   background: var(--stone);
@@ -370,6 +370,31 @@ h3 { line-height: 1.05; }
 .note-card .note-copy { padding: 20px 22px; }
 .note-card .note-copy h3 { font-size: 24px; }
 
+.notes-index-main, .article-main { background: var(--ivory-soft); }
+.notes-index-hero, .article-hero { padding: clamp(68px, 8vw, 112px) 0 56px; border-bottom: 1px solid var(--line-strong); }
+.notes-index-hero-inner, .article-hero-inner { max-width: 920px; }
+.notes-index-hero h1, .article-hero h1 { margin-bottom: 22px; font-size: 72px; line-height: .95; }
+.notes-index-hero p, .article-deck { max-width: 720px; color: var(--muted); font-size: 17px; }
+.article-meta { display: flex; flex-wrap: wrap; gap: 12px 20px; margin-bottom: 22px; color: var(--terracotta); font-size: 11px; font-weight: 600; text-transform: uppercase; }
+.notes-index-list { padding-block: var(--section-space); }
+.notes-index-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); border-top: 1px solid var(--line-strong); }
+.notes-index-card { min-width: 0; padding: 38px 42px 42px 0; border-bottom: 1px solid var(--line-strong); }
+.notes-index-card:nth-child(even) { border-left: 1px solid var(--line-strong); padding-right: 0; padding-left: 42px; }
+.notes-index-card h2 { margin-bottom: 16px; font-size: 40px; line-height: 1.02; }
+.notes-index-card p:last-child { margin-bottom: 0; color: var(--muted); }
+.article-layout { display: grid; grid-template-columns: minmax(0, 700px) 220px; justify-content: center; gap: 84px; padding-block: clamp(64px, 8vw, 110px); }
+.article-body { min-width: 0; }
+.article-body h2 { margin: 54px 0 20px; font-size: 42px; line-height: 1.02; }
+.article-body h2:first-child { margin-top: 0; }
+.article-body p, .article-body li { font-size: 17px; line-height: 1.85; }
+.article-body ul { margin: 0 0 28px; padding-left: 22px; }
+.article-body blockquote { margin: 42px 0; border-left: 2px solid var(--terracotta); padding: 10px 0 10px 28px; color: var(--sage-deep); font-family: var(--serif); font-size: 31px; line-height: 1.15; }
+.article-aside { align-self: start; position: sticky; top: 28px; border-top: 1px solid var(--line-strong); padding-top: 22px; }
+.article-aside p { color: var(--muted); font-size: 12px; }
+.article-aside .text-link { margin-top: 8px; }
+.article-navigation { display: flex; justify-content: space-between; gap: 24px; margin-top: 64px; border-top: 1px solid var(--line-strong); padding-top: 28px; }
+.article-navigation a { min-height: 44px; display: inline-flex; align-items: center; color: var(--terracotta); font-weight: 600; }
+
 .contact-section { background: var(--stone); }
 .contact-layout { max-width: 1080px; display: grid; grid-template-columns: minmax(300px, 440px) minmax(0, 560px); justify-content: center; gap: 72px; align-items: start; }
 .contact-copy h2 { margin-bottom: 18px; }
@@ -548,7 +573,7 @@ button.contact-link { border: 0; padding: 0; background: transparent; }
   .hero-heading { align-self: auto; }
   .eyebrow { margin-bottom: 12px; }
   .hero h1 { font-size: 50px; line-height: .94; }
-  .hero-portrait { width: min(84vw, 330px); aspect-ratio: 720 / 1300; justify-self: center; border-radius: 50% 50% 0 0 / 16% 16% 0 0; }
+  .hero-portrait { width: min(84vw, 330px); aspect-ratio: 4 / 5; justify-self: center; border-radius: 50% 50% 0 0 / 16% 16% 0 0; }
   .hero-body { max-width: none; }
   .hero-intro { margin-bottom: 20px; }
   .hero-actions { align-items: stretch; }
@@ -603,6 +628,15 @@ button.contact-link { border: 0; padding: 0; background: transparent; }
   .footer-row > span, .footer-row > a:not(.footer-brand) { white-space: normal; }
   .footer-row a:not(.footer-brand) { min-height: 44px; display: inline-flex; align-items: center; }
   .maker-credit { grid-column: 1; justify-self: start; text-align: left; }
+  .notes-index-hero h1, .article-hero h1 { font-size: 48px; }
+  .notes-index-grid, .article-layout { grid-template-columns: minmax(0, 1fr); }
+  .notes-index-card, .notes-index-card:nth-child(even) { border-left: 0; padding: 28px 0 32px; }
+  .notes-index-card h2 { font-size: 34px; }
+  .article-layout { gap: 44px; }
+  .article-aside { position: static; }
+  .article-body h2 { font-size: 36px; }
+  .article-body p, .article-body li { font-size: 16px; }
+  .article-navigation { align-items: flex-start; flex-direction: column; }
 }
 
 @media (max-width: 360px) {

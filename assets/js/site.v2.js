@@ -111,12 +111,6 @@
     placeholders.forEach((placeholder) => { placeholder.hidden = true; });
   };
 
-  const initMedia = () => {
-    document.querySelectorAll("img[loading='lazy']").forEach((image) => {
-      image.loading = "eager";
-    });
-  };
-
   const initContactForm = () => {
     const form = document.querySelector("[data-contact-form]");
     if (!form) return;
@@ -201,7 +195,6 @@
   };
 
   const init = () => {
-    initMedia();
     initMobileNavigation();
     initReveals();
     initActiveNavigation();

@@ -11,7 +11,7 @@ from urllib.parse import unquote, urlsplit
 
 
 ROOT = Path(__file__).resolve().parents[1]
-HTML_FILES = (ROOT / "index.html", ROOT / "ru" / "index.html")
+HTML_FILES = tuple(sorted(ROOT.glob("**/index.html")))
 LOCAL_SCHEMES = {"", "file"}
 CSS_URL = re.compile(r"url\(\s*(['\"]?)(.*?)\1\s*\)", re.IGNORECASE)
 
@@ -48,9 +48,13 @@ class AssetParser(HTMLParser):
             if rel.intersection({"stylesheet", "preload", "icon"}):
                 self.references.append((f"link[{','.join(sorted(rel))}]", values["href"]))
         if tag == "a" and values.get("href"):
-            suffix = Path(urlsplit(values["href"]).path).suffix.lower()
+            href = values["href"]
+            parsed = urlsplit(href)
+            suffix = Path(parsed.path).suffix.lower()
             if suffix in {".jpg", ".jpeg", ".png", ".webp", ".svg", ".pdf"}:
-                self.references.append(("a[href]", values["href"]))
+                self.references.append(("a[href]", href))
+            elif parsed.path and not parsed.scheme and not parsed.netloc:
+                self.references.append(("a[href]", href))
 
     def _add_srcset(self, srcset: str) -> None:
         for candidate in srcset.split(","):
@@ -69,6 +73,8 @@ def validate_html(source: Path) -> tuple[list[str], set[Path]]:
         if target is None:
             continue
         target = target.resolve()
+        if target.is_dir():
+            target = target / "index.html"
         if not target.is_file():
             errors.append(f"{source.relative_to(ROOT)}: missing {kind} -> {value}")
         elif target.suffix.lower() == ".css":
