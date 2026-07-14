@@ -19,6 +19,7 @@
 }
 
 * { box-sizing: border-box; }
+[hidden] { display: none !important; }
 html { scroll-behavior: smooth; }
 body {
   margin: 0;
@@ -183,17 +184,35 @@ h3 { line-height: 1.05; }
 .hero-portrait {
   grid-area: portrait;
   align-self: center;
+  position: relative;
+  isolation: isolate;
   width: 100%;
   aspect-ratio: 2 / 3;
   overflow: hidden;
   border-radius: 50% 50% 0 0 / 20% 20% 0 0;
-  background: var(--stone);
+  background: #263021;
   clip-path: inset(0 0 100% 0 round 50% 50% 0 0 / 20% 20% 0 0);
   transition: clip-path 1.1s var(--ease);
 }
+.hero-portrait::before {
+  position: absolute;
+  z-index: -2;
+  inset: -6%;
+  background: linear-gradient(rgba(21, 30, 18, .18), rgba(21, 30, 18, .18)), url("../images/portrait/alina-horb-portrait-hero-v3.webp") center / cover no-repeat;
+  filter: blur(18px) saturate(.82) brightness(.76);
+  transform: scale(1.08);
+  content: "";
+}
+.hero-portrait::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(26, 35, 23, .34), transparent 18%, transparent 82%, rgba(26, 35, 23, .34));
+  content: "";
+}
 .hero-portrait.is-visible { clip-path: inset(0 0 0 0 round 50% 50% 0 0 / 20% 20% 0 0); }
-.hero-portrait picture, .hero-portrait img { width: 100%; height: 100%; }
-.hero-portrait img { object-fit: contain; object-position: center top; }
+.hero-portrait picture { position: relative; z-index: 1; display: grid; place-items: center; width: 100%; height: 100%; }
+.hero-portrait img { width: auto; height: 100%; max-width: 100%; object-fit: contain; object-position: center top; }
 .hero-body { grid-area: body; align-self: start; min-width: 0; max-width: 570px; }
 .hero-intro { margin-bottom: 24px; color: var(--muted); font-size: 16px; line-height: 1.7; }
 .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; }
@@ -650,4 +669,16 @@ button.contact-link { border: 0; padding: 0; background: transparent; }
   *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
   [data-reveal] { opacity: 1; transform: none; }
   .hero-portrait { clip-path: none; }
+}
+
+
+/* PR11 refinement: one real form + non-clickable temporary Telegram handle */
+.telegram-handle { display: inline-flex; min-height: 44px; align-items: center; color: var(--terracotta); font-family: var(--serif); font-size: 24px; }
+.contact-form-wrap { max-width: 560px; justify-self: end; }
+.contact-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 800px) { .contact-form-wrap { justify-self: stretch; } }
+@media (max-width: 620px) {
+  .hero-portrait { width: min(84vw, 330px); aspect-ratio: 4 / 5; justify-self: center; border-radius: 50% 50% 0 0 / 16% 16% 0 0; }
+  .hero-portrait img { height: 100%; width: auto; max-width: 100%; }
+  .contact-form { grid-template-columns: 1fr; }
 }

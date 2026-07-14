@@ -11,7 +11,7 @@
       error: "Не вдалося підготувати звернення. Напишіть на email.",
       invalid: "Перевірте, будь ласка, обов’язкові поля.",
       submit: "Надіслати звернення",
-      fields: { name: "Ім’я", reply: "Контакт", language: "Мова", message: "Повідомлення" }
+      fields: { name: "Ім’я", reply: "Контакт", channel: "Спосіб зв’язку", language: "Мова", format: "Формат", message: "Повідомлення" }
     },
     ru: {
       subject: "Обращение через сайт Алины Горб",
@@ -20,7 +20,7 @@
       error: "Не удалось подготовить обращение. Напишите на email.",
       invalid: "Проверьте, пожалуйста, обязательные поля.",
       submit: "Отправить обращение",
-      fields: { name: "Имя", reply: "Контакт", language: "Язык", message: "Сообщение" }
+      fields: { name: "Имя", reply: "Контакт", channel: "Способ связи", language: "Язык", format: "Формат", message: "Сообщение" }
     }
   };
 
@@ -137,7 +137,9 @@
       return {
         name: String(data.get("name") || "").trim(),
         reply: String(data.get("reply") || "").trim(),
+        channel: String(data.get("channel") || "").trim(),
         language: String(data.get("language") || "").trim(),
+        format: String(data.get("format") || "").trim(),
         message: String(data.get("message") || "").trim(),
         consent: data.get("consent") === "on",
         locale
@@ -149,7 +151,9 @@
       const body = [
         `${fields.name}: ${payload.name}`,
         `${fields.reply}: ${payload.reply}`,
+        `${fields.channel}: ${payload.channel}`,
         `${fields.language}: ${payload.language}`,
+        `${fields.format}: ${payload.format}`,
         "",
         `${fields.message}:`,
         payload.message
