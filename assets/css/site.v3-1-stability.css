@@ -167,6 +167,15 @@
   .article-body p,
   .article-body li { font-size: 17px; }
   .contact-form-wrap { padding: 22px 18px; }
+
+  .footer-main {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 12px 14px;
+    align-items: start;
+  }
+  .footer-brand { grid-column: 1; grid-row: 1; width: 104px; }
+  .footer-meta { grid-column: 2; grid-row: 1; align-self: center; justify-self: end; font-size: 12px; }
+  .footer-links { grid-column: 1 / -1; grid-row: 2; justify-content: flex-start; gap: 0 14px; font-size: 12px; }
 }
 
 @media (max-width: 520px) {
