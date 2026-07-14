@@ -159,12 +159,14 @@ h3 { line-height: 1.05; }
   gap: 8px;
   align-items: baseline;
   min-height: 24px;
-  color: var(--muted);
-  font-size: 9px;
+  color: #555750;
+  font-size: 12px;
+  line-height: 1.35;
+  letter-spacing: .015em;
   text-transform: uppercase;
   transition: color .2s ease;
 }
-.side-navigation b { color: var(--terracotta); font-size: 10px; font-weight: 500; }
+.side-navigation b { color: var(--terracotta); font-size: 12px; font-weight: 600; }
 .side-navigation a.is-active, .side-navigation a:hover { color: var(--graphite); }
 .hero-heading { grid-area: heading; align-self: end; min-width: 0; max-width: 590px; }
 .eyebrow {
@@ -198,21 +200,21 @@ h3 { line-height: 1.05; }
   position: absolute;
   z-index: -2;
   inset: -6%;
-  background: linear-gradient(rgba(21, 30, 18, .18), rgba(21, 30, 18, .18)), url("../images/portrait/alina-horb-portrait-hero-v3.webp") center / cover no-repeat;
-  filter: blur(18px) saturate(.82) brightness(.76);
-  transform: scale(1.08);
+  background: linear-gradient(rgba(30, 42, 27, .06), rgba(30, 42, 27, .06)), url("../images/portrait/alina-horb-portrait-hero-v3.webp") center / cover no-repeat;
+  filter: blur(12px) saturate(.96) brightness(.92);
+  transform: scale(1.045);
   content: "";
 }
 .hero-portrait::after {
   position: absolute;
   z-index: -1;
   inset: 0;
-  background: linear-gradient(90deg, rgba(26, 35, 23, .34), transparent 18%, transparent 82%, rgba(26, 35, 23, .34));
+  background: linear-gradient(90deg, rgba(29, 42, 26, .12), transparent 12%, transparent 88%, rgba(29, 42, 26, .12));
   content: "";
 }
 .hero-portrait.is-visible { clip-path: inset(0 0 0 0 round 50% 50% 0 0 / 20% 20% 0 0); }
-.hero-portrait picture { position: relative; z-index: 1; display: grid; place-items: center; width: 100%; height: 100%; }
-.hero-portrait img { width: auto; height: 100%; max-width: none; object-fit: contain; object-position: center top; }
+.hero-portrait picture { position: relative; z-index: 1; display: grid; place-items: start center; width: 100%; height: 100%; }
+.hero-portrait img { width: 80%; height: auto; max-width: none; object-fit: contain; object-position: center top; }
 .hero-body { grid-area: body; align-self: start; min-width: 0; max-width: 570px; }
 .hero-intro { margin-bottom: 24px; color: var(--muted); font-size: 16px; line-height: 1.7; }
 .hero-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; }
@@ -679,7 +681,7 @@ button.contact-link { border: 0; padding: 0; background: transparent; }
 @media (max-width: 800px) { .contact-form-wrap { justify-self: stretch; } }
 @media (max-width: 620px) {
   .hero-portrait { width: min(84vw, 330px); aspect-ratio: 4 / 5; justify-self: center; border-radius: 50% 50% 0 0 / 16% 16% 0 0; }
-  .hero-portrait img { height: 100%; width: auto; max-width: none; }
+  .hero-portrait img { width: 80%; height: auto; max-width: none; }
   .contact-form { grid-template-columns: 1fr; }
 }
 
