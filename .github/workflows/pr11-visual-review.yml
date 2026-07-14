@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - review/pr11-visual-qa
+  pull_request:
+    branches:
+      - feature/premium-editorial-v2
 
 permissions:
   contents: read
