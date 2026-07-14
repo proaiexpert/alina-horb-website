@@ -44,7 +44,7 @@ jobs:
       - name: Capture full pages
         run: |
           mkdir -p final-qa
-          cat > /tmp/capture.mjs <<'EOF'
+          cat > capture.mjs <<'EOF'
           import { chromium } from 'playwright';
           import fs from 'node:fs/promises';
 
@@ -92,7 +92,7 @@ jobs:
           await fs.writeFile('final-qa/report.json', JSON.stringify(report, null, 2));
           await fs.writeFile('final-qa/summary.txt', 'Full-page screenshots captured.\n');
           EOF
-          node /tmp/capture.mjs > final-qa/run.log 2>&1 || echo "Capture failed; inspect run.log" >> final-qa/summary.txt
+          node capture.mjs > final-qa/run.log 2>&1 || echo "Capture failed; inspect run.log" >> final-qa/summary.txt
           cp /tmp/alina-http.log final-qa/http.log || true
 
       - name: Upload QA artifact
