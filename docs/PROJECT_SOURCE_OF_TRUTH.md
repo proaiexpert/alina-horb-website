@@ -23,20 +23,43 @@
 - Consultation languages: Ukrainian and Russian.
 - Primary format: online consultations.
 - In-person consultations: possible only by prior agreement.
-- No city, address, Germany, or Khust may be published at this stage.
-- Online consultations are available regardless of country of residence, without using a loud “worldwide” marketing claim.
-- Current audience wording: adolescents, families, women, and men.
-- Do not add children, couples, groups, organizations, or clinical categories without separate confirmation.
+- No city, address, Germany, Khust, phone, WhatsApp, map or office hours may be published at this stage.
+- Audience wording: people of different ages, couples and families; work with minors is agreed separately.
 - Session duration: 50 minutes.
 - Price: 600 UAH for online and in-person formats.
 
+## Confirmed focus areas
+
+Use careful professional wording without diagnosis or treatment guarantees:
+
+- psychological support for people affected by war, including internally displaced persons;
+- acute and chronic stress;
+- panic attacks and their consequences;
+- anxiety states and psychological support with diagnosed anxiety disorders;
+- traumatic experience and PTSD symptoms;
+- intrusive thoughts, rituals and OCD manifestations;
+- domestic violence;
+- crises, relationships and family requests;
+- primary psychological support during acute stress;
+- repeated suicidal or self-harm thoughts with a clear emergency disclaimer.
+
+The website and form are not emergency services. When there is immediate danger, a concrete plan, or inability to remain safe, the user must be directed to local emergency or crisis services.
+
 ## Contact information
 
-- Temporary confirmed email: `alinahorb1991@gmail.com`.
-- Telegram is a planned channel, but the exact username is not confirmed.
-- Telegram must remain disabled/non-interactive until the exact username is supplied.
-- Phone, WhatsApp, address, map, city, and office hours are not published.
+- Email: `alinahorb1991@gmail.com`.
+- Telegram: `@alina_horb1991` / `https://t.me/alina_horb1991`.
+- Instagram: `@ng_alina_dp` / `https://instagram.com/ng_alina_dp`.
+- Telegram is the primary direct channel; Instagram and email are additional channels.
 - Shared contact configuration: `assets/js/site-config.v2.js`.
+
+## Portrait decisions for V3.1
+
+- Hero source: seated portrait with a book in a warm ivory interior.
+- About source: close portrait in an ivory blouse.
+- The two roles must remain distinct.
+- Old pink-shirt outdoor portraits are not used on the homepage after V3.1.
+- Do not generate or alter face, body, hair or clothing. Only crop, resize, compression and color management are allowed.
 
 ## Diploma safety
 
@@ -47,9 +70,10 @@
 ## Brand and design
 
 - Visual direction: Premium Editorial Sanctuary.
-- Approved portrait, arch composition, palette, typography, decorative system, and section rhythm remain locked.
+- Reference mix: Kinfolk for editorial structure, Oura for organic geometry and restrained motion, Portland Talk Club for psychological content clarity.
 - Ukrainian pages use the approved UA dark logo on light surfaces.
 - Russian pages use the approved RU dark logo on light surfaces.
+- Motion must remain restrained and respect `prefers-reduced-motion`.
 
 ## Domain and preview
 
