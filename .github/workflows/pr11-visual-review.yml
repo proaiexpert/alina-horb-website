@@ -45,7 +45,7 @@ jobs:
       - name: Capture visual review package
         run: |
           mkdir -p visual-review
-          cat > /tmp/visual-review.mjs <<'EOF'
+          cat > visual-review-runner.mjs <<'EOF'
           import { chromium, webkit } from 'playwright';
           import fs from 'node:fs/promises';
           import path from 'node:path';
@@ -171,7 +171,7 @@ jobs:
           }
           EOF
           set +e
-          node /tmp/visual-review.mjs > visual-review/run.log 2>&1
+          node visual-review-runner.mjs > visual-review/run.log 2>&1
           status=$?
           cat visual-review/run.log
           echo "$status" > visual-review/exit-code.txt
