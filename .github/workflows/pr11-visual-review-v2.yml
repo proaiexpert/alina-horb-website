@@ -1,13 +1,39 @@
-name: PR 11 Apply Refinement
+name: PR 11 Apply Portrait Contain Fix
 
 on:
-  workflow_dispatch:
+  push:
+    branches:
+      - review/pr11-visual-qa
 
 permissions:
   contents: write
 
 jobs:
-  refine:
+  fix:
     runs-on: ubuntu-latest
+    timeout-minutes: 8
     steps:
-      - run: echo "Refinement already applied to PR 11."
+      - name: Checkout review tools
+        uses: actions/checkout@v4
+        with:
+          ref: review/pr11-visual-qa
+          path: review-tools
+
+      - name: Checkout PR 11 branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/premium-editorial-v2
+          fetch-depth: 0
+          path: site
+
+      - name: Apply exact contain fix
+        run: python3 review-tools/scripts/fix-pr11-portrait-contain.py site
+
+      - name: Commit and push
+        working-directory: site
+        run: |
+          git config user.name "OpenAI Review Bot"
+          git config user.email "review-bot@users.noreply.github.com"
+          git add assets/css/site.v2.css
+          git commit -m "Fix full portrait containment in hero"
+          git push origin HEAD:feature/premium-editorial-v2
