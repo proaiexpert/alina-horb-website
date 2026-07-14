@@ -11,6 +11,6 @@ window.ALINA_SITE_CONFIG = {
 
   const stylesheet = document.createElement("link");
   stylesheet.rel = "stylesheet";
-  stylesheet.href = new URL("../css/site.v3-1-hotfix.css", script.src).href;
+  stylesheet.href = new URL("../css/site.v3-1-stability.css", script.src).href;
   document.head.appendChild(stylesheet);
 })();
