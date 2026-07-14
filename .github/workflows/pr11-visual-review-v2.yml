@@ -1,9 +1,7 @@
 name: PR 11 Apply Refinement
 
 on:
-  push:
-    branches:
-      - review/pr11-visual-qa
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -11,42 +9,5 @@ permissions:
 jobs:
   refine:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
     steps:
-      - name: Checkout review tools
-        uses: actions/checkout@v4
-        with:
-          ref: review/pr11-visual-qa
-          path: review-tools
-
-      - name: Checkout PR 11 branch
-        uses: actions/checkout@v4
-        with:
-          ref: feature/premium-editorial-v2
-          fetch-depth: 0
-          path: site
-
-      - name: Apply refinement
-        run: python3 review-tools/scripts/refine-pr11.py site
-
-      - name: Validate
-        working-directory: site
-        run: |
-          python3 scripts/validate-assets.py
-          grep -q 'alina-horb-portrait-hero-v3.webp' index.html
-          grep -q '@alina_horb' index.html
-          grep -q 'name="channel"' index.html
-          grep -q 'name="format"' ru/index.html
-
-      - name: Commit and push to PR 11 branch
-        working-directory: site
-        run: |
-          git config user.name "OpenAI Review Bot"
-          git config user.email "review-bot@users.noreply.github.com"
-          if git diff --quiet; then
-            echo "No changes required"
-            exit 0
-          fi
-          git add index.html ru/index.html assets/css/site.v2.css assets/js/site.v2.js
-          git commit -m "Refine portrait framing and unify contact form"
-          git push origin HEAD:feature/premium-editorial-v2
+      - run: echo "Refinement already applied to PR 11."
