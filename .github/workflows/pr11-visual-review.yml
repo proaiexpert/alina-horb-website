@@ -41,9 +41,10 @@ jobs:
           cat /tmp/alina-http.log
           exit 1
 
-      - name: Capture full pages
+      - name: Capture full pages and portrait assets
         run: |
-          mkdir -p final-qa
+          mkdir -p final-qa/portrait-assets
+          cp assets/images/portrait/* final-qa/portrait-assets/
           cat > capture.mjs <<'EOF'
           import { chromium } from 'playwright';
           import fs from 'node:fs/promises';
@@ -90,7 +91,7 @@ jobs:
           }
           await browser.close();
           await fs.writeFile('final-qa/report.json', JSON.stringify(report, null, 2));
-          await fs.writeFile('final-qa/summary.txt', 'Full-page screenshots captured.\n');
+          await fs.writeFile('final-qa/summary.txt', 'Full-page screenshots and portrait assets captured.\n');
           EOF
           node capture.mjs > final-qa/run.log 2>&1 || echo "Capture failed; inspect run.log" >> final-qa/summary.txt
           cp /tmp/alina-http.log final-qa/http.log || true
