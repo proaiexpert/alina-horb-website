@@ -717,3 +717,17 @@ button.contact-link { border: 0; padding: 0; background: transparent; }
     transform: translateX(-50%);
   }
 }
+
+
+.safety-notice {
+  grid-column: 1 / -1;
+  margin-top: 30px;
+  border: 1px solid rgba(198, 83, 63, .32);
+  padding: 22px 24px;
+  background: rgba(198, 83, 63, .055);
+  color: var(--muted);
+  font-size: 14px;
+  line-height: 1.75;
+}
+.safety-notice strong { color: var(--graphite); }
+@media (max-width: 700px) { .safety-notice { padding: 18px; font-size: 13px; } }
