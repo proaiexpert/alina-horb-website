@@ -36,7 +36,7 @@
 - Telegram is a planned channel, but the exact username is not confirmed.
 - Telegram must remain disabled/non-interactive until the exact username is supplied.
 - Phone, WhatsApp, address, map, city, and office hours are not published.
-- Shared contact configuration: `assets/js/site-config.js`.
+- Shared contact configuration: `assets/js/site-config.v2.js`.
 
 ## Diploma safety
 
