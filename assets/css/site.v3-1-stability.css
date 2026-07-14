@@ -1,0 +1,104 @@
+/* V3.1 stabilization: sticky boundaries, readability, footer, form and mobile polish. */
+
+/* Keep the crisis notice in the scrolling content column on desktop. */
+@media (min-width: 801px) {
+  .topics-layout > .safety-notice {
+    grid-column: 2;
+    margin-top: 4px;
+  }
+}
+
+/* Essential text must remain readable without weakening the editorial hierarchy. */
+.section-kicker,
+.eyebrow,
+.language-switch,
+.side-navigation a,
+.side-navigation b,
+.button,
+.text-link,
+.note-meta,
+.article-meta {
+  font-size: 13px;
+}
+
+.need-item p,
+.topic-row p {
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.topics-intro p,
+.section-heading-row > p,
+.contact-copy > p,
+.faq-answer > p {
+  font-size: 16px;
+  line-height: 1.75;
+}
+
+.about-portrait figcaption,
+.diploma-frame figcaption,
+.editorial-quote footer {
+  font-size: 13px;
+  line-height: 1.6;
+}
+
+.process-step h3 { font-size: 15px; }
+.process-step p { font-size: 14px; line-height: 1.65; }
+.article-body p,
+.article-body li { font-size: 18px; line-height: 1.85; }
+.article-aside p { font-size: 14px; line-height: 1.65; }
+
+.contact-list strong,
+.form-field label,
+.field-error,
+.form-consent,
+.form-status {
+  font-size: 13px;
+}
+
+.contact-note {
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+.safety-notice {
+  font-size: 15px;
+  line-height: 1.75;
+}
+
+.footer-links,
+.footer-meta,
+.footer-bottom {
+  font-size: 13px;
+}
+
+/* Sticky elements remain bounded by their own sections. */
+.topics-intro,
+.about-portrait,
+.article-aside {
+  top: 24px;
+}
+
+/* Mobile menu remains visually separated from content and easy to scan. */
+@media (max-width: 800px) {
+  .topics-layout > .safety-notice { grid-column: 1 / -1; }
+  .topics-intro,
+  .about-portrait,
+  .article-aside { position: static; }
+  .mobile-navigation {
+    box-shadow: 0 18px 34px rgba(47, 48, 45, .12);
+  }
+  .mobile-navigation a { font-size: 13px; }
+}
+
+@media (max-width: 620px) {
+  body { font-size: 16px; }
+  .hero-intro { font-size: 16px; }
+  .need-item p,
+  .topic-row p,
+  .process-step p,
+  .safety-notice { font-size: 15px; }
+  .article-body p,
+  .article-body li { font-size: 17px; }
+  .contact-form-wrap { padding: 22px 18px; }
+}
