@@ -68,6 +68,7 @@
     [text.notes, notesHref],
     [text.contact, `${homeHref}#contact`]
   ];
+  const desktopLinks = [links[0], links[1], links[4], links[5]];
 
   const languageSwitch = isRu
     ? `<div class="language-switch" aria-label="Выбор языка"><a href="${alternateHref}" lang="uk" hreflang="uk">UA</a><span aria-hidden="true">/</span><span aria-current="page">RU</span></div>`
@@ -83,7 +84,7 @@
           <img src="${logoUrl}" width="512" height="156" alt="${isRu ? "Алина Горб" : "Аліна Горб"}">
         </a>
         <nav class="inner-desktop-nav" aria-label="${text.nav}">
-          ${links.slice(0, 4).map(([label, href]) => `<a href="${href}">${label}</a>`).join("")}
+          ${desktopLinks.map(([label, href]) => `<a href="${href}">${label}</a>`).join("")}
         </nav>
         <div class="header-tools">
           ${languageSwitch}
