@@ -64,7 +64,7 @@ jobs:
             page.on('pageerror', e => errors.push(String(e)));
             const response = await page.goto('http://127.0.0.1:4173' + url, { waitUntil: 'networkidle' });
             await page.evaluate(async () => {
-              await document.fonts.ready;
+              if (document.fonts && document.fonts.ready) await document.fonts.ready;
               document.documentElement.style.scrollBehavior = 'auto';
               [...document.querySelectorAll('[data-reveal], .hero-portrait')].forEach(el => el.classList.add('is-visible'));
             });
@@ -92,7 +92,8 @@ jobs:
           await fs.writeFile('final-qa/report.json', JSON.stringify(report, null, 2));
           await fs.writeFile('final-qa/summary.txt', 'Full-page screenshots captured.\n');
           EOF
-          node /tmp/capture.mjs
+          node /tmp/capture.mjs > final-qa/run.log 2>&1 || echo "Capture failed; inspect run.log" >> final-qa/summary.txt
+          cp /tmp/alina-http.log final-qa/http.log || true
 
       - name: Upload QA artifact
         if: always()
