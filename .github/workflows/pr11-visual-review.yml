@@ -97,7 +97,7 @@ jobs:
                   badResponses.push({ status: response.status(), url: response.url() });
                 }
               });
-              const response = await page.goto(base + item.url, { waitUntil: 'networkidle' });
+              const response = await page.goto(base + item.url, { waitUntil: 'networkidle', timeout: 45000 });
               await page.evaluate(() => document.fonts?.ready);
               await page.waitForTimeout(300);
               const metrics = await page.evaluate(() => {
@@ -134,7 +134,7 @@ jobs:
                   hasTouch: Boolean(item.mobile),
                 });
                 const page = await context.newPage();
-                await page.goto(base + item.url, { waitUntil: 'networkidle' });
+                await page.goto(base + item.url, { waitUntil: 'networkidle', timeout: 45000 });
                 await page.evaluate(() => document.fonts?.ready);
                 await page.waitForTimeout(300);
                 const locator = page.locator(item.selector).first();
@@ -147,24 +147,35 @@ jobs:
             await browser.close();
           }
 
-          await inspect(chromium, 'chromium');
-          await inspect(webkit, 'webkit');
-          await fs.writeFile(path.join(out, 'report.json'), JSON.stringify(results, null, 2));
+          try {
+            await inspect(chromium, 'chromium');
+            await inspect(webkit, 'webkit');
+            await fs.writeFile(path.join(out, 'report.json'), JSON.stringify(results, null, 2));
 
-          const failures = results.filter(result =>
-            result.httpStatus !== 200 ||
-            result.consoleErrors.length ||
-            result.pageErrors.length ||
-            result.badResponses.length ||
-            result.brokenImages.length ||
-            result.horizontalOverflow > 1 ||
-            result.h1Count !== 1 ||
-            (result.id.includes('desktop') && result.contactFormWidth && result.contactFormWidth > 600)
-          );
-          await fs.writeFile(path.join(out, 'summary.txt'), failures.length ? JSON.stringify(failures, null, 2) : 'Automated visual checks passed.\n');
-          if (failures.length) process.exitCode = 1;
+            const failures = results.filter(result =>
+              result.httpStatus !== 200 ||
+              result.consoleErrors.length ||
+              result.pageErrors.length ||
+              result.badResponses.length ||
+              result.brokenImages.length ||
+              result.horizontalOverflow > 1 ||
+              result.h1Count !== 1 ||
+              (result.id.includes('desktop') && result.contactFormWidth && result.contactFormWidth > 600)
+            );
+            await fs.writeFile(path.join(out, 'summary.txt'), failures.length ? JSON.stringify(failures, null, 2) : 'Automated visual checks passed.\n');
+            if (failures.length) process.exitCode = 1;
+          } catch (error) {
+            await fs.writeFile(path.join(out, 'fatal.txt'), String(error?.stack || error));
+            console.error(error);
+            process.exitCode = 2;
+          }
           EOF
-          node /tmp/visual-review.mjs
+          set +e
+          node /tmp/visual-review.mjs > visual-review/run.log 2>&1
+          status=$?
+          cat visual-review/run.log
+          echo "$status" > visual-review/exit-code.txt
+          exit 0
 
       - name: Upload visual review package
         if: always()
