@@ -4,9 +4,14 @@
 
 | Production file | Source | Dimensions | Use | Status |
 |---|---|---:|---|---|
-| `assets/images/portrait/alina-horb-portrait-hero.jpg` (356,377 B) | `01_INPUT_ASSETS/portrait/originals/alina-horb-portrait-master.jpg` | 1200 × 2538 | Hero image, preload, Open Graph and Twitter metadata | Optimized public production derivative |
+| `assets/images/portrait/alina-horb-hero-v3-1-desktop.jpg` | `ALINA_HORB_HERO_SOURCE_V5.jpeg` | 900 × 1350 | Desktop/tablet Hero, Open Graph and Twitter metadata | Optimized public production derivative |
+| `assets/images/portrait/alina-horb-hero-v3-1-desktop.webp` | `ALINA_HORB_HERO_SOURCE_V5.jpeg` | 900 × 1350 | Preferred desktop/tablet Hero | Optimized public production derivative |
+| `assets/images/portrait/alina-horb-hero-v3-1-mobile.jpg` | `ALINA_HORB_HERO_SOURCE_V5.jpeg` | 800 × 1000 | Mobile Hero fallback | Optimized public production derivative |
+| `assets/images/portrait/alina-horb-hero-v3-1-mobile.webp` | `ALINA_HORB_HERO_SOURCE_V5.jpeg` | 800 × 1000 | Preferred mobile Hero | Optimized public production derivative |
+| `assets/images/portrait/alina-horb-about-v3-1.jpg` | `ALINA_HORB_ABOUT_SOURCE_V2.jpeg` | 900 × 1125 | About Alina fallback | Optimized public production derivative |
+| `assets/images/portrait/alina-horb-about-v3-1.webp` | `ALINA_HORB_ABOUT_SOURCE_V2.jpeg` | 900 × 1125 | Preferred About Alina portrait | Optimized public production derivative |
 
-The private source master (`1513 × 3200`) is **not included** in this repository. No generative reconstruction, face alteration, clothing recoloring, or beauty filtering was performed. Existing V2.1 arch geometry and `object-position` values were retained.
+The approved `1122 × 1402` source files remain in private Google Drive and are **not included** in this repository. The production derivatives were made only through crop, resize, compression and color management. No generative reconstruction or alteration of Alina's face, body, hair, hands, book or clothing was performed.
 
 ## Logo
 
@@ -24,4 +29,4 @@ Original, unredacted, private-master, and PDF diploma files are not included.
 ## Decorative assets
 
 - `assets/images/decorative/support-still-life.svg` — original project decorative still-life.
-- `assets/images/decorative/cta-vase.svg` — original project CTA decoration.
+- `assets/images/decorative/cta-vase.svg` remains in repository history but is not used by the V3.1 homepage.
