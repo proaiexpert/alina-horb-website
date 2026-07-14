@@ -1,0 +1,249 @@
+name: Refine PR 11 portrait and contact
+
+on:
+  push:
+    branches:
+      - review/pr11-visual-qa
+
+permissions:
+  contents: write
+
+jobs:
+  refine:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR 11 branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/premium-editorial-v2
+          fetch-depth: 0
+
+      - name: Apply approved portrait and single-form refinement
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          root = Path('.')
+
+          def replace_once(text, pattern, replacement, label, flags=0):
+              updated, count = re.subn(pattern, replacement, text, count=1, flags=flags)
+              if count != 1:
+                  raise SystemExit(f'{label}: expected 1 replacement, got {count}')
+              return updated
+
+          # ---------- UA ----------
+          ua_path = root / 'index.html'
+          ua = ua_path.read_text(encoding='utf-8')
+
+          ua = ua.replace(
+              '<meta property="og:image" content="https://proaiexpert.github.io/alina-horb-website/assets/images/portrait/alina-horb-portrait-v4-desktop.jpg">',
+              '<meta property="og:image" content="https://proaiexpert.github.io/alina-horb-website/assets/images/portrait/alina-horb-portrait-hero-v3.jpg">'
+          )
+          ua = ua.replace('<meta property="og:image:width" content="576">', '<meta property="og:image:width" content="1200">')
+          ua = ua.replace('<meta property="og:image:height" content="864">', '<meta property="og:image:height" content="2538">')
+          ua = ua.replace(
+              '<meta name="twitter:image" content="https://proaiexpert.github.io/alina-horb-website/assets/images/portrait/alina-horb-portrait-v4-desktop.jpg">',
+              '<meta name="twitter:image" content="https://proaiexpert.github.io/alina-horb-website/assets/images/portrait/alina-horb-portrait-hero-v3.jpg">'
+          )
+          ua = replace_once(
+              ua,
+              r'\s*<link rel="preload" as="image" href="assets/images/portrait/alina-horb-portrait-v4-desktop\.webp"[^>]*>\s*<link rel="preload" as="image" href="assets/images/portrait/alina-horb-portrait-v4-mobile\.webp"[^>]*>',
+              '\n  <link rel="preload" as="image" href="assets/images/portrait/alina-horb-portrait-hero-v3.webp" type="image/webp">',
+              'UA portrait preload',
+              re.S,
+          )
+          ua = replace_once(
+              ua,
+              r'<figure class="hero-portrait">.*?</figure>',
+              '''<figure class="hero-portrait">
+        <picture>
+          <source srcset="assets/images/portrait/alina-horb-portrait-hero-v3.webp" type="image/webp">
+          <img src="assets/images/portrait/alina-horb-portrait-hero-v3.jpg" width="1200" height="2538" alt="Портрет психолога Аліни Горб" fetchpriority="high">
+        </picture>
+      </figure>''',
+              'UA hero portrait',
+              re.S,
+          )
+          ua = ua.replace(
+              'Напишіть коротко у формі або на email. Telegram стане активним після підтвердження username.',
+              'Напишіть коротко через форму, у Telegram або на email.'
+          )
+          ua_contact = '''<section class="contact-section section-block" id="contact" aria-labelledby="contact-title">
+      <div class="page-shell contact-layout">
+        <div class="contact-copy" data-reveal>
+          <p class="section-kicker">Перший крок</p>
+          <h2 id="contact-title">Контакти і запис</h2>
+          <p>Одна коротка форма допоможе узгодити зручний спосіб зв’язку, мову та формат консультації.</p>
+          <ul class="contact-list">
+            <li><strong>Telegram</strong><span class="telegram-handle" aria-label="Тимчасовий Telegram username">@alina_horb</span></li>
+            <li><strong>Email</strong><a class="contact-link" href="mailto:alinahorb1991@gmail.com">alinahorb1991@gmail.com</a></li>
+            <li><strong>Що буде далі</strong><span>Аліна відповість, уточнить організаційні деталі та запропонує доступний час.</span></li>
+          </ul>
+          <p class="contact-note">Не надсилайте у першому повідомленні медичні документи, кризові подробиці або інші чутливі дані.</p>
+        </div>
+        <div class="contact-form-wrap" data-reveal>
+          <h3>Коротке звернення</h3>
+          <form class="contact-form" data-contact-form data-locale="uk" novalidate>
+            <div class="form-field"><label for="contact-name">Ім’я</label><input id="contact-name" name="name" type="text" autocomplete="name" required maxlength="100"></div>
+            <div class="form-field"><label for="contact-reply">Ваш контакт</label><input id="contact-reply" name="reply" type="text" autocomplete="off" required maxlength="160" placeholder="@username або email"></div>
+            <div class="form-field"><label for="contact-channel">Як зручно відповісти</label><select id="contact-channel" name="channel" required><option value="" selected disabled>Оберіть спосіб</option><option value="Telegram">Telegram</option><option value="Email">Email</option></select></div>
+            <div class="form-field"><label for="contact-language">Зручна мова</label><select id="contact-language" name="language" required><option value="" selected disabled>Оберіть мову</option><option value="Українська">Українська</option><option value="Російська">Російська</option></select></div>
+            <div class="form-field form-field-full"><label for="contact-format">Бажаний формат</label><select id="contact-format" name="format" required><option value="" selected disabled>Оберіть формат</option><option value="Онлайн">Онлайн</option><option value="Очно за попереднім погодженням">Очно за попереднім погодженням</option></select></div>
+            <div class="form-field form-field-full"><label for="contact-message">Коротко про запит або запитання</label><textarea id="contact-message" name="message" required maxlength="1200"></textarea></div>
+            <label class="form-consent" for="contact-consent"><input id="contact-consent" name="consent" type="checkbox" required><span>Я погоджуюся на надсилання цього звернення та обробку вказаних контактних даних для відповіді.</span></label>
+            <div class="form-actions"><button class="button button-filled" type="submit">Надіслати звернення</button></div>
+            <p class="form-status" data-form-status data-state="idle" aria-live="polite"></p>
+          </form>
+        </div>
+      </div>
+    </section>'''
+          ua = replace_once(ua, r'<section class="contact-section section-block" id="contact".*?</section>', ua_contact, 'UA contact section', re.S)
+          ua_path.write_text(ua, encoding='utf-8')
+
+          # ---------- RU ----------
+          ru_path = root / 'ru' / 'index.html'
+          ru = ru_path.read_text(encoding='utf-8')
+
+          ru = ru.replace(
+              'https://proaiexpert.github.io/alina-horb-website/assets/images/portrait/alina-horb-portrait-v4-desktop.jpg',
+              'https://proaiexpert.github.io/alina-horb-website/assets/images/portrait/alina-horb-portrait-hero-v3.jpg'
+          )
+          ru = ru.replace('content="576"><meta property="og:image:height" content="864"', 'content="1200"><meta property="og:image:height" content="2538"')
+          ru = replace_once(
+              ru,
+              r'<link rel="preload" as="image" href="\.\./assets/images/portrait/alina-horb-portrait-v4-desktop\.webp"[^>]*><link rel="preload" as="image" href="\.\./assets/images/portrait/alina-horb-portrait-v4-mobile\.webp"[^>]*>',
+              '<link rel="preload" as="image" href="../assets/images/portrait/alina-horb-portrait-hero-v3.webp" type="image/webp">',
+              'RU portrait preload',
+              re.S,
+          )
+          ru = replace_once(
+              ru,
+              r'<figure class="hero-portrait">.*?</figure>',
+              '<figure class="hero-portrait"><picture><source srcset="../assets/images/portrait/alina-horb-portrait-hero-v3.webp" type="image/webp"><img src="../assets/images/portrait/alina-horb-portrait-hero-v3.jpg" width="1200" height="2538" alt="Портрет психолога Алины Горб" fetchpriority="high"></picture></figure>',
+              'RU hero portrait',
+              re.S,
+          )
+          ru = ru.replace(
+              'Напишите коротко в форме или на email. Telegram станет активным после подтверждения username.',
+              'Напишите коротко через форму, в Telegram или на email.'
+          )
+          ru_contact = '''<section class="contact-section section-block" id="contact" aria-labelledby="contact-title"><div class="page-shell contact-layout">
+          <div class="contact-copy" data-reveal><p class="section-kicker">Первый шаг</p><h2 id="contact-title">Контакты и запись</h2><p>Одна короткая форма поможет согласовать удобный способ связи, язык и формат консультации.</p><ul class="contact-list"><li><strong>Telegram</strong><span class="telegram-handle" aria-label="Временный Telegram username">@alina_horb</span></li><li><strong>Email</strong><a class="contact-link" href="mailto:alinahorb1991@gmail.com">alinahorb1991@gmail.com</a></li><li><strong>Что будет дальше</strong><span>Алина ответит, уточнит организационные детали и предложит доступное время.</span></li></ul><p class="contact-note">Не отправляйте в первом сообщении медицинские документы, кризисные подробности или другие чувствительные данные.</p></div>
+          <div class="contact-form-wrap" data-reveal><h3>Короткое обращение</h3><form class="contact-form" data-contact-form data-locale="ru" novalidate><div class="form-field"><label for="contact-name-ru">Имя</label><input id="contact-name-ru" name="name" type="text" autocomplete="name" required maxlength="100"></div><div class="form-field"><label for="contact-reply-ru">Ваш контакт</label><input id="contact-reply-ru" name="reply" type="text" autocomplete="off" required maxlength="160" placeholder="@username или email"></div><div class="form-field"><label for="contact-channel-ru">Как удобно ответить</label><select id="contact-channel-ru" name="channel" required><option value="" selected disabled>Выберите способ</option><option value="Telegram">Telegram</option><option value="Email">Email</option></select></div><div class="form-field"><label for="contact-language-ru">Удобный язык</label><select id="contact-language-ru" name="language" required><option value="" selected disabled>Выберите язык</option><option value="Русский">Русский</option><option value="Украинский">Украинский</option></select></div><div class="form-field form-field-full"><label for="contact-format-ru">Предпочтительный формат</label><select id="contact-format-ru" name="format" required><option value="" selected disabled>Выберите формат</option><option value="Онлайн">Онлайн</option><option value="Очно по предварительному согласованию">Очно по предварительному согласованию</option></select></div><div class="form-field form-field-full"><label for="contact-message-ru">Коротко о запросе или вопросе</label><textarea id="contact-message-ru" name="message" required maxlength="1200"></textarea></div><label class="form-consent" for="contact-consent-ru"><input id="contact-consent-ru" name="consent" type="checkbox" required><span>Я соглашаюсь на отправку этого обращения и обработку указанных контактных данных для ответа.</span></label><div class="form-actions"><button class="button button-filled" type="submit">Отправить обращение</button></div><p class="form-status" data-form-status data-state="idle" aria-live="polite"></p></form></div>
+        </div></section>'''
+          ru = replace_once(ru, r'<section class="contact-section section-block" id="contact".*?</section>', ru_contact, 'RU contact section', re.S)
+          ru_path.write_text(ru, encoding='utf-8')
+
+          # ---------- CSS ----------
+          css_path = root / 'assets' / 'css' / 'site.v2.css'
+          css = css_path.read_text(encoding='utf-8')
+          if '[hidden] { display: none !important; }' not in css:
+              css = css.replace('* { box-sizing: border-box; }', '* { box-sizing: border-box; }\n[hidden] { display: none !important; }')
+
+          portrait_css = '''.hero-portrait {
+  grid-area: portrait;
+  align-self: center;
+  position: relative;
+  isolation: isolate;
+  width: 100%;
+  aspect-ratio: 2 / 3;
+  overflow: hidden;
+  border-radius: 50% 50% 0 0 / 20% 20% 0 0;
+  background: #263021;
+  clip-path: inset(0 0 100% 0 round 50% 50% 0 0 / 20% 20% 0 0);
+  transition: clip-path 1.1s var(--ease);
+}
+.hero-portrait::before {
+  position: absolute;
+  z-index: -2;
+  inset: -6%;
+  background: linear-gradient(rgba(21, 30, 18, .18), rgba(21, 30, 18, .18)), url("../images/portrait/alina-horb-portrait-hero-v3.webp") center / cover no-repeat;
+  filter: blur(18px) saturate(.82) brightness(.76);
+  transform: scale(1.08);
+  content: "";
+}
+.hero-portrait::after {
+  position: absolute;
+  z-index: -1;
+  inset: 0;
+  background: linear-gradient(90deg, rgba(26, 35, 23, .34), transparent 18%, transparent 82%, rgba(26, 35, 23, .34));
+  content: "";
+}
+.hero-portrait.is-visible { clip-path: inset(0 0 0 0 round 50% 50% 0 0 / 20% 20% 0 0); }
+.hero-portrait picture { position: relative; z-index: 1; display: grid; place-items: center; width: 100%; height: 100%; }
+.hero-portrait img { width: auto; height: 100%; max-width: 100%; object-fit: contain; object-position: center top; }
+.hero-body {'''
+          css = replace_once(css, r'\.hero-portrait \{.*?\.hero-body \{', portrait_css, 'portrait CSS', re.S)
+
+          css += '''
+
+/* PR11 refinement: one real form + non-clickable temporary Telegram handle */
+.telegram-handle {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  color: var(--terracotta);
+  font-family: var(--serif);
+  font-size: 24px;
+}
+.contact-form-wrap { max-width: 560px; justify-self: end; }
+.contact-form { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 800px) {
+  .contact-form-wrap { justify-self: stretch; }
+}
+@media (max-width: 620px) {
+  .hero-portrait {
+    width: min(84vw, 330px);
+    aspect-ratio: 4 / 5;
+    justify-self: center;
+    border-radius: 50% 50% 0 0 / 16% 16% 0 0;
+  }
+  .hero-portrait img { height: 100%; width: auto; max-width: 100%; }
+  .contact-form { grid-template-columns: 1fr; }
+}
+'''
+          css_path.write_text(css, encoding='utf-8')
+
+          # ---------- JS ----------
+          js_path = root / 'assets' / 'js' / 'site.v2.js'
+          js = js_path.read_text(encoding='utf-8')
+          js = js.replace(
+              'fields: { name: "Ім’я", reply: "Контакт", language: "Мова", message: "Повідомлення" }',
+              'fields: { name: "Ім’я", reply: "Контакт", channel: "Спосіб зв’язку", language: "Мова", format: "Формат", message: "Повідомлення" }'
+          )
+          js = js.replace(
+              'fields: { name: "Имя", reply: "Контакт", language: "Язык", message: "Сообщение" }',
+              'fields: { name: "Имя", reply: "Контакт", channel: "Способ связи", language: "Язык", format: "Формат", message: "Сообщение" }'
+          )
+          js = js.replace(
+              'reply: String(data.get("reply") || "").trim(),\n        language: String(data.get("language") || "").trim(),',
+              'reply: String(data.get("reply") || "").trim(),\n        channel: String(data.get("channel") || "").trim(),\n        language: String(data.get("language") || "").trim(),\n        format: String(data.get("format") || "").trim(),'
+          )
+          js = js.replace(
+              '`${fields.reply}: ${payload.reply}`,\n        `${fields.language}: ${payload.language}`,',
+              '`${fields.reply}: ${payload.reply}`,\n        `${fields.channel}: ${payload.channel}`,\n        `${fields.language}: ${payload.language}`,\n        `${fields.format}: ${payload.format}`,'
+          )
+          js_path.write_text(js, encoding='utf-8')
+          PY
+
+      - name: Validate
+        run: |
+          python3 scripts/validate-assets.py
+          grep -q 'alina-horb-portrait-hero-v3.webp' index.html
+          grep -q '@alina_horb' index.html
+          grep -q 'name="channel"' index.html
+          grep -q 'name="format"' ru/index.html
+
+      - name: Commit and push to PR 11 branch
+        run: |
+          git config user.name "OpenAI Review Bot"
+          git config user.email "review-bot@users.noreply.github.com"
+          if git diff --quiet; then
+            echo "No changes required"
+            exit 0
+          fi
+          git add index.html ru/index.html assets/css/site.v2.css assets/js/site.v2.js
+          git commit -m "Refine portrait framing and unify contact form"
+          git push origin HEAD:feature/premium-editorial-v2
