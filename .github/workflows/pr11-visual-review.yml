@@ -1,0 +1,173 @@
+name: PR 11 Visual Review
+
+on:
+  push:
+    branches:
+      - review/pr11-visual-qa
+
+permissions:
+  contents: read
+
+jobs:
+  visual-review:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout review branch
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.52.0
+          npx playwright install --with-deps chromium webkit
+
+      - name: Start local site
+        run: |
+          python3 -m http.server 4173 > /tmp/alina-http.log 2>&1 &
+          echo $! > /tmp/alina-http.pid
+          for i in {1..30}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/alina-http.log
+          exit 1
+
+      - name: Capture visual review package
+        run: |
+          mkdir -p visual-review
+          cat > /tmp/visual-review.mjs <<'EOF'
+          import { chromium, webkit } from 'playwright';
+          import fs from 'node:fs/promises';
+          import path from 'node:path';
+
+          const base = 'http://127.0.0.1:4173';
+          const out = path.resolve('visual-review');
+          const results = [];
+
+          const pages = [
+            { id: 'ua-desktop-1440', url: '/', width: 1440, height: 1000, fullPage: true },
+            { id: 'ua-laptop-1280', url: '/', width: 1280, height: 900, fullPage: true },
+            { id: 'ua-mobile-390', url: '/', width: 390, height: 844, fullPage: true, mobile: true },
+            { id: 'ru-desktop-1440', url: '/ru/', width: 1440, height: 1000, fullPage: true },
+            { id: 'ru-mobile-390', url: '/ru/', width: 390, height: 844, fullPage: true, mobile: true },
+          ];
+
+          const sections = [
+            { id: 'ua-hero-desktop', url: '/', width: 1440, height: 1000, selector: '.hero' },
+            { id: 'ua-hero-mobile', url: '/', width: 390, height: 844, selector: '.hero', mobile: true },
+            { id: 'ru-hero-desktop', url: '/ru/', width: 1440, height: 1000, selector: '.hero' },
+            { id: 'notes-desktop', url: '/', width: 1440, height: 1000, selector: '#notes' },
+            { id: 'notes-mobile', url: '/', width: 390, height: 844, selector: '#notes', mobile: true },
+            { id: 'contact-desktop', url: '/', width: 1440, height: 1000, selector: '#contact' },
+            { id: 'contact-mobile', url: '/', width: 390, height: 844, selector: '#contact', mobile: true },
+            { id: 'ua-article', url: '/notes/when-coping-stops-helping/', width: 1280, height: 900, selector: 'main' },
+            { id: 'ru-article', url: '/ru/notes/when-coping-stops-helping/', width: 1280, height: 900, selector: 'main' },
+          ];
+
+          async function inspect(browserType, browserName) {
+            const browser = await browserType.launch();
+            const browserDir = path.join(out, browserName);
+            await fs.mkdir(browserDir, { recursive: true });
+
+            for (const item of pages) {
+              const context = await browser.newContext({
+                viewport: { width: item.width, height: item.height },
+                deviceScaleFactor: 1,
+                isMobile: Boolean(item.mobile),
+                hasTouch: Boolean(item.mobile),
+              });
+              const page = await context.newPage();
+              const consoleErrors = [];
+              const pageErrors = [];
+              const badResponses = [];
+              page.on('console', msg => { if (msg.type() === 'error') consoleErrors.push(msg.text()); });
+              page.on('pageerror', err => pageErrors.push(String(err)));
+              page.on('response', response => {
+                if (response.url().startsWith(base) && response.status() >= 400) {
+                  badResponses.push({ status: response.status(), url: response.url() });
+                }
+              });
+              const response = await page.goto(base + item.url, { waitUntil: 'networkidle' });
+              await page.evaluate(() => document.fonts?.ready);
+              await page.waitForTimeout(300);
+              const metrics = await page.evaluate(() => {
+                const doc = document.documentElement;
+                const heroImage = document.querySelector('.hero-portrait img');
+                const form = document.querySelector('.contact-form-wrap');
+                const brokenImages = [...document.images].filter(img => !img.complete || img.naturalWidth === 0).map(img => img.currentSrc || img.src);
+                return {
+                  title: document.title,
+                  statusPath: location.pathname,
+                  h1Count: document.querySelectorAll('h1').length,
+                  horizontalOverflow: Math.max(doc.scrollWidth, document.body.scrollWidth) - window.innerWidth,
+                  brokenImages,
+                  heroImage: heroImage ? {
+                    currentSrc: heroImage.currentSrc,
+                    naturalWidth: heroImage.naturalWidth,
+                    naturalHeight: heroImage.naturalHeight,
+                    rendered: heroImage.getBoundingClientRect().toJSON(),
+                  } : null,
+                  contactFormWidth: form ? Math.round(form.getBoundingClientRect().width) : null,
+                };
+              });
+              await page.screenshot({ path: path.join(browserDir, `${item.id}.png`), fullPage: true });
+              results.push({ browser: browserName, id: item.id, httpStatus: response?.status() ?? null, consoleErrors, pageErrors, badResponses, ...metrics });
+              await context.close();
+            }
+
+            if (browserName === 'chromium') {
+              for (const item of sections) {
+                const context = await browser.newContext({
+                  viewport: { width: item.width, height: item.height },
+                  deviceScaleFactor: 1,
+                  isMobile: Boolean(item.mobile),
+                  hasTouch: Boolean(item.mobile),
+                });
+                const page = await context.newPage();
+                await page.goto(base + item.url, { waitUntil: 'networkidle' });
+                await page.evaluate(() => document.fonts?.ready);
+                await page.waitForTimeout(300);
+                const locator = page.locator(item.selector).first();
+                await locator.scrollIntoViewIfNeeded();
+                await locator.screenshot({ path: path.join(browserDir, `${item.id}.png`) });
+                await context.close();
+              }
+            }
+
+            await browser.close();
+          }
+
+          await inspect(chromium, 'chromium');
+          await inspect(webkit, 'webkit');
+          await fs.writeFile(path.join(out, 'report.json'), JSON.stringify(results, null, 2));
+
+          const failures = results.filter(result =>
+            result.httpStatus !== 200 ||
+            result.consoleErrors.length ||
+            result.pageErrors.length ||
+            result.badResponses.length ||
+            result.brokenImages.length ||
+            result.horizontalOverflow > 1 ||
+            result.h1Count !== 1 ||
+            (result.id.includes('desktop') && result.contactFormWidth && result.contactFormWidth > 600)
+          );
+          await fs.writeFile(path.join(out, 'summary.txt'), failures.length ? JSON.stringify(failures, null, 2) : 'Automated visual checks passed.\n');
+          if (failures.length) process.exitCode = 1;
+          EOF
+          node /tmp/visual-review.mjs
+
+      - name: Upload visual review package
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pr11-visual-review
+          path: visual-review
+          if-no-files-found: error
+          retention-days: 7
