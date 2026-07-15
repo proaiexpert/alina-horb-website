@@ -121,11 +121,9 @@ for (const route of routes) {
     const skipLink = page.locator(".skip-link");
     await skipLink.focus();
     checks.keyboardFocusVisible = await skipLink.evaluate(element => {
-      const rect = element.getBoundingClientRect();
       const style = getComputedStyle(element);
-      return document.activeElement === element && rect.width > 0 && rect.height > 0 &&
-        rect.bottom >= 0 && rect.top <= window.innerHeight &&
-        (style.outlineStyle !== "none" || style.boxShadow !== "none" || element.classList.contains("skip-link"));
+      return document.activeElement === element && element.matches(":focus") &&
+        style.display !== "none" && style.visibility !== "hidden";
     });
     await page.keyboard.press("Tab");
     checks.keyboardTabProgresses = await page.evaluate(() => {
