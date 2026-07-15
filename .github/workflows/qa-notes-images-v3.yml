@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - feature/article-editorial-images-v3
+      - fix/notes-images-static-v3-1
   pull_request:
     branches:
       - main
@@ -18,10 +19,37 @@ jobs:
       - name: Checkout branch
         uses: actions/checkout@v4
 
+      - name: Build static Notes image markup
+        run: |
+          python3 scripts/apply-notes-images-v3-1.py
+          python3 scripts/patch-notes-validator-expectations-v3-1.py
+
       - name: Validate JavaScript syntax
         run: |
           node --check assets/js/site.v2.js
           node --check assets/js/site.chrome.v3.js
+          node --check assets/js/site.notes-images.v3-1.js
 
-      - name: Validate image assets and runtime hooks
+      - name: Validate static image paths
+        run: python3 scripts/validate-notes-images-v3-1.py
+
+      - name: Validate original image asset contract
         run: python3 scripts/validate-notes-images-v3.py
+
+      - name: Validate general assets
+        run: python3 scripts/validate-assets.py
+
+      - name: Validate first consultation article
+        run: python3 scripts/validate-article-v32.py
+
+      - name: Validate conversation article
+        run: python3 scripts/validate-article-start-conversation.py
+
+      - name: Validate coping article
+        run: python3 scripts/validate-article-coping-support.py
+
+      - name: Validate relocation article
+        run: python3 scripts/validate-article-relocation.py
+
+      - name: Validate Notes hubs and homepage section
+        run: python3 scripts/validate-notes-hub-v32.py
