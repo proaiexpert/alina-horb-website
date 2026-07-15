@@ -2,13 +2,17 @@
   const script = document.currentScript;
   if (!script) return;
 
-  const cssUrl = new URL("../css/site.chrome.v3.css", script.src).href;
-  if (!document.querySelector(`link[href="${cssUrl}"]`)) {
+  const appendStylesheet = (relativePath) => {
+    const href = new URL(relativePath, script.src).href;
+    if (document.querySelector(`link[href="${href}"]`)) return;
     const stylesheet = document.createElement("link");
     stylesheet.rel = "stylesheet";
-    stylesheet.href = cssUrl;
+    stylesheet.href = href;
     document.head.appendChild(stylesheet);
-  }
+  };
+
+  appendStylesheet("../css/site.chrome.v3.css");
+  appendStylesheet("../css/site.footer.v3-2.css");
 
   const faviconUrl = new URL("../images/logos/favicon-ag.svg", script.src).href;
   let favicon = document.querySelector('link[rel~="icon"]');
