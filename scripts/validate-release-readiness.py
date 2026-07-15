@@ -91,8 +91,10 @@ for css_relative in ("assets/css/site.v2.css", "assets/css/site.v3-1.css"):
     require(".skip-link:focus" in css and "translateY(0)" in css, f"{css_relative}: skip-link focus reveal missing")
 
 config = (ROOT / "assets/js/site-config.v2.js").read_text(encoding="utf-8")
-require("appendStylesheet" not in config and "createElement(\"link\")" not in config, "site-config: runtime CSS/favicon injection remains")
-require('formEndpoint: ""' in config and 'formMode: "mailto"' in config, "site-config: unapproved form endpoint or fallback mode")
+require("appendStylesheet" not in config and 'createElement("link")' not in config, "site-config: runtime CSS/favicon injection remains")
+require('formEndpoint: "https://formspree.io/f/mvzezana"' in config, "site-config: approved Formspree endpoint missing")
+require('formMode: "formspree"' in config, "site-config: production form mode missing")
+require('turnstileSiteKey: ""' in config, "site-config: Turnstile gate changed before public key approval")
 require('email: "hello@alinahorb.com"' in config, "site-config: public email mismatch")
 
 sitemap_path = ROOT / "sitemap.xml"
@@ -124,4 +126,4 @@ if errors:
         print(f"- {error}")
     raise SystemExit(1)
 
-print(f"Release readiness validation passed for {len(ROUTES)} routes")
+print(f"Release readiness validation passed for {len(ROUTES)} routes; indexing remains gated")
