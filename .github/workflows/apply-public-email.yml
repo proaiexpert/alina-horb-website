@@ -1,0 +1,40 @@
+name: Apply branded public email
+
+on:
+  push:
+    branches:
+      - feature/v32-privacy-intake
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/v32-privacy-intake
+          fetch-depth: 0
+
+      - name: Replace legacy public email
+        run: python3 scripts/apply-public-email.py
+
+      - name: Validate canonical public email
+        run: python3 scripts/validate-public-email.py
+
+      - name: Commit migration
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          if git diff --cached --quiet; then
+            echo "No email changes to commit."
+            exit 0
+          fi
+          git commit -m "Use hello@alinahorb.com across the site"
+          git push origin HEAD:feature/v32-privacy-intake
