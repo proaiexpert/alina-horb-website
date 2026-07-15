@@ -9,7 +9,7 @@ on:
       - main
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   coping-support-article-qa:
@@ -20,6 +20,10 @@ jobs:
         uses: actions/checkout@v4
         with:
           ref: feature/v32-article-coping-support
+          fetch-depth: 0
+
+      - name: Normalize final direct answer
+        run: python3 scripts/apply-v32-article-coping-support.py
 
       - name: Validate production contracts
         run: |
@@ -52,3 +56,18 @@ jobs:
           name: v32-article-coping-support-qa
           path: qa-artifacts/article-coping-support
           if-no-files-found: error
+
+      - name: Commit normalized production page
+        if: github.event_name == 'push' && success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add ru/notes/when-coping-stops-helping/index.html
+          if git diff --cached --quiet; then
+            echo "No normalization changes to commit."
+            exit 0
+          fi
+          git commit -m "Normalize Russian direct answer in third article"
+          git push origin HEAD:feature/v32-article-coping-support
