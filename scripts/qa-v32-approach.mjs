@@ -34,6 +34,7 @@ for (const [viewportName, viewport] of viewports) {
       const duplicateIds = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
       const about = document.querySelector("#about");
       const text = about?.innerText ?? "";
+      const bodyText = document.body.innerText.toLowerCase();
       const isRu = document.documentElement.lang.startsWith("ru");
       const expected = isRu
         ? ["Подход в работе", "Клиент-центрированный подход", "Гештальт-инструменты и метафорические карты", "Вера, ценности и поиск смысла", "Алина Горб · о внутренней опоре"]
@@ -46,20 +47,21 @@ for (const [viewportName, viewport] of viewports) {
         duplicateIds,
         methodCount: document.querySelectorAll(".approach-method").length,
         topicCount: document.querySelectorAll("#topics .topic-row").length,
+        principleCount: document.querySelectorAll(".principles-list > li").length,
         missing,
         pageOverflow: document.documentElement.scrollWidth > window.innerWidth + 1,
         aboutOverflow,
         innerWidth: window.innerWidth,
         innerHeight: window.innerHeight,
         noindex: Boolean(document.querySelector('meta[name="robots"][content="noindex, nofollow"]')),
-        supervisionClaim: document.body.innerText.toLowerCase().includes("регулярна супервізія") || document.body.innerText.toLowerCase().includes("регулярная супервизия")
+        supervisionClaim: bodyText.includes("супервізія") || bodyText.includes("супервизия")
       };
     });
 
     const screenshot = `${outputDir}/${language}-${viewportName}.png`;
     await about.screenshot({ path: screenshot });
     const correctViewport = checks.innerWidth === viewport.width && checks.innerHeight === viewport.height;
-    const ok = Boolean(response?.ok()) && correctViewport && checks.h1Count === 1 && checks.duplicateIds.length === 0 && checks.methodCount === 3 && checks.topicCount === 10 && checks.missing.length === 0 && !checks.pageOverflow && !checks.aboutOverflow && checks.noindex && !checks.supervisionClaim && consoleErrors.length === 0;
+    const ok = Boolean(response?.ok()) && correctViewport && checks.h1Count === 1 && checks.duplicateIds.length === 0 && checks.methodCount === 3 && checks.topicCount === 10 && checks.principleCount === 4 && checks.missing.length === 0 && !checks.pageOverflow && !checks.aboutOverflow && checks.noindex && !checks.supervisionClaim && consoleErrors.length === 0;
     if (!ok) failed = true;
     report.push({ language, route, viewportName, expectedViewport: viewport, status: response?.status(), correctViewport, ok, consoleErrors, ...checks, screenshot });
     await page.close();
