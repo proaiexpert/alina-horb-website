@@ -13,3 +13,5 @@ Approved scope for Issue #26:
 UA social line: `Онлайн-консультації українською та російською`.
 
 RU social line: `Онлайн-консультации на русском и украинском`.
+
+Implementation status: active.
