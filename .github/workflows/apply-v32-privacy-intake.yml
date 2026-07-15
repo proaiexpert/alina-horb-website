@@ -47,6 +47,7 @@ jobs:
         run: node scripts/qa-v32-privacy-intake.mjs
 
       - name: Upload privacy and intake QA
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: v32-privacy-intake-qa
@@ -54,7 +55,7 @@ jobs:
           if-no-files-found: error
 
       - name: Commit production markup
-        if: github.event_name == 'push'
+        if: github.event_name == 'push' && success()
         shell: bash
         run: |
           set -euo pipefail
