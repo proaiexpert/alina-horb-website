@@ -32,6 +32,7 @@ jobs:
           python3 scripts/validate-social-previews.py
           python3 scripts/validate-public-email.py
           python3 scripts/validate-privacy-intake.py
+          python3 scripts/validate-article-v32.py
 
       - name: Prepare public site artifact
         shell: bash
@@ -53,9 +54,11 @@ jobs:
           test -f _site/index.html
           test -f _site/favicon.svg
           test -f _site/notes/index.html
+          test -f _site/notes/first-consultation/index.html
           test -f _site/privacy/index.html
           test -f _site/ru/index.html
           test -f _site/ru/notes/index.html
+          test -f _site/ru/notes/first-consultation/index.html
           test -f _site/ru/privacy/index.html
 
       - name: Configure GitHub Pages
