@@ -32,6 +32,7 @@ jobs:
           python3 scripts/validate-social-previews.py
           python3 scripts/validate-public-email.py
           python3 scripts/validate-privacy-intake.py
+          python3 scripts/validate-form-hardening.py
           python3 scripts/validate-article-v32.py
           python3 scripts/validate-article-start-conversation.py
           python3 scripts/validate-article-coping-support.py
