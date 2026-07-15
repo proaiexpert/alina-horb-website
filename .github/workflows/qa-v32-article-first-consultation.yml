@@ -22,7 +22,7 @@ jobs:
           ref: feature/v32-article-first-consultation
           fetch-depth: 0
 
-      - name: Apply final direct-answer normalization
+      - name: Apply final direct-answer and figure normalization
         run: python3 scripts/apply-v32-article-first-consultation.py
 
       - name: Validate production contracts
@@ -62,10 +62,10 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add notes/first-consultation/index.html ru/notes/first-consultation/index.html
+          git add notes/first-consultation/index.html ru/notes/first-consultation/index.html assets/css/site.article.v3-2.css
           if git diff --cached --quiet; then
             echo "No normalized article changes to commit."
             exit 0
           fi
-          git commit -m "Normalize direct answers in bilingual article pilot"
+          git commit -m "Normalize bilingual article pilot and figure layout"
           git push origin HEAD:feature/v32-article-first-consultation
