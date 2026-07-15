@@ -1,0 +1,40 @@
+name: QA V3.2 form hardening
+
+on:
+  push:
+    branches:
+      - feature/v32-production-form-launch-gate
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  form-hardening:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/v32-production-form-launch-gate
+
+      - name: Build hardened runtime
+        run: python3 scripts/apply-v32-form-hardening.py
+
+      - name: Validate production contracts
+        run: |
+          python3 scripts/validate-assets.py
+          python3 scripts/validate-public-email.py
+          python3 scripts/validate-privacy-intake.py
+          python3 scripts/validate-release-readiness.py
+          python3 scripts/validate-form-hardening.py
+
+      - name: Upload hardened runtime
+        uses: actions/upload-artifact@v4
+        with:
+          name: v32-hardened-form-runtime
+          path: assets/js/site.v2.js
+          if-no-files-found: error
