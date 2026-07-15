@@ -85,6 +85,7 @@
 }
 
 .article-hero-visual {
+  margin: 0;
   position: relative;
   isolation: isolate;
   min-height: 610px;
@@ -430,6 +431,7 @@
 
 .article-author-portrait {
   width: 128px;
+  margin: 0;
   aspect-ratio: 4 / 5;
   overflow: hidden;
   border-radius: 50% 50% 4px 4px / 20% 20% 4px 4px;
