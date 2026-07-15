@@ -16,10 +16,28 @@ REPLACEMENTS = {
 
 for path, (old, new) in REPLACEMENTS.items():
     text = path.read_text(encoding="utf-8")
-    if new in text:
+    if new not in text:
+        count = text.count(old)
+        if count != 1:
+            raise SystemExit(f"Expected one direct-answer source in {path}; found {count}")
+        path.write_text(text.replace(old, new, 1), encoding="utf-8")
+        print(f"Updated {path.relative_to(ROOT)}")
+
+css_path = ROOT / "assets/css/site.article.v3-2.css"
+css = css_path.read_text(encoding="utf-8")
+css_replacements = (
+    (".article-hero-visual {\n  position: relative;", ".article-hero-visual {\n  margin: 0;\n  position: relative;"),
+    (".article-author-portrait {\n  width: 128px;", ".article-author-portrait {\n  width: 128px;\n  margin: 0;")
+)
+changed = False
+for old, new in css_replacements:
+    if new in css:
         continue
-    count = text.count(old)
+    count = css.count(old)
     if count != 1:
-        raise SystemExit(f"Expected one direct-answer source in {path}; found {count}")
-    path.write_text(text.replace(old, new, 1), encoding="utf-8")
-    print(f"Updated {path.relative_to(ROOT)}")
+        raise SystemExit(f"Expected one CSS source for {old!r}; found {count}")
+    css = css.replace(old, new, 1)
+    changed = True
+if changed:
+    css_path.write_text(css, encoding="utf-8")
+    print(f"Updated {css_path.relative_to(ROOT)}")
