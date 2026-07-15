@@ -20,6 +20,9 @@ jobs:
         with:
           ref: fix/v32-footer-consistency
 
+      - name: Validate repository assets
+        run: python3 scripts/validate-assets.py
+
       - name: Install Playwright
         run: |
           npm install --no-save playwright@1.54.1
@@ -38,9 +41,6 @@ jobs:
 
       - name: Run footer visual QA
         run: node scripts/qa-footer-screenshots.mjs
-
-      - name: Validate repository assets
-        run: python3 scripts/validate-assets.py
 
       - name: Upload footer screenshots and report
         if: always()
