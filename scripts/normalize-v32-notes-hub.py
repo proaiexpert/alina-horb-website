@@ -10,12 +10,15 @@ replacements = {
     '<meta property="og:url" content="https://alinahorb.com/notes/">': '<meta property="og:url" content="https://alinahorb.com/ru/notes/">',
     'aria-label="Вибір мови"': 'aria-label="Выбор языка"',
 }
+
 for old, new in replacements.items():
-    if new in text:
+    old_count = text.count(old)
+    if old_count == 1:
+        text = text.replace(old, new, 1)
         continue
-    count = text.count(old)
-    if count != 1:
-        raise SystemExit(f"Expected one occurrence of {old!r}; found {count}")
-    text = text.replace(old, new, 1)
+    if old_count == 0 and new in text:
+        continue
+    raise SystemExit(f"Expected one old occurrence or an already-normalized value for {old!r}; found {old_count}")
+
 path.write_text(text, encoding="utf-8")
 print("Normalized RU Notes hub metadata and accessibility labels")
