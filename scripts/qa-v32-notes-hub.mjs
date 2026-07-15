@@ -40,13 +40,38 @@ for (const route of routes) {
     page.on("pageerror", error => consoleErrors.push(String(error)));
 
     const response = await page.goto(baseUrl + route.path, { waitUntil: "networkidle" });
+    const targetSelector = route.kind === "home" ? "#notes" : ".notes-hub-main-v32";
+    const featuredImageSelector = route.kind === "home" ? ".home-note-feature-media img" : ".notes-hub-feature-media img";
+    await page.locator(targetSelector).scrollIntoViewIfNeeded();
+    await page.waitForTimeout(650);
+
     const checks = {};
     checks.http200 = response?.status() === 200;
     checks.oneH1 = (await page.locator("h1").count()) === 1;
     checks.noOverflow = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth + 1);
     checks.stylesheetLoaded = await page.evaluate(() => [...document.styleSheets].some(sheet => String(sheet.href || "").includes("site.notes-hub.v3-2.css")));
     checks.noConsoleErrors = consoleErrors.length === 0;
-    checks.imagesLoaded = await page.evaluate(() => [...document.images].every(image => image.complete && image.naturalWidth > 0));
+    checks.imagesLoaded = await page.locator(targetSelector).evaluate(element => [...element.querySelectorAll("img")].every(image => image.complete && image.naturalWidth > 0));
+
+    const featuredImage = await page.locator(featuredImageSelector).evaluate(image => {
+      const style = getComputedStyle(image);
+      const rect = image.getBoundingClientRect();
+      return {
+        src: image.getAttribute("src"),
+        currentSrc: image.currentSrc,
+        naturalWidth: image.naturalWidth,
+        naturalHeight: image.naturalHeight,
+        renderedWidth: rect.width,
+        renderedHeight: rect.height,
+        opacity: style.opacity,
+        display: style.display,
+        visibility: style.visibility,
+        position: style.position,
+        zIndex: style.zIndex,
+      };
+    });
+    checks.featuredImageSource = featuredImage.currentSrc.includes("/assets/images/notes/alina-horb-notes-editorial-v2");
+    checks.featuredImageVisible = featuredImage.naturalWidth > 0 && featuredImage.renderedWidth > 100 && featuredImage.renderedHeight > 100 && featuredImage.opacity !== "0" && featuredImage.display !== "none" && featuredImage.visibility !== "hidden";
 
     if (route.kind === "home") {
       checks.featuredCount = (await page.locator(".home-note-feature").count()) === 1;
@@ -91,11 +116,15 @@ for (const route of routes) {
     }
 
     const screenshot = `${outputDir}/${route.key}-${viewport.key}.png`;
-    await page.screenshot({ path: screenshot, fullPage: true });
+    if (route.kind === "home") {
+      await page.locator("#notes").screenshot({ path: screenshot });
+    } else {
+      await page.screenshot({ path: screenshot, fullPage: true });
+    }
 
     const passed = Object.values(checks).every(Boolean);
     if (!passed) failed = true;
-    results.push({ route: route.path, viewport, checks, consoleErrors, passed, screenshot });
+    results.push({ route: route.path, viewport, checks, featuredImage, consoleErrors, passed, screenshot });
     await page.close();
   }
 }
@@ -104,7 +133,7 @@ await browser.close();
 await writeFile(`${outputDir}/results.json`, JSON.stringify(results, null, 2));
 
 for (const result of results) {
-  console.log(`${result.passed ? "PASS" : "FAIL"} ${result.route} ${result.viewport.key}`, result.checks);
+  console.log(`${result.passed ? "PASS" : "FAIL"} ${result.route} ${result.viewport.key}`, result.checks, result.featuredImage);
   if (result.consoleErrors.length) console.log(result.consoleErrors);
 }
 
