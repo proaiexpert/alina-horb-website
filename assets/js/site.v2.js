@@ -34,20 +34,12 @@
     const toggle = document.querySelector("[data-menu-toggle]");
     const nav = document.querySelector("[data-mobile-nav]");
     if (!toggle || !nav) return;
-
-    const setOpen = (open) => {
-      toggle.setAttribute("aria-expanded", String(open));
-      nav.hidden = !open;
-    };
-
+    const setOpen = (open) => { toggle.setAttribute("aria-expanded", String(open)); nav.hidden = !open; };
     setOpen(false);
     toggle.addEventListener("click", () => setOpen(toggle.getAttribute("aria-expanded") !== "true"));
     nav.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => setOpen(false)));
     document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") {
-        setOpen(false);
-        toggle.focus();
-      }
+      if (event.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") { setOpen(false); toggle.focus(); }
     });
   };
 
@@ -55,19 +47,10 @@
     const portrait = document.querySelector(".hero-portrait");
     const elements = document.querySelectorAll("[data-reveal], .process-timeline");
     if (portrait) window.requestAnimationFrame(() => portrait.classList.add("is-visible"));
-    if (reducedMotion || !("IntersectionObserver" in window)) {
-      elements.forEach((element) => element.classList.add("is-visible"));
-      return;
-    }
-
+    if (reducedMotion || !("IntersectionObserver" in window)) { elements.forEach((element) => element.classList.add("is-visible")); return; }
     const observer = new IntersectionObserver((entries) => {
-      entries.forEach((entry) => {
-        if (!entry.isIntersecting) return;
-        entry.target.classList.add("is-visible");
-        observer.unobserve(entry.target);
-      });
+      entries.forEach((entry) => { if (!entry.isIntersecting) return; entry.target.classList.add("is-visible"); observer.unobserve(entry.target); });
     }, { threshold: .14, rootMargin: "0px 0px -6%" });
-
     elements.forEach((element) => observer.observe(element));
   };
 
@@ -76,44 +59,30 @@
     if (!links.length || !("IntersectionObserver" in window)) return;
     const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
     const nav = document.querySelector(".side-navigation");
-
     const activate = (id) => {
       const index = links.findIndex((link) => link.getAttribute("href") === `#${id}`);
       if (index < 0) return;
       links.forEach((link, linkIndex) => link.classList.toggle("is-active", linkIndex === index));
       if (nav) nav.style.setProperty("--nav-progress", `${9 + (index / Math.max(links.length - 1, 1)) * 82}%`);
     };
-
     const observer = new IntersectionObserver((entries) => {
       const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio);
       if (visible[0]) activate(visible[0].target.id);
     }, { threshold: [.2, .45, .7], rootMargin: "-20% 0px -55%" });
-
     sections.forEach((section) => observer.observe(section));
     if (sections[0]) activate(sections[0].id);
   };
 
   const initFaq = () => {
-    document.querySelectorAll(".faq-list details").forEach((detail) => {
-      detail.addEventListener("toggle", () => {
-        detail.querySelector("summary")?.setAttribute("aria-expanded", String(detail.open));
-      });
-    });
+    document.querySelectorAll(".faq-list details").forEach((detail) => detail.addEventListener("toggle", () => detail.querySelector("summary")?.setAttribute("aria-expanded", String(detail.open))));
   };
 
   const initTelegram = () => {
     const username = String(config.telegramUsername || "").trim().replace(/^@/, "");
     const links = document.querySelectorAll("[data-telegram-link]");
     const placeholders = document.querySelectorAll("[data-telegram-placeholder]");
-    if (!username) {
-      links.forEach((link) => { link.hidden = true; });
-      placeholders.forEach((placeholder) => { placeholder.hidden = false; });
-      return;
-    }
-    links.forEach((link) => {
-      link.href = `https://t.me/${username}`;
-      link.hidden = false;
-    });
+    if (!username) { links.forEach((link) => { link.hidden = true; }); placeholders.forEach((placeholder) => { placeholder.hidden = false; }); return; }
+    links.forEach((link) => { link.href = `https://t.me/${username}`; link.hidden = false; });
     placeholders.forEach((placeholder) => { placeholder.hidden = true; });
   };
 
@@ -130,48 +99,29 @@
     let openedAt = Date.now();
     let interacted = false;
     let submitting = false;
-
     if (startedAtField) startedAtField.value = String(openedAt);
 
     const setState = (state, message) => {
-      if (status) {
-        status.dataset.state = state;
-        status.textContent = message;
-      }
-      if (button) {
-        button.disabled = state === "loading";
-        button.textContent = state === "loading" ? text.loading : text.submit;
-      }
+      if (status) { status.dataset.state = state; status.textContent = message; }
+      if (button) { button.disabled = state === "loading"; button.textContent = state === "loading" ? text.loading : text.submit; }
       form.setAttribute("aria-busy", String(state === "loading"));
     };
 
     const payloadFromForm = () => {
       const data = new FormData(form);
       return {
-        name: String(data.get("name") || "").trim(),
-        reply: String(data.get("reply") || "").trim(),
-        channel: String(data.get("channel") || "").trim(),
-        language: String(data.get("language") || "").trim(),
-        format: String(data.get("format") || "").trim(),
-        message: String(data.get("message") || "").trim(),
-        consent: data.get("consent") === "on",
-        locale,
-        subject: text.subject,
-        source: window.location.href
+        name: String(data.get("name") || "").trim(), reply: String(data.get("reply") || "").trim(),
+        channel: String(data.get("channel") || "").trim(), language: String(data.get("language") || "").trim(),
+        format: String(data.get("format") || "").trim(), message: String(data.get("message") || "").trim(),
+        consent: data.get("consent") === "on", locale, subject: text.subject, source: window.location.href
       };
     };
 
     const mailtoFallback = (payload) => {
       const fields = text.fields;
       const body = [
-        `${fields.name}: ${payload.name}`,
-        `${fields.reply}: ${payload.reply}`,
-        `${fields.channel}: ${payload.channel}`,
-        `${fields.language}: ${payload.language}`,
-        `${fields.format}: ${payload.format}`,
-        "",
-        `${fields.message}:`,
-        payload.message
+        `${fields.name}: ${payload.name}`, `${fields.reply}: ${payload.reply}`, `${fields.channel}: ${payload.channel}`,
+        `${fields.language}: ${payload.language}`, `${fields.format}: ${payload.format}`, "", `${fields.message}:`, payload.message
       ].join("\n");
       const email = String(config.email || "hello@alinahorb.com").trim();
       setState("success", text.success);
@@ -181,80 +131,43 @@
     const markInteraction = () => { interacted = true; };
     form.addEventListener("pointerdown", markInteraction, { passive: true });
     form.addEventListener("keydown", markInteraction);
-    form.addEventListener("input", () => {
-      interacted = true;
-      if (status?.dataset.state === "error") setState("idle", "");
-    });
+    form.addEventListener("input", () => { interacted = true; if (status?.dataset.state === "error") setState("idle", ""); });
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
       if (submitting) return;
-      if (!form.reportValidity()) {
-        setState("error", text.invalid);
-        return;
-      }
-
+      if (!form.reportValidity()) { setState("error", text.invalid); return; }
       const payload = payloadFromForm();
       const elapsed = Date.now() - openedAt;
       const trapped = Boolean(String(honeypot?.value || "").trim());
       const meaningful = payload.name.length > 0 && payload.reply.length > 2 && payload.message.length > 2 && payload.consent;
-      if (trapped || elapsed < 1500 || !interacted) {
-        setState("error", text.blocked);
-        return;
-      }
-      if (!meaningful) {
-        setState("error", text.invalid);
-        return;
-      }
-
+      if (trapped || elapsed < 1500 || !interacted) { setState("error", text.blocked); return; }
+      if (!meaningful) { setState("error", text.invalid); return; }
       submitting = true;
       setState("loading", text.loading);
-
       if (!endpoint || config.formMode === "mailto") {
-        window.setTimeout(() => {
-          submitting = false;
-          mailtoFallback(payload);
-        }, reducedMotion ? 0 : 240);
+        window.setTimeout(() => { submitting = false; mailtoFallback(payload); }, reducedMotion ? 0 : 240);
         return;
       }
-
       const controller = new AbortController();
       const timeoutId = window.setTimeout(() => controller.abort(), 10000);
-
       try {
         const response = await fetch(endpoint, {
           method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Accept": "application/json"
-          },
-          body: JSON.stringify(payload),
-          signal: controller.signal
+          headers: { "Content-Type": "application/json", "Accept": "application/json" },
+          body: JSON.stringify(payload), signal: controller.signal
         });
-        if (!response.ok) {
-          const requestError = new Error(`HTTP ${response.status}`);
-          requestError.status = response.status;
-          throw requestError;
-        }
-        form.reset();
-        openedAt = Date.now();
-        interacted = false;
+        if (!response.ok) { const requestError = new Error(`HTTP ${response.status}`); requestError.status = response.status; throw requestError; }
+        form.reset(); openedAt = Date.now(); interacted = false;
         if (startedAtField) startedAtField.value = String(openedAt);
         setState("success", text.sent);
       } catch (error) {
         console.error("Contact form submission failed", error);
         const statusCode = Number(error?.status || 0);
         const recoverable = error?.name === "AbortError" || statusCode === 0 || statusCode >= 500;
-        if (recoverable) {
-          setState("error", text.fallback);
-          window.setTimeout(() => mailtoFallback(payload), reducedMotion ? 0 : 360);
-        } else {
-          setState("error", text.error);
-        }
-      } finally {
-        window.clearTimeout(timeoutId);
-        submitting = false;
-      }
+        if (recoverable) { setState("error", text.fallback); window.setTimeout(() => mailtoFallback(payload), reducedMotion ? 0 : 360); }
+        else setState("error", text.error);
+      } finally { window.clearTimeout(timeoutId); submitting = false; }
     });
   };
 
@@ -265,48 +178,22 @@
     const contact = document.querySelector("#contact");
     const footer = document.querySelector(".site-footer");
     if (!cta || !heroCta || !contact) return;
-
     const mobile = window.matchMedia("(max-width: 800px)");
     let frame = 0;
     let hideTimer = 0;
-
     const setVisible = (visible) => {
       window.clearTimeout(hideTimer);
-      if (visible) {
-        cta.hidden = false;
-        window.requestAnimationFrame(() => cta.classList.add("is-visible"));
-        cta.setAttribute("aria-hidden", "false");
-        return;
-      }
-      cta.classList.remove("is-visible");
-      cta.setAttribute("aria-hidden", "true");
+      if (visible) { cta.hidden = false; window.requestAnimationFrame(() => cta.classList.add("is-visible")); cta.setAttribute("aria-hidden", "false"); return; }
+      cta.classList.remove("is-visible"); cta.setAttribute("aria-hidden", "true");
       hideTimer = window.setTimeout(() => { cta.hidden = true; }, reducedMotion ? 0 : 240);
     };
-
-    const inViewport = (element) => {
-      if (!element) return false;
-      const rect = element.getBoundingClientRect();
-      return rect.top < window.innerHeight && rect.bottom > 0;
-    };
-
+    const inViewport = (element) => { if (!element) return false; const rect = element.getBoundingClientRect(); return rect.top < window.innerHeight && rect.bottom > 0; };
     const update = () => {
       frame = 0;
-      if (!mobile.matches) {
-        setVisible(false);
-        return;
-      }
-      const heroBottom = heroCta.getBoundingClientRect().bottom;
-      const longReadingBlockVisible = inViewport(about);
-      const contactVisible = inViewport(contact);
-      const footerVisible = inViewport(footer);
-      setVisible(heroBottom < 0 && !longReadingBlockVisible && !contactVisible && !footerVisible);
+      if (!mobile.matches) { setVisible(false); return; }
+      setVisible(heroCta.getBoundingClientRect().bottom < 0 && !inViewport(about) && !inViewport(contact) && !inViewport(footer));
     };
-
-    const requestUpdate = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(update);
-    };
-
+    const requestUpdate = () => { if (frame) return; frame = window.requestAnimationFrame(update); };
     window.addEventListener("scroll", requestUpdate, { passive: true });
     window.addEventListener("resize", requestUpdate);
     mobile.addEventListener?.("change", requestUpdate);
@@ -317,37 +204,28 @@
   const initEditorialNotesImages = () => {
     const section = document.querySelector(".home-notes-editorial");
     if (!section) return;
-
-    const stylesheetHref = new URL("assets/css/site.notes-images.v3.css", document.baseURI).href;
+    const projectMarker = "/alina-horb-website/";
+    const rootPath = window.location.pathname.includes(projectMarker) ? projectMarker : "/";
+    const assetRoot = new URL(`${rootPath}assets/`, window.location.origin).href;
+    const stylesheetHref = `${assetRoot}css/site.notes-images.v3.css`;
     if (!document.querySelector(`link[href="${stylesheetHref}"]`)) {
-      const stylesheet = document.createElement("link");
-      stylesheet.rel = "stylesheet";
-      stylesheet.href = stylesheetHref;
-      document.head.appendChild(stylesheet);
+      const stylesheet = document.createElement("link"); stylesheet.rel = "stylesheet"; stylesheet.href = stylesheetHref; document.head.appendChild(stylesheet);
     }
-
     const isRu = document.documentElement.lang.toLowerCase().startsWith("ru");
-    const base = new URL("assets/images/notes/", document.baseURI).href;
+    const base = `${assetRoot}images/notes/`;
     const images = {
       first: ["alina-horb-note-first-consultation-v3.webp", isRu ? "Два кресла в спокойном светлом пространстве для первой консультации" : "Два крісла у спокійному світлому просторі для першої консультації"],
       conversation: ["alina-horb-note-conversation-v3.webp", isRu ? "Открытый блокнот как образ начала трудного разговора" : "Відкритий нотатник як образ початку складної розмови"],
       observation: ["alina-horb-note-observation-v3.webp", isRu ? "Блокнот и ручка как образ внимательного наблюдения за своим состоянием" : "Нотатник і ручка як образ уважного спостереження за власним станом"],
       transition: ["alina-horb-note-transition-v3.webp", isRu ? "Коробка, карта и ключ как образ переезда и восстановления опоры" : "Коробка, мапа і ключ як образ переїзду та відновлення опори"]
     };
-
     const picture = (key) => `<picture><img src="${base}${images[key][0]}" width="1200" height="800" loading="lazy" decoding="async" alt="${images[key][1]}"></picture>`;
-
     const feature = section.querySelector(".home-note-feature-media");
-    if (feature) {
-      const index = feature.querySelector(".home-note-index")?.outerHTML || "";
-      feature.innerHTML = `${picture("first")}${index}`;
-    }
-
+    if (feature) { const index = feature.querySelector(".home-note-index")?.outerHTML || ""; feature.innerHTML = `${picture("first")}${index}`; }
     ["conversation", "observation", "transition"].forEach((key) => {
       const element = section.querySelector(`.note-identity--${key}`);
       if (!element) return;
-      element.classList.add("note-photo", `note-photo--${key}`);
-      element.innerHTML = picture(key);
+      element.classList.add("note-photo", `note-photo--${key}`); element.innerHTML = picture(key);
     });
   };
 
