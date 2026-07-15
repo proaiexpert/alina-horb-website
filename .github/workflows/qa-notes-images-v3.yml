@@ -1,0 +1,27 @@
+name: QA Notes editorial images
+
+on:
+  push:
+    branches:
+      - feature/article-editorial-images-v3
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  notes-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+
+      - name: Validate JavaScript syntax
+        run: |
+          node --check assets/js/site.v2.js
+          node --check assets/js/site.chrome.v3.js
+
+      - name: Validate image assets and runtime hooks
+        run: python3 scripts/validate-notes-images-v3.py
