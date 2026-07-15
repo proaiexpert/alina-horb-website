@@ -34,6 +34,7 @@ jobs:
           python3 scripts/validate-privacy-intake.py
           python3 scripts/validate-article-v32.py
           python3 scripts/validate-article-start-conversation.py
+          python3 scripts/validate-article-coping-support.py
 
       - name: Prepare public site artifact
         shell: bash
@@ -57,11 +58,13 @@ jobs:
           test -f _site/notes/index.html
           test -f _site/notes/first-consultation/index.html
           test -f _site/notes/how-to-start-the-conversation/index.html
+          test -f _site/notes/when-coping-stops-helping/index.html
           test -f _site/privacy/index.html
           test -f _site/ru/index.html
           test -f _site/ru/notes/index.html
           test -f _site/ru/notes/first-consultation/index.html
           test -f _site/ru/notes/how-to-start-the-conversation/index.html
+          test -f _site/ru/notes/when-coping-stops-helping/index.html
           test -f _site/ru/privacy/index.html
 
       - name: Configure GitHub Pages
