@@ -70,10 +70,26 @@ for (const [viewportName, viewport] of viewports) {
         makerLabel: footerElement?.querySelector(".maker-credit small")
       };
       const hidden = Object.entries(elements).filter(([, element]) => !visible(element)).map(([name]) => name);
+      const footerRect = footerElement?.getBoundingClientRect();
+      const footerOverflow = Boolean(footerRect && (footerRect.left < -1 || footerRect.right > window.innerWidth + 1 || footerElement.scrollWidth > footerElement.clientWidth + 1));
+      const pageOverflow = document.documentElement.scrollWidth > window.innerWidth + 1;
+      const overflowElements = pageOverflow
+        ? [...document.querySelectorAll("body *")].map(element => {
+            const rect = element.getBoundingClientRect();
+            return {
+              selector: `${element.tagName.toLowerCase()}${element.id ? `#${element.id}` : ""}${[...element.classList].slice(0, 3).map(name => `.${name}`).join("")}`,
+              left: Math.round(rect.left * 10) / 10,
+              right: Math.round(rect.right * 10) / 10,
+              width: Math.round(rect.width * 10) / 10
+            };
+          }).filter(item => item.width > 0 && (item.left < -1 || item.right > window.innerWidth + 1)).slice(0, 20)
+        : [];
       return {
         missing,
         hidden,
-        overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
+        footerOverflow,
+        pageOverflow,
+        overflowElements,
         scrollWidth: document.documentElement.scrollWidth,
         innerWidth: window.innerWidth,
         innerHeight: window.innerHeight,
@@ -85,7 +101,7 @@ for (const [viewportName, viewport] of viewports) {
     await footer.screenshot({ path: screenshot });
 
     const correctViewport = checks.innerWidth === viewport.width && checks.innerHeight === viewport.height;
-    const ok = Boolean(response?.ok()) && correctViewport && checks.footerCount === 1 && !checks.overflow && checks.missing.length === 0 && checks.hidden.length === 0 && consoleErrors.length === 0;
+    const ok = Boolean(response?.ok()) && correctViewport && checks.footerCount === 1 && !checks.footerOverflow && checks.missing.length === 0 && checks.hidden.length === 0 && consoleErrors.length === 0;
     if (!ok) failed = true;
     report.push({ route, routeName, viewportName, expectedViewport: viewport, status: response?.status(), correctViewport, ok, consoleErrors, ...checks, screenshot });
     await page.close();
