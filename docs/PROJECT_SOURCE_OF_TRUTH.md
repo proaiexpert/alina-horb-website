@@ -75,7 +75,7 @@ The adopted article evidence and safety standard is:
 
 ## Contact information
 
-- Email: `alinahorb1991@gmail.com`.
+- Email: `hello@alinahorb.com`.
 - Telegram: `@alina_horb1991` / `https://t.me/alina_horb1991`.
 - Instagram: `@ng_alina_dp` / `https://instagram.com/ng_alina_dp`.
 - Telegram is the primary direct channel; Instagram and email are additional channels.

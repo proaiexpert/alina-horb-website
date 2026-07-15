@@ -158,7 +158,7 @@
         `${fields.message}:`,
         payload.message
       ].join("\n");
-      const email = String(config.email || "alinahorb1991@gmail.com").trim();
+      const email = String(config.email || "hello@alinahorb.com").trim();
       setState("success", text.success);
       window.location.href = `mailto:${email}?subject=${encodeURIComponent(text.subject)}&body=${encodeURIComponent(body)}`;
     };

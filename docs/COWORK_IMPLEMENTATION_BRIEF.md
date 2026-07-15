@@ -201,7 +201,7 @@ The confirmed booking channel is Telegram, but the exact Telegram URL is pending
 Until supplied:
 
 - centralize the CTA destination in one config/data value;
-- use `mailto:alinahorb1991@gmail.com` as the temporary functional fallback;
+- use `mailto:hello@alinahorb.com` as the temporary functional fallback;
 - add a source-code TODO for replacement with the exact Telegram URL;
 - do not display a fake Telegram username.
 
@@ -212,7 +212,7 @@ Include:
 - approved Alina Horb logo;
 - RU / UA switch;
 - `alinahorb.com`;
-- `alinahorb1991@gmail.com`;
+- `hello@alinahorb.com`;
 - privacy-policy link placeholder;
 - `© Алина Горб, 2026`;
 - thin premium ProAI Expert maker credit;

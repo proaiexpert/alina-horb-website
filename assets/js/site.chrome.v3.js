@@ -109,7 +109,7 @@
         </a>
         <nav class="footer-links" aria-label="${text.nav}">
           ${languageSwitch}
-          <a href="mailto:alinahorb1991@gmail.com">Email</a>
+          <a href="mailto:hello@alinahorb.com">Email</a>
           <a href="https://t.me/alina_horb1991" target="_blank" rel="noopener noreferrer">Telegram</a>
           <a href="https://instagram.com/ng_alina_dp" target="_blank" rel="noopener noreferrer">Instagram</a>
         </nav>

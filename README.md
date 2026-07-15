@@ -77,7 +77,7 @@ Current contact channels:
 
 - Telegram: `@alina_horb1991`
 - Instagram: `@ng_alina_dp`
-- Email: `alinahorb1991@gmail.com`
+- Email: `hello@alinahorb.com`
 
 ## Areas of support
 

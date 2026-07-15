@@ -7,7 +7,7 @@
 - Desktop mockup: approved and locked
 - Main language structure: Russian and Ukrainian
 - Maker credit: ProAI Expert
-- Temporary contact email: alinahorb1991@gmail.com
+- Temporary contact email: hello@alinahorb.com
 
 ## Workflow
 

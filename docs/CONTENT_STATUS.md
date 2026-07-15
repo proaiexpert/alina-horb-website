@@ -16,7 +16,7 @@ BILINGUAL UA/RU PREVIEW IMPLEMENTED — PENDING PR REVIEW
 - Audience wording: adolescents, families, women, and men.
 - Duration and price: 50 minutes / 600 UAH.
 - Public redacted diploma title page.
-- Temporary email: `alinahorb1991@gmail.com`.
+- Temporary email: `hello@alinahorb.com`.
 - Localized contact form using a temporary `mailto:` flow.
 
 ## Not published
