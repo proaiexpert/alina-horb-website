@@ -22,10 +22,8 @@ jobs:
           ref: feature/v32-notes-hub
           fetch-depth: 0
 
-      - name: Apply production Notes hub
-        run: |
-          python3 scripts/apply-v32-notes-hub.py
-          python3 scripts/normalize-v32-notes-hub.py
+      - name: Normalize localized Notes hub
+        run: python3 scripts/normalize-v32-notes-hub.py
 
       - name: Validate production contracts
         run: |
@@ -61,17 +59,17 @@ jobs:
           path: qa-artifacts/notes-hub-v32
           if-no-files-found: error
 
-      - name: Commit production pages
+      - name: Commit localized production page
         if: github.event_name == 'push' && success()
         shell: bash
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add index.html ru/index.html notes/index.html ru/notes/index.html
+          git add ru/notes/index.html
           if git diff --cached --quiet; then
-            echo "No Notes hub changes to commit."
+            echo "No localized Notes hub changes to commit."
             exit 0
           fi
-          git commit -m "Build bilingual V3.2 Notes hub and homepage cards"
+          git commit -m "Normalize RU Notes hub accessibility metadata"
           git push origin HEAD:feature/v32-notes-hub
