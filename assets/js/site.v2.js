@@ -8,7 +8,9 @@
       subject: "Звернення через сайт Аліни Горб",
       loading: "Готуємо звернення…",
       success: "Звернення підготовлено. Відкриваємо поштову програму.",
-      error: "Не вдалося підготувати звернення. Напишіть на email.",
+      sent: "Звернення надіслано. Аліна відповість через обраний канал зв’язку.",
+      fallback: "Сервіс форми тимчасово недоступний. Відкриваємо поштову програму, щоб звернення не втратилося.",
+      error: "Не вдалося надіслати звернення. Перевірте дані або напишіть на email.",
       invalid: "Перевірте, будь ласка, обов’язкові поля.",
       blocked: "Не вдалося надіслати форму. Зачекайте кілька секунд і спробуйте ще раз.",
       submit: "Надіслати звернення",
@@ -18,7 +20,9 @@
       subject: "Обращение через сайт Алины Горб",
       loading: "Готовим обращение…",
       success: "Обращение подготовлено. Открываем почтовую программу.",
-      error: "Не удалось подготовить обращение. Напишите на email.",
+      sent: "Обращение отправлено. Алина ответит через выбранный канал связи.",
+      fallback: "Сервис формы временно недоступен. Открываем почтовую программу, чтобы обращение не потерялось.",
+      error: "Не удалось отправить обращение. Проверьте данные или напишите на email.",
       invalid: "Проверьте, пожалуйста, обязательные поля.",
       blocked: "Не удалось отправить форму. Подождите несколько секунд и попробуйте ещё раз.",
       submit: "Отправить обращение",
@@ -125,6 +129,7 @@
     const endpoint = String(config.formEndpoint || "").trim();
     let openedAt = Date.now();
     let interacted = false;
+    let submitting = false;
 
     if (startedAtField) startedAtField.value = String(openedAt);
 
@@ -150,7 +155,9 @@
         format: String(data.get("format") || "").trim(),
         message: String(data.get("message") || "").trim(),
         consent: data.get("consent") === "on",
-        locale
+        locale,
+        subject: text.subject,
+        source: window.location.href
       };
     };
 
@@ -181,6 +188,7 @@
 
     form.addEventListener("submit", async (event) => {
       event.preventDefault();
+      if (submitting) return;
       if (!form.reportValidity()) {
         setState("error", text.invalid);
         return;
@@ -199,28 +207,53 @@
         return;
       }
 
+      submitting = true;
       setState("loading", text.loading);
 
       if (!endpoint || config.formMode === "mailto") {
-        window.setTimeout(() => mailtoFallback(payload), reducedMotion ? 0 : 240);
+        window.setTimeout(() => {
+          submitting = false;
+          mailtoFallback(payload);
+        }, reducedMotion ? 0 : 240);
         return;
       }
+
+      const controller = new AbortController();
+      const timeoutId = window.setTimeout(() => controller.abort(), 10000);
 
       try {
         const response = await fetch(endpoint, {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(payload)
+          headers: {
+            "Content-Type": "application/json",
+            "Accept": "application/json"
+          },
+          body: JSON.stringify(payload),
+          signal: controller.signal
         });
-        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        if (!response.ok) {
+          const requestError = new Error(`HTTP ${response.status}`);
+          requestError.status = response.status;
+          throw requestError;
+        }
         form.reset();
         openedAt = Date.now();
         interacted = false;
         if (startedAtField) startedAtField.value = String(openedAt);
-        setState("success", text.success);
+        setState("success", text.sent);
       } catch (error) {
         console.error("Contact form submission failed", error);
-        setState("error", text.error);
+        const statusCode = Number(error?.status || 0);
+        const recoverable = error?.name === "AbortError" || statusCode === 0 || statusCode >= 500;
+        if (recoverable) {
+          setState("error", text.fallback);
+          window.setTimeout(() => mailtoFallback(payload), reducedMotion ? 0 : 360);
+        } else {
+          setState("error", text.error);
+        }
+      } finally {
+        window.clearTimeout(timeoutId);
+        submitting = false;
       }
     });
   };
