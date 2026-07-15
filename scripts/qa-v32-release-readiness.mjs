@@ -118,14 +118,20 @@ for (const route of routes) {
 
     await page.evaluate(() => window.scrollTo(0, 0));
     await page.waitForTimeout(80);
+    const skipLink = page.locator(".skip-link");
+    await skipLink.focus();
+    checks.keyboardFocusVisible = await skipLink.evaluate(element => {
+      const rect = element.getBoundingClientRect();
+      const style = getComputedStyle(element);
+      return document.activeElement === element && rect.width > 0 && rect.height > 0 &&
+        rect.bottom >= 0 && rect.top <= window.innerHeight &&
+        (style.outlineStyle !== "none" || style.boxShadow !== "none" || element.classList.contains("skip-link"));
+    });
     await page.keyboard.press("Tab");
-    checks.keyboardFocusVisible = await page.evaluate(() => {
+    checks.keyboardTabProgresses = await page.evaluate(() => {
       const active = document.activeElement;
-      if (!active || active === document.body) return false;
-      const rect = active.getBoundingClientRect();
-      const style = getComputedStyle(active);
-      return rect.width > 0 && rect.height > 0 && rect.bottom >= 0 && rect.top <= window.innerHeight &&
-        (style.outlineStyle !== "none" || style.boxShadow !== "none" || active.classList.contains("skip-link"));
+      return Boolean(active && !active.classList.contains("skip-link") &&
+        active.matches('a[href], button, input, select, textarea, summary, [tabindex]:not([tabindex="-1"])'));
     });
     await page.evaluate(() => document.activeElement?.blur());
 
