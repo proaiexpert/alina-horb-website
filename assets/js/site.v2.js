@@ -314,8 +314,46 @@
     update();
   };
 
+  const initEditorialNotesImages = () => {
+    const section = document.querySelector(".home-notes-editorial");
+    if (!section) return;
+
+    const stylesheetHref = new URL("assets/css/site.notes-images.v3.css", document.baseURI).href;
+    if (!document.querySelector(`link[href="${stylesheetHref}"]`)) {
+      const stylesheet = document.createElement("link");
+      stylesheet.rel = "stylesheet";
+      stylesheet.href = stylesheetHref;
+      document.head.appendChild(stylesheet);
+    }
+
+    const isRu = document.documentElement.lang.toLowerCase().startsWith("ru");
+    const base = new URL("assets/images/notes/", document.baseURI).href;
+    const images = {
+      first: ["alina-horb-note-first-consultation-v3.webp", isRu ? "Два кресла в спокойном светлом пространстве для первой консультации" : "Два крісла у спокійному світлому просторі для першої консультації"],
+      conversation: ["alina-horb-note-conversation-v3.webp", isRu ? "Открытый блокнот как образ начала трудного разговора" : "Відкритий нотатник як образ початку складної розмови"],
+      observation: ["alina-horb-note-observation-v3.webp", isRu ? "Блокнот и ручка как образ внимательного наблюдения за своим состоянием" : "Нотатник і ручка як образ уважного спостереження за власним станом"],
+      transition: ["alina-horb-note-transition-v3.webp", isRu ? "Коробка, карта и ключ как образ переезда и восстановления опоры" : "Коробка, мапа і ключ як образ переїзду та відновлення опори"]
+    };
+
+    const picture = (key) => `<picture><img src="${base}${images[key][0]}" width="1200" height="800" loading="lazy" decoding="async" alt="${images[key][1]}"></picture>`;
+
+    const feature = section.querySelector(".home-note-feature-media");
+    if (feature) {
+      const index = feature.querySelector(".home-note-index")?.outerHTML || "";
+      feature.innerHTML = `${picture("first")}${index}`;
+    }
+
+    ["conversation", "observation", "transition"].forEach((key) => {
+      const element = section.querySelector(`.note-identity--${key}`);
+      if (!element) return;
+      element.classList.add("note-photo", `note-photo--${key}`);
+      element.innerHTML = picture(key);
+    });
+  };
+
   const init = () => {
     initMobileNavigation();
+    initEditorialNotesImages();
     initReveals();
     initActiveNavigation();
     initFaq();
