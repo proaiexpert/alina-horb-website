@@ -1,0 +1,75 @@
+name: Production domain migration
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - .github/workflows/production-domain-migration.yml
+
+permissions:
+  contents: write
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Update production HTML and sitemap
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          from xml.sax.saxutils import escape
+
+          root = Path('.')
+          html_files = [p for p in root.rglob('*.html') if '.git' not in p.parts]
+
+          css_link = '<link rel="stylesheet" href="/assets/css/site-global-v1.css">'
+          js_link = '<script src="/assets/js/site-global-v1.js" defer></script>'
+          favicon = '<link rel="icon" type="image/svg+xml" href="/favicon.svg">'
+
+          for path in html_files:
+              text = path.read_text(encoding='utf-8')
+              text = re.sub(r'\s*<meta\s+name=["\']robots["\']\s+content=["\']noindex,\s*nofollow["\']\s*/?>', '', text, flags=re.I)
+              text = text.replace('https://proaiexpert.github.io/alina-horb-website', 'https://alinahorb.com')
+              text = re.sub(r'<link\s+rel=["\']icon["\'][^>]*>', favicon, text, flags=re.I)
+              if '/favicon.svg' not in text:
+                  text = text.replace('</head>', f'  {favicon}\n</head>')
+              if 'site-global-v1.css' not in text:
+                  text = text.replace('</head>', f'  {css_link}\n</head>')
+              if 'site-global-v1.js' not in text:
+                  text = text.replace('</body>', f'  {js_link}\n</body>')
+              path.write_text(text, encoding='utf-8')
+
+          urls = []
+          for path in html_files:
+              rel = path.as_posix()
+              if rel == 'index.html':
+                  url_path = '/'
+              elif rel.endswith('/index.html'):
+                  url_path = '/' + rel[:-10]
+              else:
+                  continue
+              urls.append('https://alinahorb.com' + url_path)
+
+          urls = sorted(set(urls), key=lambda u: (u.count('/'), u))
+          sitemap = ['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">']
+          sitemap.extend(f'  <url><loc>{escape(url)}</loc></url>' for url in urls)
+          sitemap.append('</urlset>')
+          Path('sitemap.xml').write_text('\n'.join(sitemap) + '\n', encoding='utf-8')
+          PY
+
+      - name: Commit production migration
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -- '*.html' sitemap.xml
+          if git diff --cached --quiet; then
+            echo "No migration changes required"
+            exit 0
+          fi
+          git commit -m "Release production domain and global site shell"
+          git push
