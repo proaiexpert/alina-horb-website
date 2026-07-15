@@ -1,0 +1,47 @@
+name: Apply and validate Notes image hotfix
+
+on:
+  push:
+    branches:
+      - fix/notes-images-static-v3-1
+
+permissions:
+  contents: write
+
+jobs:
+  apply-static-notes-images:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout hotfix branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/notes-images-static-v3-1
+          fetch-depth: 0
+
+      - name: Apply static image integration
+        run: python3 scripts/apply-notes-images-v3-1.py
+
+      - name: Validate JavaScript and every RU/UA path
+        run: |
+          node --check assets/js/site.notes-images.v3-1.js
+          python3 scripts/validate-notes-images-v3.py
+          python3 scripts/validate-notes-images-v3-1.py
+          python3 scripts/validate-assets.py
+          python3 scripts/validate-article-v32.py
+          python3 scripts/validate-article-start-conversation.py
+          python3 scripts/validate-article-coping-support.py
+          python3 scripts/validate-article-relocation.py
+          python3 scripts/validate-notes-hub-v32.py
+
+      - name: Commit generated source changes
+        run: |
+          if git diff --quiet; then
+            echo "No generated changes"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html ru/index.html notes ru/notes assets/js/site.notes-images.v3-1.js scripts
+          git commit -m "Make Notes images static and cache-safe"
+          git push origin HEAD:fix/notes-images-static-v3-1
