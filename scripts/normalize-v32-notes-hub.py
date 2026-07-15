@@ -8,6 +8,7 @@ replacements = {
     '<meta property="og:locale" content="uk_UA">': '<meta property="og:locale" content="ru_RU">',
     '<meta property="og:locale:alternate" content="ru_RU">': '<meta property="og:locale:alternate" content="uk_UA">',
     '<meta property="og:url" content="https://alinahorb.com/notes/">': '<meta property="og:url" content="https://alinahorb.com/ru/notes/">',
+    'aria-label="Вибір мови"': 'aria-label="Выбор языка"',
 }
 for old, new in replacements.items():
     if new in text:
@@ -17,4 +18,4 @@ for old, new in replacements.items():
         raise SystemExit(f"Expected one occurrence of {old!r}; found {count}")
     text = text.replace(old, new, 1)
 path.write_text(text, encoding="utf-8")
-print("Normalized RU Notes hub metadata")
+print("Normalized RU Notes hub metadata and accessibility labels")
