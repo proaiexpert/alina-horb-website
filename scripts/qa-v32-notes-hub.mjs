@@ -43,6 +43,9 @@ for (const route of routes) {
     const targetSelector = route.kind === "home" ? "#notes" : ".notes-hub-main-v32";
     const featuredImageSelector = route.kind === "home" ? ".home-note-feature-media img" : ".notes-hub-feature-media img";
     await page.locator(targetSelector).scrollIntoViewIfNeeded();
+    await page.locator(targetSelector).evaluate(element => {
+      element.querySelectorAll("[data-reveal]").forEach(node => node.classList.add("is-visible"));
+    });
     await page.waitForTimeout(650);
 
     const checks = {};
@@ -114,6 +117,14 @@ for (const route of routes) {
         break;
       }
     }
+
+    await page.evaluate(() => {
+      if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
+      const style = document.createElement("style");
+      style.dataset.qaOnly = "true";
+      style.textContent = ".skip-link,.mobile-booking-cta{display:none!important}";
+      document.head.appendChild(style);
+    });
 
     const screenshot = `${outputDir}/${route.key}-${viewport.key}.png`;
     if (route.kind === "home") {
