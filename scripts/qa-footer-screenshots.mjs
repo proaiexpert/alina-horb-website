@@ -25,7 +25,7 @@ const report = [];
 let failed = false;
 
 for (const [viewportName, viewport] of viewports) {
-  const context = await browser.newContext({ viewportSize: viewport, deviceScaleFactor: 1 });
+  const context = await browser.newContext({ viewport, deviceScaleFactor: 1 });
   for (const [routeName, route] of routes) {
     const page = await context.newPage();
     const consoleErrors = [];
@@ -76,6 +76,7 @@ for (const [viewportName, viewport] of viewports) {
         overflow: document.documentElement.scrollWidth > window.innerWidth + 1,
         scrollWidth: document.documentElement.scrollWidth,
         innerWidth: window.innerWidth,
+        innerHeight: window.innerHeight,
         footerCount: document.querySelectorAll(".site-footer").length
       };
     });
@@ -83,9 +84,10 @@ for (const [viewportName, viewport] of viewports) {
     const screenshot = `${outputDir}/${routeName}-${viewportName}.png`;
     await footer.screenshot({ path: screenshot });
 
-    const ok = Boolean(response?.ok()) && checks.footerCount === 1 && !checks.overflow && checks.missing.length === 0 && checks.hidden.length === 0 && consoleErrors.length === 0;
+    const correctViewport = checks.innerWidth === viewport.width && checks.innerHeight === viewport.height;
+    const ok = Boolean(response?.ok()) && correctViewport && checks.footerCount === 1 && !checks.overflow && checks.missing.length === 0 && checks.hidden.length === 0 && consoleErrors.length === 0;
     if (!ok) failed = true;
-    report.push({ route, routeName, viewportName, status: response?.status(), ok, consoleErrors, ...checks, screenshot });
+    report.push({ route, routeName, viewportName, expectedViewport: viewport, status: response?.status(), correctViewport, ok, consoleErrors, ...checks, screenshot });
     await page.close();
   }
   await context.close();
