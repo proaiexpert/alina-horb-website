@@ -26,11 +26,15 @@ if missing:
 
 if js.count('form.addEventListener("submit"') != 1:
     raise SystemExit("Expected exactly one form submit handler")
-if 'formEndpoint: ""' not in config or 'formMode: "mailto"' not in config:
-    raise SystemExit("Endpoint must remain disabled until the approved provider URL is supplied")
+if 'formEndpoint: "https://formspree.io/f/mvzezana"' not in config:
+    raise SystemExit("Approved Formspree endpoint is not configured")
+if 'formMode: "formspree"' not in config:
+    raise SystemExit("Production form mode is not enabled")
+if 'turnstileSiteKey: ""' not in config:
+    raise SystemExit("Turnstile launch gate changed before the public site key was supplied")
 if 'noindex, nofollow' not in (ROOT / "index.html").read_text(encoding="utf-8"):
     raise SystemExit("Indexing gate changed unexpectedly")
 if 'noindex, nofollow' not in (ROOT / "ru/index.html").read_text(encoding="utf-8"):
     raise SystemExit("RU indexing gate changed unexpectedly")
 
-print("Production form hardening validation: OK")
+print("Production Formspree endpoint staged; Turnstile and indexing remain gated")
