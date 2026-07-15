@@ -235,18 +235,21 @@
             <li><strong>Email</strong><a class="contact-link" href="mailto:hello@alinahorb.com">hello@alinahorb.com</a></li>
             <li><strong>Що буде далі</strong><span>Аліна відповість, уточнить організаційні деталі та запропонує доступний час.</span></li>
           </ul>
-          <p class="contact-note">Не надсилайте у першому повідомленні медичні документи, кризові подробиці або інші чутливі дані.</p>
+          <p class="contact-note">Не надсилайте у першому повідомленні медичні документи, кризові подробиці або інші чутливі дані. Сайт і форма не є екстреною службою.</p>
         </div>
         <div class="contact-form-wrap" data-reveal>
           <h3>Коротке звернення</h3>
+          <p class="form-guidance"><strong>Для першого контакту достатньо кількох речень.</strong> Не надсилайте медичні документи, діагнози, копії посвідчень, платіжні дані або докладний опис кризової ситуації.</p>
           <form class="contact-form" data-contact-form data-locale="uk" novalidate>
+            <div class="form-honeypot" aria-hidden="true"><label for="contact-website">Не заповнюйте це поле</label><input id="contact-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
+            <input name="startedAt" type="hidden" value="">
             <div class="form-field"><label for="contact-name">Ім’я</label><input id="contact-name" name="name" type="text" autocomplete="name" required maxlength="100"></div>
             <div class="form-field"><label for="contact-reply">Ваш контакт</label><input id="contact-reply" name="reply" type="text" autocomplete="off" required maxlength="160" placeholder="@username або email"></div>
             <div class="form-field"><label for="contact-channel">Як зручно відповісти</label><select id="contact-channel" name="channel" required><option value="" selected disabled>Оберіть спосіб</option><option value="Telegram">Telegram</option><option value="Instagram">Instagram</option><option value="Email">Email</option></select></div>
             <div class="form-field"><label for="contact-language">Зручна мова</label><select id="contact-language" name="language" required><option value="" selected disabled>Оберіть мову</option><option value="Українська">Українська</option><option value="Російська">Російська</option></select></div>
             <div class="form-field form-field-full"><label for="contact-format">Бажаний формат</label><select id="contact-format" name="format" required><option value="" selected disabled>Оберіть формат</option><option value="Онлайн">Онлайн</option><option value="Очно за попереднім погодженням">Очно за попереднім погодженням</option></select></div>
-            <div class="form-field form-field-full"><label for="contact-message">Коротко про запит або запитання</label><textarea id="contact-message" name="message" required maxlength="1200"></textarea></div>
-            <label class="form-consent" for="contact-consent"><input id="contact-consent" name="consent" type="checkbox" required><span>Я погоджуюся на надсилання цього звернення та обробку вказаних контактних даних для відповіді.</span></label>
+            <div class="form-field form-field-full"><label for="contact-message">Коротко про запит або запитання</label><textarea id="contact-message" name="message" required minlength="3" maxlength="600" aria-describedby="contact-message-help"></textarea><p id="contact-message-help" class="form-privacy-note">Коротко опишіть організаційне запитання або те, з чим хотіли б звернутися. Екстрені звернення через форму не обробляються.</p></div>
+            <label class="form-consent" for="contact-consent"><input id="contact-consent" name="consent" type="checkbox" required><span>Я погоджуюся на надсилання звернення та обробку вказаних контактних даних для відповіді відповідно до <a href="privacy/">Політики конфіденційності</a>.</span></label>
             <div class="form-actions"><button class="button button-filled" type="submit">Надіслати звернення</button></div>
             <p class="form-status" data-form-status data-state="idle" aria-live="polite"></p>
           </form>
@@ -264,6 +267,7 @@
       <nav class="footer-links" aria-label="Контакти та мова">
         <div class="language-switch"><span aria-current="page">UA</span><span>/</span><a href="./ru/" lang="ru" hreflang="ru">RU</a></div>
         <a href="mailto:hello@alinahorb.com">Email</a>
+        <a href="privacy/">Конфіденційність</a>
         <a href="https://t.me/alina_horb1991" target="_blank" rel="noopener noreferrer">Telegram</a>
         <a href="https://instagram.com/ng_alina_dp" target="_blank" rel="noopener noreferrer">Instagram</a>
       </nav>
