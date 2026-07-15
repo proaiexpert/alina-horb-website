@@ -23,7 +23,10 @@ ROUTES = [
     ("ru/privacy/index.html", f"{BASE}/ru/privacy/", f"{BASE}/privacy/", f"{BASE}/ru/privacy/"),
 ]
 
-ARTICLE_PATHS = {path for path, *_ in ROUTES if "/notes/" in path and path not in {"notes/index.html", "ru/notes/index.html"}}
+ARTICLE_PATHS = {
+    path for path, *_ in ROUTES
+    if "notes/" in path and path not in {"notes/index.html", "ru/notes/index.html"}
+}
 errors = []
 
 
@@ -81,6 +84,11 @@ for home in (ROOT / "index.html", ROOT / "ru/index.html"):
         require("favicon-ag.svg" in text, f"{home.relative_to(ROOT)}: SVG favicon missing")
         require('"@type": "WebSite"' in text, f"{home.relative_to(ROOT)}: WebSite schema missing")
         require('"@type": "Person"' in text, f"{home.relative_to(ROOT)}: Person schema missing")
+
+for css_relative in ("assets/css/site.v2.css", "assets/css/site.v3-1.css"):
+    css = (ROOT / css_relative).read_text(encoding="utf-8")
+    require(":focus-visible" in css and "outline:" in css, f"{css_relative}: visible focus rule missing")
+    require(".skip-link:focus" in css and "translateY(0)" in css, f"{css_relative}: skip-link focus reveal missing")
 
 config = (ROOT / "assets/js/site-config.v2.js").read_text(encoding="utf-8")
 require("appendStylesheet" not in config and "createElement(\"link\")" not in config, "site-config: runtime CSS/favicon injection remains")
