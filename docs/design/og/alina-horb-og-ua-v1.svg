@@ -1,0 +1,23 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630" role="img" aria-labelledby="title desc">
+  <title id="title">Аліна Горб — українське прев’ю сайту</title>
+  <desc id="desc">Брендована картка психолога Аліни Горб для поширення української версії сайту.</desc>
+  <rect width="1200" height="630" fill="#f4efe7"/>
+  <path d="M0 0h855l-14 21H0z" fill="#c6533f"/>
+  <ellipse cx="1035" cy="215" rx="245" ry="305" fill="#e8ded3"/>
+  <ellipse cx="1030" cy="220" rx="180" ry="255" fill="none" stroke="#87927f" stroke-width="4"/>
+  <path d="M870 178a165 220 0 0 1 324 18" fill="none" stroke="#c6533f" stroke-width="3"/>
+  <rect x="890" y="85" width="160" height="160" rx="54" fill="#faf7f1" stroke="#2f302d" stroke-width="3"/>
+  <text x="970" y="191" text-anchor="middle" font-family="Georgia, 'Times New Roman', serif" font-size="72" fill="#2f302d">АГ</text>
+  <rect x="1080" y="85" width="65" height="37" rx="16" fill="#c6533f"/>
+  <text x="1112" y="110" text-anchor="middle" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#fff">UA</text>
+  <text x="82" y="142" font-family="Georgia, 'Times New Roman', serif" font-size="57" fill="#2f302d">Аліна Горб</text>
+  <text x="84" y="181" font-family="Arial, sans-serif" font-size="18" font-weight="700" fill="#c6533f">ПСИХОЛОГ · КОНСУЛЬТАЦІЇ УКРАЇНСЬКОЮ ТА РОСІЙСЬКОЮ</text>
+  <text x="82" y="275" font-family="Georgia, 'Times New Roman', serif" font-size="43" fill="#66705f">
+    <tspan x="82" dy="0">Коли всередині надто</tspan>
+    <tspan x="82" dy="55">багато, не обов’язково</tspan>
+    <tspan x="82" dy="55">справлятися наодинці.</tspan>
+  </text>
+  <line x1="80" y1="520" x2="1120" y2="520" stroke="#cfc3b7" stroke-width="2"/>
+  <text x="82" y="563" font-family="Arial, sans-serif" font-size="18" fill="#686963">Онлайн · очно за попереднім погодженням</text>
+  <text x="1120" y="563" text-anchor="end" font-family="Arial, sans-serif" font-size="19" font-weight="700" fill="#2f302d">alinahorb.com</text>
+</svg>
