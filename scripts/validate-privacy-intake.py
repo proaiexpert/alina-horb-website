@@ -29,6 +29,8 @@ def main() -> None:
         'href="privacy/"',
         "Сайт і форма не є екстреною службою",
         '<meta name="robots" content="noindex, nofollow">',
+        'href="assets/css/site.privacy.v3-2.css"',
+        'href="assets/css/site.intake.v3-2.css"',
     )
     ru = require(
         ROOT / "ru/index.html",
@@ -40,6 +42,8 @@ def main() -> None:
         'href="privacy/"',
         "Сайт и форма не являются экстренной службой",
         '<meta name="robots" content="noindex, nofollow">',
+        'href="../assets/css/site.privacy.v3-2.css"',
+        'href="../assets/css/site.intake.v3-2.css"',
     )
     require(
         ROOT / "privacy/index.html",
@@ -57,21 +61,21 @@ def main() -> None:
         "Неэкстренный характер сайта",
         '<meta name="robots" content="noindex, nofollow">',
     )
-    js = require(
+    require(
         ROOT / "assets/js/site.v2.js",
         PUBLIC_EMAIL,
         "elapsed < 1500",
         "[name='website']",
         'document.querySelector("#about")',
     )
-    chrome = require(
+    require(
         ROOT / "assets/js/site.chrome.v3.js",
         PUBLIC_EMAIL,
         "privacyHref",
         'privacy: "Конфіденційність"',
         'privacy: "Конфиденциальность"',
     )
-    config = require(ROOT / "assets/js/site-config.v2.js", PUBLIC_EMAIL, "site.intake.v3-2.css")
+    config = require(ROOT / "assets/js/site-config.v2.js", PUBLIC_EMAIL)
     require(ROOT / "assets/css/site.intake.v3-2.css", ".form-honeypot", ".form-guidance", ".form-consent a")
     require(ROOT / "assets/css/site.privacy.v3-2.css", ".privacy-main", ".privacy-content")
 
