@@ -86,7 +86,7 @@ Support-index copy is `12px` on desktop as a compact secondary index label and `
 ## SEO and link checks
 
 - Canonical: `https://alinahorb.com/` — PASS
-- Email: `alinahorb1991@gmail.com` — PASS
+- Email: `hello@alinahorb.com` — PASS
 - Maker credit: `ProAI Expert` — PASS
 - Maker URL: `https://proai-expert.com` — PASS
 - Fabricated Telegram link: **not present**

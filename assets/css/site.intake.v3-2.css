@@ -1,0 +1,53 @@
+/* V3.2 safe first-contact form refinements. */
+
+.form-guidance {
+  margin: -4px 0 22px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.65;
+}
+
+.form-guidance strong {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+.form-honeypot {
+  position: absolute !important;
+  left: -10000px !important;
+  width: 1px !important;
+  height: 1px !important;
+  overflow: hidden !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+}
+
+.form-consent span {
+  line-height: 1.55;
+}
+
+.form-consent a {
+  color: inherit;
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+}
+
+.form-consent a:hover,
+.form-consent a:focus-visible {
+  color: var(--terracotta);
+}
+
+.form-privacy-note {
+  margin: 12px 0 0;
+  color: var(--muted);
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+@media (max-width: 620px) {
+  .form-guidance {
+    margin-bottom: 18px;
+    font-size: 12px;
+  }
+}

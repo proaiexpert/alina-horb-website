@@ -70,7 +70,7 @@ Do not redesign:
 ## Footer facts
 
 - Domain: `alinahorb.com`
-- Temporary email: `alinahorb1991@gmail.com`
+- Temporary email: `hello@alinahorb.com`
 - Copyright base year: `2026`
 - Maker credit: `ProAI Expert`
 - Maker-credit URL: `https://proai-expert.com/`

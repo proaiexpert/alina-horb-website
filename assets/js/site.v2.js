@@ -10,6 +10,7 @@
       success: "Звернення підготовлено. Відкриваємо поштову програму.",
       error: "Не вдалося підготувати звернення. Напишіть на email.",
       invalid: "Перевірте, будь ласка, обов’язкові поля.",
+      blocked: "Не вдалося надіслати форму. Зачекайте кілька секунд і спробуйте ще раз.",
       submit: "Надіслати звернення",
       fields: { name: "Ім’я", reply: "Контакт", channel: "Спосіб зв’язку", language: "Мова", format: "Формат", message: "Повідомлення" }
     },
@@ -19,6 +20,7 @@
       success: "Обращение подготовлено. Открываем почтовую программу.",
       error: "Не удалось подготовить обращение. Напишите на email.",
       invalid: "Проверьте, пожалуйста, обязательные поля.",
+      blocked: "Не удалось отправить форму. Подождите несколько секунд и попробуйте ещё раз.",
       submit: "Отправить обращение",
       fields: { name: "Имя", reply: "Контакт", channel: "Способ связи", language: "Язык", format: "Формат", message: "Сообщение" }
     }
@@ -118,7 +120,13 @@
     const text = copy[locale];
     const status = form.querySelector("[data-form-status]");
     const button = form.querySelector("button[type='submit']");
+    const honeypot = form.querySelector("[name='website']");
+    const startedAtField = form.querySelector("[name='startedAt']");
     const endpoint = String(config.formEndpoint || "").trim();
+    let openedAt = Date.now();
+    let interacted = false;
+
+    if (startedAtField) startedAtField.value = String(openedAt);
 
     const setState = (state, message) => {
       if (status) {
@@ -158,12 +166,16 @@
         `${fields.message}:`,
         payload.message
       ].join("\n");
-      const email = String(config.email || "alinahorb1991@gmail.com").trim();
+      const email = String(config.email || "hello@alinahorb.com").trim();
       setState("success", text.success);
       window.location.href = `mailto:${email}?subject=${encodeURIComponent(text.subject)}&body=${encodeURIComponent(body)}`;
     };
 
+    const markInteraction = () => { interacted = true; };
+    form.addEventListener("pointerdown", markInteraction, { passive: true });
+    form.addEventListener("keydown", markInteraction);
     form.addEventListener("input", () => {
+      interacted = true;
       if (status?.dataset.state === "error") setState("idle", "");
     });
 
@@ -175,6 +187,18 @@
       }
 
       const payload = payloadFromForm();
+      const elapsed = Date.now() - openedAt;
+      const trapped = Boolean(String(honeypot?.value || "").trim());
+      const meaningful = payload.name.length > 0 && payload.reply.length > 2 && payload.message.length > 2 && payload.consent;
+      if (trapped || elapsed < 1500 || !interacted) {
+        setState("error", text.blocked);
+        return;
+      }
+      if (!meaningful) {
+        setState("error", text.invalid);
+        return;
+      }
+
       setState("loading", text.loading);
 
       if (!endpoint || config.formMode === "mailto") {
@@ -190,6 +214,9 @@
         });
         if (!response.ok) throw new Error(`HTTP ${response.status}`);
         form.reset();
+        openedAt = Date.now();
+        interacted = false;
+        if (startedAtField) startedAtField.value = String(openedAt);
         setState("success", text.success);
       } catch (error) {
         console.error("Contact form submission failed", error);
@@ -201,6 +228,7 @@
   const initMobileBookingCta = () => {
     const cta = document.querySelector("[data-mobile-booking-cta]");
     const heroCta = document.querySelector(".hero-actions .button");
+    const about = document.querySelector("#about");
     const contact = document.querySelector("#contact");
     const footer = document.querySelector(".site-footer");
     if (!cta || !heroCta || !contact) return;
@@ -222,6 +250,12 @@
       hideTimer = window.setTimeout(() => { cta.hidden = true; }, reducedMotion ? 0 : 240);
     };
 
+    const inViewport = (element) => {
+      if (!element) return false;
+      const rect = element.getBoundingClientRect();
+      return rect.top < window.innerHeight && rect.bottom > 0;
+    };
+
     const update = () => {
       frame = 0;
       if (!mobile.matches) {
@@ -229,11 +263,10 @@
         return;
       }
       const heroBottom = heroCta.getBoundingClientRect().bottom;
-      const contactRect = contact.getBoundingClientRect();
-      const footerRect = footer?.getBoundingClientRect();
-      const contactVisible = contactRect.top < window.innerHeight && contactRect.bottom > 0;
-      const footerVisible = Boolean(footerRect && footerRect.top < window.innerHeight && footerRect.bottom > 0);
-      setVisible(heroBottom < 0 && !contactVisible && !footerVisible);
+      const longReadingBlockVisible = inViewport(about);
+      const contactVisible = inViewport(contact);
+      const footerVisible = inViewport(footer);
+      setVisible(heroBottom < 0 && !longReadingBlockVisible && !contactVisible && !footerVisible);
     };
 
     const requestUpdate = () => {

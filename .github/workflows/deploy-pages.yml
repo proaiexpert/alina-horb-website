@@ -26,10 +26,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Validate production asset references
+      - name: Validate production site contract
         run: |
           python3 scripts/validate-assets.py
           python3 scripts/validate-social-previews.py
+          python3 scripts/validate-public-email.py
+          python3 scripts/validate-privacy-intake.py
 
       - name: Prepare public site artifact
         shell: bash
@@ -41,14 +43,20 @@ jobs:
 
           cp index.html _site/
           cp favicon.svg _site/
-          cp -R ru _site/
           cp -R assets _site/
+          cp -R notes _site/
+          cp -R privacy _site/
+          cp -R ru _site/
 
           touch _site/.nojekyll
 
           test -f _site/index.html
           test -f _site/favicon.svg
+          test -f _site/notes/index.html
+          test -f _site/privacy/index.html
           test -f _site/ru/index.html
+          test -f _site/ru/notes/index.html
+          test -f _site/ru/privacy/index.html
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5

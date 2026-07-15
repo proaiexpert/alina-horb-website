@@ -109,7 +109,7 @@ New confirmed information from Alina was added:
 
 - Telegram `@alina_horb1991`;
 - Instagram `@ng_alina_dp`;
-- email `alinahorb1991@gmail.com`;
+- email `hello@alinahorb.com`;
 - work with people of different ages, couples, and families;
 - work with minors agreed separately;
 - support for people affected by war and internally displaced persons;

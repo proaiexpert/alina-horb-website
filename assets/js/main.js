@@ -2,7 +2,7 @@
   'use strict';
 
   const config = window.ALINA_SITE_CONFIG || {
-    email: 'alinahorb1991@gmail.com',
+    email: 'hello@alinahorb.com',
     telegramUsername: '',
     phone: ''
   };
@@ -97,7 +97,7 @@
 
       if (status) status.textContent = text.opening;
 
-      const email = String(config.email || 'alinahorb1991@gmail.com').trim();
+      const email = String(config.email || 'hello@alinahorb.com').trim();
       window.location.href = `mailto:${email}?subject=${encodeURIComponent(text.subject)}&body=${encodeURIComponent(body)}`;
     });
   };
