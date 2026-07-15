@@ -27,7 +27,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Validate production asset references
-        run: python3 scripts/validate-assets.py
+        run: |
+          python3 scripts/validate-assets.py
+          python3 scripts/validate-social-previews.py
 
       - name: Prepare public site artifact
         shell: bash
