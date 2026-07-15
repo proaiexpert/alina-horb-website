@@ -1,0 +1,10 @@
+{
+  "path": "ru/index.html",
+  "replacements": [
+    {
+      "label": "RU unconfirmed supervision principle",
+      "old": "<li><strong>Супервизия</strong><span>Регулярная профессиональная поддержка как часть ответственной практики.</span></li>",
+      "new": ""
+    }
+  ]
+}
