@@ -38,12 +38,14 @@ jobs:
           mkdir -p _site
 
           cp index.html _site/
+          cp favicon.svg _site/
           cp -R ru _site/
           cp -R assets _site/
 
           touch _site/.nojekyll
 
           test -f _site/index.html
+          test -f _site/favicon.svg
           test -f _site/ru/index.html
 
       - name: Configure GitHub Pages
