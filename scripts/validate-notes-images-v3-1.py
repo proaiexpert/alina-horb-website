@@ -7,8 +7,8 @@ ROOT = Path(__file__).resolve().parents[1]
 PAGES = {
     Path("index.html"): ("assets/", None),
     Path("ru/index.html"): ("../assets/", None),
-    Path("notes/index.html"): ("../assets/", "first"),
-    Path("ru/notes/index.html"): ("../../assets/", "first"),
+    Path("notes/index.html"): ("../assets/", None),
+    Path("ru/notes/index.html"): ("../../assets/", None),
 }
 
 SLUGS = {
