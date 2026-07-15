@@ -36,6 +36,7 @@ jobs:
           python3 scripts/validate-article-start-conversation.py
           python3 scripts/validate-article-coping-support.py
           python3 scripts/validate-article-relocation.py
+          python3 scripts/validate-notes-hub-v32.py
 
       - name: Prepare public site artifact
         shell: bash
@@ -52,6 +53,7 @@ jobs:
           touch _site/.nojekyll
           test -f _site/index.html
           test -f _site/favicon.svg
+          test -f _site/assets/css/site.notes-hub.v3-2.css
           test -f _site/notes/index.html
           test -f _site/notes/first-consultation/index.html
           test -f _site/notes/how-to-start-the-conversation/index.html
