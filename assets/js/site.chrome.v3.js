@@ -33,6 +33,7 @@
   const ruRelative = relativePath.startsWith("ru/") ? relativePath : `ru/${relativePath}`;
   const homeHref = `${rootPath}${isRu ? "ru/" : ""}`;
   const notesHref = `${rootPath}${isRu ? "ru/notes/" : "notes/"}`;
+  const privacyHref = `${rootPath}${isRu ? "ru/privacy/" : "privacy/"}`;
   const alternateHref = `${rootPath}${isRu ? uaRelative : ruRelative}`;
   const logoUrl = new URL(`../images/logos/alina-horb-logo-${isRu ? "ru" : "ua"}-dark.png`, script.src).href;
 
@@ -47,6 +48,7 @@
     process: "Процесс",
     notes: "Заметки",
     contact: "Контакты",
+    privacy: "Конфиденциальность",
     developed: "Разработано",
     copyright: "© Алина Горб, 2026"
   } : {
@@ -60,6 +62,7 @@
     process: "Процес",
     notes: "Нотатки",
     contact: "Контакти",
+    privacy: "Конфіденційність",
     developed: "Розроблено",
     copyright: "© Аліна Горб, 2026"
   };
@@ -112,6 +115,7 @@
           <a href="mailto:hello@alinahorb.com">Email</a>
           <a href="https://t.me/alina_horb1991" target="_blank" rel="noopener noreferrer">Telegram</a>
           <a href="https://instagram.com/ng_alina_dp" target="_blank" rel="noopener noreferrer">Instagram</a>
+          <a href="${privacyHref}">${text.privacy}</a>
         </nav>
         <div class="footer-meta"><span>${text.copyright}</span></div>
       </div>
