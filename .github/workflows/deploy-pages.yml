@@ -35,36 +35,35 @@ jobs:
           python3 scripts/validate-article-v32.py
           python3 scripts/validate-article-start-conversation.py
           python3 scripts/validate-article-coping-support.py
+          python3 scripts/validate-article-relocation.py
 
       - name: Prepare public site artifact
         shell: bash
         run: |
           set -euo pipefail
-
           rm -rf _site
           mkdir -p _site
-
           cp index.html _site/
           cp favicon.svg _site/
           cp -R assets _site/
           cp -R notes _site/
           cp -R privacy _site/
           cp -R ru _site/
-
           touch _site/.nojekyll
-
           test -f _site/index.html
           test -f _site/favicon.svg
           test -f _site/notes/index.html
           test -f _site/notes/first-consultation/index.html
           test -f _site/notes/how-to-start-the-conversation/index.html
           test -f _site/notes/when-coping-stops-helping/index.html
+          test -f _site/notes/stress-relocation-and-lost-support/index.html
           test -f _site/privacy/index.html
           test -f _site/ru/index.html
           test -f _site/ru/notes/index.html
           test -f _site/ru/notes/first-consultation/index.html
           test -f _site/ru/notes/how-to-start-the-conversation/index.html
           test -f _site/ru/notes/when-coping-stops-helping/index.html
+          test -f _site/ru/notes/stress-relocation-and-lost-support/index.html
           test -f _site/ru/privacy/index.html
 
       - name: Configure GitHub Pages
