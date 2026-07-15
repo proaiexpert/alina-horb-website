@@ -34,7 +34,8 @@ def append_once(target: str, fragment: str, marker: str) -> None:
 
 def main() -> None:
     apply_replacements("ua.json")
-    apply_replacements("ru.json")
+    apply_replacements("ru-topics.json")
+    apply_replacements("ru-about.json")
     append_once("assets/css/site.v3-1-stability.css", "approach.css", "V3.2 author voice and working approach")
     append_once("docs/PROJECT_SOURCE_OF_TRUTH.md", "source-of-truth.md", "V3.2 — Author voice and working approach")
     print("Applied V3.2 author voice and working approach.")
