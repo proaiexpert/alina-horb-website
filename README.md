@@ -1,14 +1,16 @@
 # Alina Horb — Psychology Practice Website
 
-Premium bilingual website for psychologist **Alina Horb**, designed as a calm editorial environment for learning about her practice, areas of support, consultation process, professional boundaries, notes, and contact options.
+Premium bilingual website for psychologist **Alina Horb**, designed as a calm editorial environment for learning about her practice, areas of support, consultation process, professional boundaries, Notes, and contact options.
 
-> **Current status:** public review preview. The site is intentionally served with `noindex, nofollow` until the official domain, final editorial review, legal pages, and production SEO are complete.
+> **Current status:** the production domain is connected and HTTPS is active. The site intentionally remains `noindex, nofollow` until privacy/legal pages, the production contact workflow, final article editing, and SEO launch review are complete.
 
-## Live preview
+## Production website
 
-- Ukrainian: https://proaiexpert.github.io/alina-horb-website/
-- Russian: https://proaiexpert.github.io/alina-horb-website/ru/
-- Planned production domain: https://alinahorb.com/
+- Ukrainian: https://alinahorb.com/
+- Russian: https://alinahorb.com/ru/
+- `www`: https://www.alinahorb.com/ redirects to the apex domain
+
+The former GitHub Pages project URL redirects to the production domain.
 
 ## Project goals
 
@@ -19,7 +21,7 @@ The project is intended to provide:
 - separate natural Ukrainian and Russian editorial versions;
 - transparent information about format, price, duration, professional boundaries, and first contact;
 - careful communication around crisis, trauma, anxiety, OCD manifestations, panic attacks, war-related displacement, and domestic violence;
-- an editorial notes layer for future long-form educational content and organic search visibility;
+- an editorial Notes layer for educational content and future organic-search visibility;
 - a lightweight, accessible, maintainable static implementation.
 
 ## Brand direction
@@ -39,7 +41,7 @@ Reference roles:
 
 - **Kinfolk** — editorial composition, typography, pacing, and whitespace;
 - **Oura** — organic geometry, visual storytelling, and controlled interaction;
-- **Portland Talk Club** — psychological content clarity, recognizable situations, FAQ, and contact logic.
+- **Portland Talk Club** — psychological-content clarity, recognizable situations, FAQ, and contact logic.
 
 ## Current information architecture
 
@@ -92,26 +94,29 @@ The website currently presents careful, non-diagnostic wording around:
 - primary psychological support during acute stress;
 - repeated suicidal or self-harm thoughts with a clear emergency disclaimer.
 
-The site and contact form are **not emergency services**. The copy directs users to local emergency or crisis services when there is immediate danger, a concrete plan, or inability to remain safe.
+These statements must not be expanded into specialization, diagnosis, treatment, jurisdiction, or outcome claims without explicit confirmation and evidence.
+
+The site and contact form are **not emergency services**. Copy must direct users to local emergency or crisis services when there is immediate danger, a concrete plan, or inability to remain safe.
 
 ## Current features
 
 - Ukrainian homepage at `/`
 - Russian homepage at `/ru/`
 - reciprocal language switching
-- semantic section navigation
-- mobile hamburger navigation
-- mobile booking CTA that appears after the hero CTA leaves the viewport
+- shared desktop and mobile navigation
+- mobile booking CTA
 - accessible FAQ accordions
-- restrained section reveal and process-line animation
+- restrained reveal and process-line motion
 - `prefers-reduced-motion` support
+- approved Hero and About portrait derivatives
 - public redacted diploma preview
-- editorial Notes index and four current draft article routes per language
+- Notes index and four current article routes per language
 - Telegram, Instagram, and email contact paths
 - compact bilingual consultation form
 - responsive layouts from mobile through wide desktop
 - automated GitHub Pages deployment
-- local asset validation in CI
+- local asset-reference validation in CI
+- production domain, HTTPS, apex/`www`, and GitHub Pages redirects
 
 ## Technical architecture
 
@@ -135,11 +140,13 @@ index.html                         Ukrainian homepage
 ru/index.html                      Russian homepage
 notes/                             Ukrainian Notes index and articles
 ru/notes/                          Russian Notes index and articles
-assets/css/site.v2.css             shared visual system
-assets/js/site.v2.js               navigation, FAQ, motion, form behavior
+assets/css/site.v3-1.css           current homepage V3.1 visual layer
+assets/css/site.v2.css             older shared Notes/article layer pending V3.2
+assets/js/site.v2.js               navigation, FAQ, motion, and form behavior
 assets/js/site-config.v2.js        shared contact configuration
 assets/images/                     public production assets
-docs/                              governance, decisions, QA, and roadmap
+favicon.svg                        production favicon copied by Pages workflow
+docs/                              governance, research, decisions, QA, and roadmap
 scripts/validate-assets.py         local asset-reference validator
 .github/workflows/deploy-pages.yml GitHub Pages deployment
 ```
@@ -157,19 +164,20 @@ Open:
 - http://127.0.0.1:8080/
 - http://127.0.0.1:8080/ru/
 
-Do not review the pages through `file://` because relative routes, language links, and browser security behavior may differ.
+Do not review pages through `file://` because relative routes, language links, and browser security behavior may differ.
 
 ## Contact form status
 
-The current preview form prepares a localized email message and opens the visitor's configured email client. It does not yet use a server-side form endpoint and does not store submissions.
+The current form prepares a localized email message and opens the visitor's configured email client. It does not use a server-side form endpoint and does not store submissions.
 
-Before production release, the form must move to a privacy-reviewed endpoint with:
+Before search launch, the form must move to a privacy-reviewed endpoint with:
 
 - server-side validation;
 - anti-spam protection;
 - clear success and error states;
 - minimal data collection;
-- documented provider and retention behavior.
+- documented provider and retention behavior;
+- explicit handling boundaries for crisis or sensitive information.
 
 Telegram remains the preferred direct contact channel.
 
@@ -181,9 +189,19 @@ GitHub Pages deploys from `main` through:
 .github/workflows/deploy-pages.yml
 ```
 
-The deployment publishes the website files directly from the repository. It must not depend on Google Drive, local ZIP files, private source assets, or external build artifacts.
+The deployment publishes website files directly from the repository. It must not depend on Google Drive, local ZIP files, private source assets, or external build artifacts.
 
 Changed public assets should use versioned filenames rather than silently replacing old files under the same URL.
+
+### Production routing
+
+Expected behavior:
+
+- `http://alinahorb.com/` redirects to HTTPS;
+- `https://alinahorb.com/` serves the Ukrainian homepage;
+- `https://alinahorb.com/ru/` serves the Russian homepage;
+- `https://www.alinahorb.com/` redirects to the apex domain;
+- the former GitHub Pages project URL redirects to `alinahorb.com`.
 
 ## QA expectations
 
@@ -199,16 +217,17 @@ Major visual or structural changes are reviewed at:
 Required checks include:
 
 - broken images: `0`
-- local asset 404s: `0`
+- local/production asset 404s: `0`
 - console/runtime errors: `0`
 - horizontal overflow: `0`
 - one H1 per page
 - logical H2/H3 hierarchy
 - keyboard navigation and visible focus
 - functional language switching
-- functional hamburger navigation and mobile booking CTA
+- functional navigation, FAQ, form, and mobile booking CTA
 - reduced-motion behavior
 - correct public-only asset usage
+- correct HTTPS and redirect behavior
 
 ## Public asset policy
 
@@ -230,19 +249,40 @@ Never commit:
 
 ## Current development wave
 
-The active large implementation task is:
+The active roadmap is:
 
-- [Issue #15 — V3.1 Wave 1: Homepage Content & Visual Polish](https://github.com/proaiexpert/alina-horb-website/issues/15)
+- [Issue #19 — V3.2: Editorial Notes, Article System & Premium Site Polish](https://github.com/proaiexpert/alina-horb-website/issues/19)
 
-V3.1 includes:
+The V3.1 homepage, responsive stabilization, global navigation/footer, production domain, HTTPS, and favicon deployment are complete.
 
-- a new seated-with-book Hero portrait;
-- a separate close About portrait;
-- natural UA/RU homepage editing;
-- typography and readability refinement;
-- diploma and principles-section polish;
-- restrained motion refinement;
-- preservation of footer, mobile CTA, accessibility, and preview safeguards.
+V3.2 now focuses on:
+
+- Notes-index redesign;
+- one shared premium article system for all UA/RU articles;
+- native Ukrainian editorial refinement and natural Russian localization;
+- article-specific visuals;
+- evidence, safety, author, dates, internal links, and structured data;
+- privacy/legal pages and a production contact endpoint;
+- final SEO and indexing release gate.
+
+## Research and editorial governance
+
+The July 2026 Deep Research Pack has been reduced into an implementation standard:
+
+- [`docs/V3_2_RESEARCH_SYNTHESIS.md`](docs/V3_2_RESEARCH_SYNTHESIS.md)
+
+Key adopted rules:
+
+- no diagnosis from symptom lists;
+- no universal time threshold;
+- no guaranteed outcome;
+- no fixed first-session script unless confirmed by Alina;
+- no absolute confidentiality claim;
+- no universal migration stages or automatic trauma claims;
+- Ukrainian is the primary canonical editorial version;
+- Russian is an independent natural localization;
+- health and safety claims use primary or authoritative sources;
+- `noindex, nofollow` remains until privacy, form, editorial, and SEO gates are approved.
 
 ## Roadmap
 
@@ -251,15 +291,17 @@ Detailed project phases and release gates are maintained in:
 - [`docs/ROADMAP.md`](docs/ROADMAP.md)
 - [`docs/PROJECT_HISTORY.md`](docs/PROJECT_HISTORY.md)
 - [`docs/PROJECT_SOURCE_OF_TRUTH.md`](docs/PROJECT_SOURCE_OF_TRUTH.md)
+- [`docs/V3_2_RESEARCH_SYNTHESIS.md`](docs/V3_2_RESEARCH_SYNTHESIS.md)
 
-High-level next waves:
+High-level next order:
 
-1. **Homepage V3.1** — content and visual polish
-2. **Notes and articles** — full UA/RU editorial rewrite and article-specific visuals
-3. **SEO and AI-search** — titles, descriptions, schema, internal linking, author data, and content QA
-4. **Privacy and production form** — legal pages and real form delivery
-5. **Domain and release** — connect `alinahorb.com`, verify deployment, remove preview `noindex`, submit sitemap
-6. **Post-launch iteration** — analytics-informed improvements without weakening privacy or editorial quality
+1. verify post-domain production deployment and favicon;
+2. prepare UA/RU privacy and production form workflow;
+3. rebuild Notes under V3.2;
+4. implement one article template for all eight routes;
+5. complete UA/RU editorial, evidence, safety, and SEO review;
+6. finalize sitemap/robots/Search Console and remove `noindex` in a dedicated launch commit;
+7. perform post-launch measurement and iteration.
 
 ## Governance
 
@@ -267,10 +309,11 @@ Production decisions are governed by:
 
 1. the latest confirmed information from Alina;
 2. `docs/PROJECT_SOURCE_OF_TRUTH.md`;
-3. approved design and content decisions;
-4. reviewed GitHub issues and pull requests.
+3. `docs/V3_2_RESEARCH_SYNTHESIS.md` for article evidence and safety;
+4. approved design and content decisions;
+5. reviewed GitHub issues and pull requests.
 
-Large changes are implemented in feature branches and reviewed through pull requests. Small reversible fixes may be merged independently when they do not conflict with an active implementation branch.
+Large changes are implemented in feature branches and reviewed through pull requests. Small reversible fixes may be merged independently when they do not conflict with active implementation work.
 
 ## Credits
 
