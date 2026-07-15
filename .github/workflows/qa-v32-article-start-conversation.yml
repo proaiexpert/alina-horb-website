@@ -1,0 +1,72 @@
+name: QA V3.2 conversation article
+
+on:
+  push:
+    branches:
+      - feature/v32-article-start-conversation
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  conversation-article-qa:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/v32-article-start-conversation
+          fetch-depth: 0
+
+      - name: Apply final neutral-language polish
+        run: python3 scripts/apply-v32-article-start-conversation.py
+
+      - name: Validate production contracts
+        run: |
+          python3 scripts/validate-assets.py
+          python3 scripts/validate-social-previews.py
+          python3 scripts/validate-public-email.py
+          python3 scripts/validate-privacy-intake.py
+          python3 scripts/validate-article-v32.py
+          python3 scripts/validate-article-start-conversation.py
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local site
+        run: |
+          python3 -m http.server 8080 --bind 127.0.0.1 > /tmp/alina-conversation-article.log 2>&1 &
+          echo $! > /tmp/alina-conversation-article.pid
+          sleep 2
+
+      - name: Run responsive article QA
+        run: node scripts/qa-v32-article-start-conversation.mjs
+
+      - name: Upload article QA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v32-article-start-conversation-qa
+          path: qa-artifacts/article-start-conversation
+          if-no-files-found: error
+
+      - name: Commit polished production pages
+        if: github.event_name == 'push' && success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add notes/how-to-start-the-conversation/index.html ru/notes/how-to-start-the-conversation/index.html
+          if git diff --cached --quiet; then
+            echo "No article polish changes to commit."
+            exit 0
+          fi
+          git commit -m "Polish neutral language in bilingual conversation article"
+          git push origin HEAD:feature/v32-article-start-conversation
