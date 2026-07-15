@@ -1,0 +1,55 @@
+name: QA V3.2 relocation article
+
+on:
+  push:
+    branches:
+      - feature/v32-article-relocation
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  relocation-article-qa:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/v32-article-relocation
+
+      - name: Validate production contracts
+        run: |
+          python3 scripts/validate-assets.py
+          python3 scripts/validate-social-previews.py
+          python3 scripts/validate-public-email.py
+          python3 scripts/validate-privacy-intake.py
+          python3 scripts/validate-article-v32.py
+          python3 scripts/validate-article-start-conversation.py
+          python3 scripts/validate-article-coping-support.py
+          python3 scripts/validate-article-relocation.py
+
+      - name: Install Playwright
+        run: |
+          npm install --no-save playwright@1.55.0
+          npx playwright install --with-deps chromium
+
+      - name: Start local site
+        run: |
+          python3 -m http.server 8080 --bind 127.0.0.1 > /tmp/alina-relocation.log 2>&1 &
+          echo $! > /tmp/alina-relocation.pid
+          sleep 2
+
+      - name: Run responsive article QA
+        run: node scripts/qa-v32-article-relocation.mjs
+
+      - name: Upload article QA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: v32-article-relocation-qa
+          path: qa-artifacts/article-relocation
+          if-no-files-found: error
