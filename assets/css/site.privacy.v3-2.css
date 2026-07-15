@@ -14,6 +14,8 @@
   margin: 0 0 22px;
   font-size: clamp(54px, 7vw, 82px);
   line-height: .94;
+  overflow-wrap: anywhere;
+  hyphens: auto;
 }
 
 .privacy-hero p:not(.section-kicker):not(.privacy-updated) {
@@ -130,7 +132,10 @@
 
 @media (max-width: 620px) {
   .privacy-hero { padding: 54px 0 38px; }
-  .privacy-hero h1 { font-size: 48px; }
+  .privacy-hero h1 {
+    font-size: clamp(40px, 11vw, 46px);
+    line-height: .98;
+  }
   .privacy-layout { padding-block: 52px 68px; }
   .privacy-content section { margin-top: 42px; padding-top: 20px; }
   .privacy-content h2 { font-size: 32px; }
