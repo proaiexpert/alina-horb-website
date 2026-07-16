@@ -1,4 +1,4 @@
-name: Inspect recent Pages deployments
+name: Inspect Pages deployment failure
 
 on:
   pull_request:
@@ -13,31 +13,7 @@ jobs:
   inspect:
     runs-on: ubuntu-latest
     steps:
-      - name: Print recent deploy-pages runs
-        env:
-          GH_TOKEN: ${{ github.token }}
-          REPO: ${{ github.repository }}
-        run: |
-          set -euo pipefail
-          curl -fsSL \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/${REPO}/actions/workflows/deploy-pages.yml/runs?branch=main&per_page=10" \
-            -o runs.json
-          python3 - <<'PY'
-          import json
-          data = json.load(open('runs.json', encoding='utf-8'))
-          print(f"TOTAL MATCHING RUNS: {data.get('total_count')}")
-          for run in data.get('workflow_runs', []):
-              print(
-                  f"RUN id={run['id']} status={run['status']} conclusion={run.get('conclusion')} "
-                  f"event={run['event']} head_sha={run['head_sha']} created={run['created_at']} "
-                  f"updated={run['updated_at']} url={run['html_url']}"
-              )
-          PY
-
-      - name: Print failed deploy job log tail
+      - name: Print deployment failure details
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
@@ -49,7 +25,19 @@ jobs:
             -H "X-GitHub-Api-Version: 2022-11-28" \
             "https://api.github.com/repos/${REPO}/actions/jobs/87725924994/logs" \
             -o deploy-job.log
-          echo '--- DEPLOY JOB LOG TAIL ---'
-          tail -n 90 deploy-job.log
-          echo '--- FAILURE MARKERS ---'
-          grep -nE 'Error|ERROR|Traceback|AssertionError|SystemExit|failed|FAIL|Missing|expected|Expected' deploy-job.log | tail -n 80 || true
+          echo '--- FAILURE CONTEXT ---'
+          python3 - <<'PY'
+          from pathlib import Path
+          lines = Path('deploy-job.log').read_text(encoding='utf-8', errors='replace').splitlines()
+          markers = ('Error', 'ERROR', 'Traceback', 'AssertionError', 'SystemExit', 'failed', 'FAIL', 'Missing', 'expected', 'Expected', '##[error]')
+          hits = [i for i, line in enumerate(lines) if any(marker in line for marker in markers)]
+          if not hits:
+              print('No explicit marker found. Last 35 lines:')
+              for line in lines[-35:]:
+                  print(line)
+          else:
+              start = max(0, min(hits) - 12)
+              end = min(len(lines), max(hits) + 13)
+              for line in lines[start:end]:
+                  print(line)
+          PY
