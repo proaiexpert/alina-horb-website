@@ -3,7 +3,7 @@ name: QA V3.2 form hardening
 on:
   push:
     branches:
-      - feature/v32-production-form-launch-gate
+      - release/v3-2-form-indexing
   pull_request:
     branches:
       - main
@@ -18,11 +18,12 @@ jobs:
     steps:
       - name: Checkout branch
         uses: actions/checkout@v4
-        with:
-          ref: feature/v32-production-form-launch-gate
 
       - name: Build hardened runtime
-        run: python3 scripts/apply-v32-form-hardening.py
+        run: |
+          python3 scripts/apply-v32-form-hardening.py
+          python3 scripts/apply-turnstile-v3-2.py
+          node --check assets/js/site.v2.js
 
       - name: Validate production contracts
         run: |
