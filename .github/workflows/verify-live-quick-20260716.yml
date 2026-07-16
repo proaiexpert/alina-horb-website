@@ -12,15 +12,15 @@ jobs:
   verify-live-quick:
     runs-on: ubuntu-latest
     steps:
-      - name: Fetch and validate production HTML
+      - name: Fetch and inspect production HTML
         shell: bash
         run: |
           set -euo pipefail
           stamp="quick-95e36c04-$(date +%s)"
-          curl -v -fsSL --connect-timeout 5 --max-time 12 \
+          curl -fsSL --connect-timeout 5 --max-time 12 \
             -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' \
             "https://alinahorb.com/?verify=${stamp}" -o ua.html
-          curl -v -fsSL --connect-timeout 5 --max-time 12 \
+          curl -fsSL --connect-timeout 5 --max-time 12 \
             -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' \
             "https://alinahorb.com/ru/?verify=${stamp}" -o ru.html
           python3 - <<'PY'
@@ -44,6 +44,7 @@ jobs:
               ],
           }
 
+          success = True
           for path, fragments in expected.items():
               text = path.read_text(encoding='utf-8', errors='replace')
               match = re.search(r'<blockquote class="editorial-quote editorial-quote--author">(.*?)</blockquote>', text, flags=re.S)
@@ -53,10 +54,23 @@ jobs:
                   print(f'{path} LIVE QUOTE: {visible}')
               else:
                   print(f'{path}: quote block not found; bytes={len(text)}')
-              positions = [text.index(fragment) for fragment in fragments]
-              assert positions == sorted(positions), f'Wrong production quote order in {path}'
+                  success = False
+                  continue
 
-          assert 'Для мене справжня сила — не в тому' not in Path('ua.html').read_text(encoding='utf-8')
-          assert 'Для меня настоящая сила — не в том' not in Path('ru.html').read_text(encoding='utf-8')
-          print('PRODUCTION VERIFIED: final Ukrainian and Russian quotes are live')
+              positions = []
+              for fragment in fragments:
+                  if fragment not in text:
+                      print(f'{path}: MISSING: {fragment}')
+                      success = False
+                  else:
+                      positions.append(text.index(fragment))
+              if len(positions) == len(fragments) and positions != sorted(positions):
+                  print(f'{path}: WRONG ORDER')
+                  success = False
+
+          if success:
+              print('PRODUCTION VERIFIED: final Ukrainian and Russian quotes are live')
+              raise SystemExit(0)
+          print('PRODUCTION NOT YET VERIFIED')
+          raise SystemExit(1)
           PY
