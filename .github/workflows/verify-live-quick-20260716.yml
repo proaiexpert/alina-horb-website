@@ -1,0 +1,62 @@
+name: Quick live final quote verification
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live-quick:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Fetch and validate production HTML
+        shell: bash
+        run: |
+          set -euo pipefail
+          stamp="quick-95e36c04-$(date +%s)"
+          curl -v -fsSL --connect-timeout 5 --max-time 12 \
+            -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' \
+            "https://alinahorb.com/?verify=${stamp}" -o ua.html
+          curl -v -fsSL --connect-timeout 5 --max-time 12 \
+            -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' \
+            "https://alinahorb.com/ru/?verify=${stamp}" -o ru.html
+          python3 - <<'PY'
+          from pathlib import Path
+          import re
+
+          expected = {
+              Path('ua.html'): [
+                  'Часом життя ставить перед нами випробування.',
+                  'Знайди в собі ресурс, щоб їх прийняти.',
+                  'Кожне випробування — це крок до глибшого пізнання себе й свого призначення.',
+                  'У кожній складності прихований урок, у кожній втраті — можливість для нового усвідомлення.',
+                  'Відкрий внутрішнє джерело, яке веде тебе вперед, і пам’ятай: справжня сила народжується не лише в перемогах, а й у здатності зберігати віру, любов і гармонію навіть у найважчі моменти.',
+              ],
+              Path('ru.html'): [
+                  'Порой жизнь ставит перед нами испытания.',
+                  'Найди в себе ресурс, чтобы их принять.',
+                  'Каждое испытание — это шаг к более глубокому познанию себя и своего предназначения.',
+                  'В каждой трудности скрыт урок, в каждой потере — возможность для нового осознания.',
+                  'Открой внутренний источник, который ведёт тебя вперёд, и помни: настоящая сила рождается не только в победах, но и в способности сохранять веру, любовь и гармонию даже в самые трудные моменты.',
+              ],
+          }
+
+          for path, fragments in expected.items():
+              text = path.read_text(encoding='utf-8', errors='replace')
+              match = re.search(r'<blockquote class="editorial-quote editorial-quote--author">(.*?)</blockquote>', text, flags=re.S)
+              if match:
+                  visible = re.sub(r'<[^>]+>', ' | ', match.group(1))
+                  visible = re.sub(r'\s+', ' ', visible).strip()
+                  print(f'{path} LIVE QUOTE: {visible}')
+              else:
+                  print(f'{path}: quote block not found; bytes={len(text)}')
+              positions = [text.index(fragment) for fragment in fragments]
+              assert positions == sorted(positions), f'Wrong production quote order in {path}'
+
+          assert 'Для мене справжня сила — не в тому' not in Path('ua.html').read_text(encoding='utf-8')
+          assert 'Для меня настоящая сила — не в том' not in Path('ru.html').read_text(encoding='utf-8')
+          print('PRODUCTION VERIFIED: final Ukrainian and Russian quotes are live')
+          PY
