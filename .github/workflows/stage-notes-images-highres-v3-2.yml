@@ -1,0 +1,70 @@
+name: Stage high-resolution Notes images
+
+on:
+  push:
+    branches:
+      - automation/stage-notes-images-highres-v3-2
+
+permissions:
+  contents: write
+
+jobs:
+  replace-images:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout target branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/notes-images-highres-v3-2
+          fetch-depth: 0
+
+      - name: Download production-resolution images
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p assets/images/notes
+          curl --fail --location --retry 3 --output assets/images/notes/alina-horb-note-first-consultation-v3.webp "https://drive.usercontent.google.com/download?id=1XUvgYk1vu7UIgp4LHcKk_jTqjDIdzqtn&export=download&confirm=t"
+          curl --fail --location --retry 3 --output assets/images/notes/alina-horb-note-conversation-v3.webp "https://drive.usercontent.google.com/download?id=13w9-moXpOXq9QDkLonGgRiqvyeC7Vk3T&export=download&confirm=t"
+          curl --fail --location --retry 3 --output assets/images/notes/alina-horb-note-observation-v3.webp "https://drive.usercontent.google.com/download?id=1K6l3rmIoj5d9Z3x72azoFFmF0JwqIfh1&export=download&confirm=t"
+          curl --fail --location --retry 3 --output assets/images/notes/alina-horb-note-transition-v3.webp "https://drive.usercontent.google.com/download?id=1hCas5eX29XOUNAwFA8eUiHl7a_6fw5ZI&export=download&confirm=t"
+
+      - name: Validate files and changed paths
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+          files = [
+              Path('assets/images/notes/alina-horb-note-first-consultation-v3.webp'),
+              Path('assets/images/notes/alina-horb-note-conversation-v3.webp'),
+              Path('assets/images/notes/alina-horb-note-observation-v3.webp'),
+              Path('assets/images/notes/alina-horb-note-transition-v3.webp'),
+          ]
+          for path in files:
+              data = path.read_bytes()
+              if not (180_000 <= len(data) <= 500_000):
+                  raise SystemExit(f'Unexpected file size for {path}: {len(data)}')
+              if data[:4] != b'RIFF' or data[8:12] != b'WEBP':
+                  raise SystemExit(f'Not a valid WebP file: {path}')
+          print('Four WebP assets passed size and header validation')
+          PY
+          changed="$(git status --porcelain | awk '{print $2}' | sort)"
+          expected="$(printf '%s\n' \
+            assets/images/notes/alina-horb-note-conversation-v3.webp \
+            assets/images/notes/alina-horb-note-first-consultation-v3.webp \
+            assets/images/notes/alina-horb-note-observation-v3.webp \
+            assets/images/notes/alina-horb-note-transition-v3.webp | sort)"
+          test "$changed" = "$expected"
+
+      - name: Commit exactly four images
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/images/notes/alina-horb-note-first-consultation-v3.webp \
+                  assets/images/notes/alina-horb-note-conversation-v3.webp \
+                  assets/images/notes/alina-horb-note-observation-v3.webp \
+                  assets/images/notes/alina-horb-note-transition-v3.webp
+          git commit -m "Replace Notes images with production-resolution assets"
+          git push origin HEAD:fix/notes-images-highres-v3-2
