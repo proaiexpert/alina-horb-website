@@ -1,0 +1,91 @@
+name: QA bilingual About pages
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validate-about:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Validate source profile pages
+        run: python3 scripts/validate-about-pages-v1.py
+
+      - name: Simulate production build
+        run: |
+          python3 scripts/apply-notes-images-v3-1.py
+          python3 scripts/patch-notes-validator-expectations-v3-1.py
+          node --check assets/js/site.notes-images.v3-1.js
+          python3 scripts/validate-notes-images-v3-1.py
+          python3 scripts/apply-turnstile-v3-2.py
+          node --check assets/js/site.v2.js
+          python3 scripts/apply-indexing-launch-v3-2.py
+          python3 scripts/apply-social-favicon-v3-3.py
+
+      - name: Validate production contract
+        run: |
+          python3 scripts/validate-assets.py
+          python3 scripts/validate-about-pages-v1.py
+          python3 scripts/validate-social-previews.py
+          python3 scripts/validate-favicon-social-v3-3.py
+          python3 scripts/validate-public-email.py
+          python3 scripts/validate-privacy-intake.py
+          python3 scripts/validate-form-hardening.py
+          python3 scripts/validate-notes-images-v3.py
+          python3 scripts/validate-notes-images-v3-1.py
+          python3 scripts/validate-article-v32.py
+          python3 scripts/validate-article-start-conversation.py
+          python3 scripts/validate-article-coping-support.py
+          python3 scripts/validate-article-relocation.py
+          python3 scripts/validate-notes-hub-v32.py
+          python3 scripts/validate-release-readiness.py
+
+      - name: Build local Pages artifact
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir -p _site
+          cp index.html _site/
+          cp favicon.svg _site/
+          cp favicon.ico _site/
+          cp favicon-16x16.png _site/
+          cp favicon-32x32.png _site/
+          cp robots.txt _site/
+          cp sitemap.xml _site/
+          cp -R assets _site/
+          cp -R about _site/
+          cp -R notes _site/
+          cp -R privacy _site/
+          cp -R ru _site/
+          touch _site/.nojekyll
+
+      - name: Serve and verify both routes
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4173 --directory _site > /tmp/about-preview.log 2>&1 &
+          server_pid=$!
+          trap 'kill ${server_pid}' EXIT
+          sleep 2
+          curl -fsS http://127.0.0.1:4173/about/ -o /tmp/about-ua.html
+          curl -fsS http://127.0.0.1:4173/ru/about/ -o /tmp/about-ru.html
+          grep -q 'Психологічна підтримка' /tmp/about-ua.html
+          grep -q 'Психологическая поддержка' /tmp/about-ru.html
+          grep -q 'ProfilePage' /tmp/about-ua.html
+          grep -q 'ProfilePage' /tmp/about-ru.html
+          grep -q 'site.about.v1.css' /tmp/about-ua.html
+          grep -q 'site.about.v1.css' /tmp/about-ru.html
+
+      - name: Upload review artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: about-pages-review
+          path: _site
+          retention-days: 14

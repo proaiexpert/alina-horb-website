@@ -47,6 +47,7 @@ jobs:
       - name: Validate production site contract
         run: |
           python3 scripts/validate-assets.py
+          python3 scripts/validate-about-pages-v1.py
           python3 scripts/validate-social-previews.py
           python3 scripts/validate-favicon-social-v3-3.py
           python3 scripts/validate-public-email.py
@@ -75,6 +76,7 @@ jobs:
           cp robots.txt _site/
           cp sitemap.xml _site/
           cp -R assets _site/
+          cp -R about _site/
           cp -R notes _site/
           cp -R privacy _site/
           cp -R ru _site/
@@ -87,6 +89,7 @@ jobs:
           test -f _site/robots.txt
           test -f _site/sitemap.xml
           test -f _site/assets/css/site.notes-hub.v3-2.css
+          test -f _site/assets/css/site.about.v1.css
           test -f _site/assets/css/site.notes-images.v3.css
           test -f _site/assets/js/site.notes-images.v3-1.js
           test -f _site/assets/images/social/alina-horb-og-ua-v2.jpg
@@ -95,6 +98,7 @@ jobs:
           test -f _site/assets/images/notes/alina-horb-note-conversation-v3.webp
           test -f _site/assets/images/notes/alina-horb-note-observation-v3.webp
           test -f _site/assets/images/notes/alina-horb-note-transition-v3.webp
+          test -f _site/about/index.html
           test -f _site/notes/index.html
           test -f _site/notes/first-consultation/index.html
           test -f _site/notes/how-to-start-the-conversation/index.html
@@ -102,6 +106,7 @@ jobs:
           test -f _site/notes/stress-relocation-and-lost-support/index.html
           test -f _site/privacy/index.html
           test -f _site/ru/index.html
+          test -f _site/ru/about/index.html
           test -f _site/ru/notes/index.html
           test -f _site/ru/notes/first-consultation/index.html
           test -f _site/ru/notes/how-to-start-the-conversation/index.html
@@ -110,10 +115,14 @@ jobs:
           test -f _site/ru/privacy/index.html
           grep -q 'content="index, follow, max-image-preview:large"' _site/index.html
           grep -q 'content="index, follow, max-image-preview:large"' _site/ru/index.html
+          grep -q 'content="index, follow, max-image-preview:large"' _site/about/index.html
+          grep -q 'content="index, follow, max-image-preview:large"' _site/ru/about/index.html
           grep -q 'alina-horb-og-ua-v2.jpg' _site/index.html
           grep -q 'alina-horb-og-ru-v2.jpg' _site/ru/index.html
           grep -q 'href="/favicon.ico"' _site/index.html
           grep -q 'href="/favicon.ico"' _site/ru/index.html
+          grep -q 'href="/favicon.ico"' _site/about/index.html
+          grep -q 'href="/favicon.ico"' _site/ru/about/index.html
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
