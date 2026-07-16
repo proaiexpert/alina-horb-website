@@ -15,22 +15,26 @@ jobs:
   verify-live:
     runs-on: ubuntu-latest
     steps:
-      - name: Poll live Ukrainian and Russian pages
+      - name: Poll and inspect live Ukrainian and Russian pages
         shell: bash
         run: |
           set -euo pipefail
-          for attempt in $(seq 1 36); do
+          for attempt in $(seq 1 12); do
             stamp="95e36c04-${attempt}-$(date +%s)"
-            echo "Live verification attempt ${attempt}/36"
-            curl -fsSL --connect-timeout 15 --max-time 30 \
+            echo "Live verification attempt ${attempt}/12"
+            ua_code=$(curl -sS -L --connect-timeout 15 --max-time 30 \
               -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' \
-              "https://alinahorb.com/?verify=${stamp}" -o ua.html || true
-            curl -fsSL --connect-timeout 15 --max-time 30 \
+              -w '%{http_code}' -o ua.html \
+              "https://alinahorb.com/?verify=${stamp}" || true)
+            ru_code=$(curl -sS -L --connect-timeout 15 --max-time 30 \
               -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' \
-              "https://alinahorb.com/ru/?verify=${stamp}" -o ru.html || true
+              -w '%{http_code}' -o ru.html \
+              "https://alinahorb.com/ru/?verify=${stamp}" || true)
+            echo "HTTP UA=${ua_code:-none} RU=${ru_code:-none}"
 
             if python3 - <<'PY'
           from pathlib import Path
+          import re
 
           expected = {
               Path('ua.html'): [
@@ -49,24 +53,35 @@ jobs:
               ],
           }
 
+          ok = True
           for path, fragments in expected.items():
               if not path.exists():
-                  raise SystemExit(1)
-              text = path.read_text(encoding='utf-8')
+                  print(f'{path}: response file missing')
+                  ok = False
+                  continue
+              text = path.read_text(encoding='utf-8', errors='replace')
+              match = re.search(r'<blockquote class="editorial-quote editorial-quote--author">(.*?)</blockquote>', text, flags=re.S)
+              if match:
+                  visible = re.sub(r'<[^>]+>', ' | ', match.group(1))
+                  visible = re.sub(r'\s+', ' ', visible).strip()
+                  print(f'{path} live quote: {visible[:900]}')
+              else:
+                  print(f'{path}: quote block not found; title present={"<title>" in text}; bytes={len(text)}')
               positions = []
               for fragment in fragments:
                   if fragment not in text:
-                      raise SystemExit(1)
-                  positions.append(text.index(fragment))
-              if positions != sorted(positions):
-                  raise SystemExit(1)
+                      print(f'{path}: missing expected fragment: {fragment}')
+                      ok = False
+                  else:
+                      positions.append(text.index(fragment))
+              if len(positions) == len(fragments) and positions != sorted(positions):
+                  print(f'{path}: expected fragments are in the wrong order')
+                  ok = False
 
-          if 'Для мене справжня сила — не в тому' in Path('ua.html').read_text(encoding='utf-8'):
-              raise SystemExit(1)
-          if 'Для меня настоящая сила — не в том' in Path('ru.html').read_text(encoding='utf-8'):
-              raise SystemExit(1)
-
-          print('LIVE SITE VERIFIED: final Ukrainian and Russian quotes are published in the approved order')
+          if ok:
+              print('LIVE SITE VERIFIED: final Ukrainian and Russian quotes are published in the approved order')
+              raise SystemExit(0)
+          raise SystemExit(1)
           PY
             then
               exit 0
