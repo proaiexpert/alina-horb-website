@@ -18,6 +18,11 @@ replace_required(hub, '"social": "alina-horb-og-ua-v1.jpg"', '"social": "alina-h
 replace_required(hub, '"social": "alina-horb-og-ru-v1.jpg"', '"social": "alina-horb-note-first-consultation-v3.webp"')
 replace_required(
     hub,
+    '    if \'<meta name="robots" content="noindex, nofollow">\' not in text:\n        fail(f"noindex changed in {rel}")',
+    '    allowed_robots = (\'<meta name="robots" content="noindex, nofollow">\', \'<meta name="robots" content="index, follow, max-image-preview:large">\')\n    if not any(marker in text for marker in allowed_robots):\n        fail(f"robots directive missing in {rel}")',
+)
+replace_required(
+    hub,
     '    if text.count("alina-horb-notes-editorial-v2") != 2:\n        fail(f"Featured photography must appear once as source+fallback in {rel}")',
     '    if "alina-horb-note-first-consultation-v3.webp" not in text:\n        fail(f"Static featured photography missing in {rel}")',
 )
@@ -37,4 +42,4 @@ old = "https://alinahorb.com/assets/images/notes/alina-horb-notes-editorial-v2.j
 for rel, filename in article_images.items():
     replace_required(ROOT / rel, old, f"https://alinahorb.com/assets/images/notes/{filename}")
 
-print("Legacy validators aligned with static Notes image assets")
+print("Legacy validators aligned with static Notes image assets and either indexing state")
