@@ -10,6 +10,8 @@ ROBOTS_META = "index, follow, max-image-preview:large"
 ROUTES = [
     ("index.html", f"{BASE}/", f"{BASE}/", f"{BASE}/ru/"),
     ("ru/index.html", f"{BASE}/ru/", f"{BASE}/", f"{BASE}/ru/"),
+    ("about/index.html", f"{BASE}/about/", f"{BASE}/about/", f"{BASE}/ru/about/"),
+    ("ru/about/index.html", f"{BASE}/ru/about/", f"{BASE}/about/", f"{BASE}/ru/about/"),
     ("notes/index.html", f"{BASE}/notes/", f"{BASE}/notes/", f"{BASE}/ru/notes/"),
     ("ru/notes/index.html", f"{BASE}/ru/notes/", f"{BASE}/notes/", f"{BASE}/ru/notes/"),
     ("notes/first-consultation/index.html", f"{BASE}/notes/first-consultation/", f"{BASE}/notes/first-consultation/", f"{BASE}/ru/notes/first-consultation/"),

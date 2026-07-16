@@ -6,6 +6,8 @@ ROOT = Path(__file__).resolve().parents[1]
 ROUTES = [
     "index.html",
     "ru/index.html",
+    "about/index.html",
+    "ru/about/index.html",
     "notes/index.html",
     "ru/notes/index.html",
     "notes/first-consultation/index.html",
