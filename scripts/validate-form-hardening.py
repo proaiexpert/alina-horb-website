@@ -4,6 +4,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 js = (ROOT / "assets/js/site.v2.js").read_text(encoding="utf-8")
 config = (ROOT / "assets/js/site-config.v2.js").read_text(encoding="utf-8")
+robots_meta = '<meta name="robots" content="index, follow, max-image-preview:large">'
 
 required = [
     'let submitting = false;',
@@ -38,9 +39,10 @@ if 'formMode: "formspree"' not in config:
     raise SystemExit("Production form mode is not enabled")
 if 'turnstileSiteKey: "0x4AAAAAAD2wlldaSXK8Bp9f"' not in config:
     raise SystemExit("Approved public Turnstile site key is not configured")
-if 'noindex, nofollow' not in (ROOT / "index.html").read_text(encoding="utf-8"):
-    raise SystemExit("Indexing gate changed unexpectedly")
-if 'noindex, nofollow' not in (ROOT / "ru/index.html").read_text(encoding="utf-8"):
-    raise SystemExit("RU indexing gate changed unexpectedly")
 
-print("Production Formspree and Cloudflare Turnstile integration: OK; indexing remains gated")
+for relative in ("index.html", "ru/index.html"):
+    html = (ROOT / relative).read_text(encoding="utf-8")
+    if robots_meta not in html or "noindex" in html.lower():
+        raise SystemExit(f"{relative}: public indexing directive is not active")
+
+print("Production Formspree and Cloudflare Turnstile integration: OK; indexing enabled")

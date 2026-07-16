@@ -5,6 +5,7 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = "https://alinahorb.com"
+ROBOTS_META = "index, follow, max-image-preview:large"
 
 ROUTES = [
     ("index.html", f"{BASE}/", f"{BASE}/", f"{BASE}/ru/"),
@@ -48,7 +49,8 @@ for relative, canonical, ua_url, ru_url in ROUTES:
 
     require(count(r"<title>.*?</title>", text) == 1, f"{relative}: expected one title")
     require(count(r'<meta\s+name="description"\s+content="[^"]+"\s*/?>', text) == 1, f"{relative}: expected one meta description")
-    require(count(r'<meta\s+name="robots"\s+content="noindex, nofollow"\s*/?>', text) == 1, f"{relative}: noindex contract changed")
+    require(text.count(f'<meta name="robots" content="{ROBOTS_META}">') == 1, f"{relative}: public indexing directive missing")
+    require("noindex" not in text.lower(), f"{relative}: noindex remains after launch")
     require(text.count(f'<link rel="canonical" href="{canonical}">') == 1, f"{relative}: canonical mismatch")
     require(text.count(f'<link rel="alternate" hreflang="uk" href="{ua_url}">') == 1, f"{relative}: UA hreflang mismatch")
     require(text.count(f'<link rel="alternate" hreflang="ru" href="{ru_url}">') == 1, f"{relative}: RU hreflang mismatch")
@@ -114,9 +116,11 @@ if robots_path.is_file():
     require("User-agent: *" in robots, "robots.txt user-agent missing")
     require("Allow: /" in robots, "robots.txt allow policy missing")
     require(f"Sitemap: {BASE}/sitemap.xml" in robots, "robots.txt sitemap directive missing")
+    require("Disallow:" not in robots, "robots.txt contains a blocking directive")
 
 workflow = (ROOT / ".github/workflows/deploy-pages.yml").read_text(encoding="utf-8")
 require("python3 scripts/apply-turnstile-v3-2.py" in workflow, "Turnstile runtime builder not wired into deployment")
+require("python3 scripts/apply-indexing-launch-v3-2.py" in workflow, "indexing launch step not wired into deployment")
 require("python3 scripts/validate-release-readiness.py" in workflow, "deployment validator not wired")
 require("cp sitemap.xml _site/" in workflow and "cp robots.txt _site/" in workflow, "deployment does not copy sitemap/robots")
 require("test -f _site/sitemap.xml" in workflow and "test -f _site/robots.txt" in workflow, "deployment does not assert sitemap/robots")
@@ -127,4 +131,4 @@ if errors:
         print(f"- {error}")
     raise SystemExit(1)
 
-print(f"Release readiness validation passed for {len(ROUTES)} routes; indexing remains gated")
+print(f"Release readiness validation passed for {len(ROUTES)} publicly indexable routes")
