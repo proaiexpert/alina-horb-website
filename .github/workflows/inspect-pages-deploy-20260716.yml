@@ -1,4 +1,4 @@
-name: Inspect Pages deployment failure
+name: Confirm final quote production deployment
 
 on:
   pull_request:
@@ -10,34 +10,100 @@ permissions:
   contents: read
 
 jobs:
-  inspect:
+  confirm-production:
     runs-on: ubuntu-latest
     steps:
-      - name: Print deployment failure details
+      - name: Wait for matching GitHub Pages deployment
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
+          TARGET_SHA: 6630a4dbba8c55ef4ca8958f801a776cf8216cf7
+        shell: bash
         run: |
           set -euo pipefail
-          curl -fsSL -L \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "Accept: application/vnd.github+json" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/${REPO}/actions/jobs/87725924994/logs" \
-            -o deploy-job.log
-          echo '--- FAILURE CONTEXT ---'
+          for attempt in $(seq 1 36); do
+            curl -fsSL \
+              -H "Authorization: Bearer ${GH_TOKEN}" \
+              -H "Accept: application/vnd.github+json" \
+              -H "X-GitHub-Api-Version: 2022-11-28" \
+              "https://api.github.com/repos/${REPO}/actions/workflows/deploy-pages.yml/runs?branch=main&per_page=20" \
+              -o runs.json
+
+            result=$(python3 - <<'PY'
+          import json, os
+          data = json.load(open('runs.json', encoding='utf-8'))
+          target = os.environ['TARGET_SHA']
+          matches = [run for run in data.get('workflow_runs', []) if run.get('head_sha') == target]
+          if not matches:
+              print('missing')
+          else:
+              run = matches[0]
+              print(f"{run['status']}|{run.get('conclusion')}|{run['id']}|{run['html_url']}")
+          PY
+            )
+            echo "Attempt ${attempt}/36: ${result}"
+
+            case "${result}" in
+              completed\|success\|*)
+                echo "MATCHING PAGES DEPLOYMENT SUCCEEDED: ${result}"
+                exit 0
+                ;;
+              completed\|failure\|*|completed\|cancelled\|*)
+                echo "Matching Pages deployment failed: ${result}" >&2
+                exit 1
+                ;;
+            esac
+            sleep 10
+          done
+          echo "Matching Pages deployment did not complete in time." >&2
+          exit 1
+
+      - name: Fetch and verify live Ukrainian and Russian pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          stamp="final-quote-6630a4db-$(date +%s)"
+          curl -fsSL --connect-timeout 10 --max-time 30 \
+            -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' \
+            "https://alinahorb.com/?verify=${stamp}" -o ua.html
+          curl -fsSL --connect-timeout 10 --max-time 30 \
+            -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' \
+            "https://alinahorb.com/ru/?verify=${stamp}" -o ru.html
+
           python3 - <<'PY'
           from pathlib import Path
-          lines = Path('deploy-job.log').read_text(encoding='utf-8', errors='replace').splitlines()
-          markers = ('Error', 'ERROR', 'Traceback', 'AssertionError', 'SystemExit', 'failed', 'FAIL', 'Missing', 'expected', 'Expected', '##[error]')
-          hits = [i for i, line in enumerate(lines) if any(marker in line for marker in markers)]
-          if not hits:
-              print('No explicit marker found. Last 35 lines:')
-              for line in lines[-35:]:
-                  print(line)
-          else:
-              start = max(0, min(hits) - 12)
-              end = min(len(lines), max(hits) + 13)
-              for line in lines[start:end]:
-                  print(line)
+          import re
+
+          expected = {
+              Path('ua.html'): [
+                  'Часом життя ставить перед нами випробування.',
+                  'Знайди в собі ресурс, щоб їх прийняти.',
+                  'Кожне випробування — це крок до глибшого пізнання себе й свого призначення.',
+                  'У кожній складності прихований урок, у кожній втраті — можливість для нового усвідомлення.',
+                  'Відкрий внутрішнє джерело, яке веде тебе вперед, і пам’ятай: справжня сила народжується не лише в перемогах, а й у здатності зберігати віру, любов і гармонію навіть у найважчі моменти.',
+              ],
+              Path('ru.html'): [
+                  'Порой жизнь ставит перед нами испытания.',
+                  'Найди в себе ресурс, чтобы их принять.',
+                  'Каждое испытание — это шаг к более глубокому познанию себя и своего предназначения.',
+                  'В каждой трудности скрыт урок, в каждой потере — возможность для нового осознания.',
+                  'Открой внутренний источник, который ведёт тебя вперёд, и помни: настоящая сила рождается не только в победах, но и в способности сохранять веру, любовь и гармонию даже в самые трудные моменты.',
+              ],
+          }
+
+          for path, fragments in expected.items():
+              text = path.read_text(encoding='utf-8', errors='strict')
+              positions = [text.index(fragment) for fragment in fragments]
+              assert positions == sorted(positions), f'Wrong quote order in live {path}'
+              match = re.search(r'<blockquote class="editorial-quote editorial-quote--author">(.*?)</blockquote>', text, flags=re.S)
+              assert match, f'Quote block absent in live {path}'
+              visible = re.sub(r'<[^>]+>', ' | ', match.group(1))
+              visible = re.sub(r'\s+', ' ', visible).strip()
+              print(f'{path} VERIFIED LIVE QUOTE: {visible}')
+
+          ua = Path('ua.html').read_text(encoding='utf-8')
+          ru = Path('ru.html').read_text(encoding='utf-8')
+          assert 'Для мене справжня сила — не в тому' not in ua
+          assert 'Для меня настоящая сила — не в том' not in ru
+          print('PRODUCTION VERIFIED: final Ukrainian and Russian quotes are live in the approved order')
           PY
