@@ -1,0 +1,76 @@
+name: Verify live final bilingual quote
+
+on:
+  push:
+    branches:
+      - qa/verify-live-final-quote-20260716
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Poll live Ukrainian and Russian pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 36); do
+            stamp="95e36c04-${attempt}-$(date +%s)"
+            echo "Live verification attempt ${attempt}/36"
+            curl -fsSL --connect-timeout 15 --max-time 30 \
+              -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' \
+              "https://alinahorb.com/?verify=${stamp}" -o ua.html || true
+            curl -fsSL --connect-timeout 15 --max-time 30 \
+              -H 'Cache-Control: no-cache' -H 'Pragma: no-cache' \
+              "https://alinahorb.com/ru/?verify=${stamp}" -o ru.html || true
+
+            if python3 - <<'PY'
+          from pathlib import Path
+
+          expected = {
+              Path('ua.html'): [
+                  'Часом життя ставить перед нами випробування.',
+                  'Знайди в собі ресурс, щоб їх прийняти.',
+                  'Кожне випробування — це крок до глибшого пізнання себе й свого призначення.',
+                  'У кожній складності прихований урок, у кожній втраті — можливість для нового усвідомлення.',
+                  'Відкрий внутрішнє джерело, яке веде тебе вперед, і пам’ятай: справжня сила народжується не лише в перемогах, а й у здатності зберігати віру, любов і гармонію навіть у найважчі моменти.',
+              ],
+              Path('ru.html'): [
+                  'Порой жизнь ставит перед нами испытания.',
+                  'Найди в себе ресурс, чтобы их принять.',
+                  'Каждое испытание — это шаг к более глубокому познанию себя и своего предназначения.',
+                  'В каждой трудности скрыт урок, в каждой потере — возможность для нового осознания.',
+                  'Открой внутренний источник, который ведёт тебя вперёд, и помни: настоящая сила рождается не только в победах, но и в способности сохранять веру, любовь и гармонию даже в самые трудные моменты.',
+              ],
+          }
+
+          for path, fragments in expected.items():
+              if not path.exists():
+                  raise SystemExit(1)
+              text = path.read_text(encoding='utf-8')
+              positions = []
+              for fragment in fragments:
+                  if fragment not in text:
+                      raise SystemExit(1)
+                  positions.append(text.index(fragment))
+              if positions != sorted(positions):
+                  raise SystemExit(1)
+
+          if 'Для мене справжня сила — не в тому' in Path('ua.html').read_text(encoding='utf-8'):
+              raise SystemExit(1)
+          if 'Для меня настоящая сила — не в том' in Path('ru.html').read_text(encoding='utf-8'):
+              raise SystemExit(1)
+
+          print('LIVE SITE VERIFIED: final Ukrainian and Russian quotes are published in the approved order')
+          PY
+            then
+              exit 0
+            fi
+
+            sleep 10
+          done
+
+          echo 'Final quote did not appear on the live site within the verification window.' >&2
+          exit 1
