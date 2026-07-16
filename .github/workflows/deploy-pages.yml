@@ -38,6 +38,9 @@ jobs:
           python3 scripts/apply-turnstile-v3-2.py
           node --check assets/js/site.v2.js
 
+      - name: Enable production indexing
+        run: python3 scripts/apply-indexing-launch-v3-2.py
+
       - name: Validate production site contract
         run: |
           python3 scripts/validate-assets.py
@@ -93,6 +96,8 @@ jobs:
           test -f _site/ru/notes/when-coping-stops-helping/index.html
           test -f _site/ru/notes/stress-relocation-and-lost-support/index.html
           test -f _site/ru/privacy/index.html
+          grep -q 'content="index, follow, max-image-preview:large"' _site/index.html
+          grep -q 'content="index, follow, max-image-preview:large"' _site/ru/index.html
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
