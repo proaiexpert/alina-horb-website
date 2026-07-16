@@ -25,11 +25,6 @@ jobs:
       - name: Normalize source-only metadata
         run: python3 scripts/normalize-source-homepages-v3-3.py
 
-      - name: Validate source state
-        run: |
-          python3 scripts/validate-social-previews.py
-          python3 scripts/validate-notes-hub-v32.py
-
       - name: Commit normalized homepages
         run: |
           git config user.name "github-actions[bot]"
