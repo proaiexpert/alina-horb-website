@@ -1,0 +1,40 @@
+name: Apply bilingual author quote
+
+on:
+  push:
+    branches:
+      - content/bilingual-author-quote-v3-3
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: content/bilingual-author-quote-v3-3
+          fetch-depth: 0
+
+      - name: Apply approved UA and RU quote
+        run: python3 scripts/apply-bilingual-author-quote-v3-3.py
+
+      - name: Validate site contracts
+        run: |
+          python3 scripts/apply-indexing-launch-v3-2.py
+          python3 scripts/apply-social-favicon-v3-3.py
+          python3 scripts/validate-social-previews.py
+          python3 scripts/validate-favicon-social-v3-3.py
+          python3 scripts/validate-release-readiness.py
+
+      - name: Commit updated homepages
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add index.html ru/index.html
+          git diff --cached --quiet && exit 0
+          git commit -m "Update bilingual author quote"
+          git push origin HEAD:content/bilingual-author-quote-v3-3
