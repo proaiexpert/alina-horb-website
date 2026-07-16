@@ -8,6 +8,7 @@ PUBLIC_EMAIL = "hello@alinahorb.com"
 OLD_EMAIL = "alinahorb1991@gmail.com"
 FORM_ENDPOINT = "https://formspree.io/f/mvzezana"
 TURNSTILE_SITE_KEY = "0x4AAAAAAD2wlldaSXK8Bp9f"
+PUBLIC_ROBOTS = '<meta name="robots" content="index, follow, max-image-preview:large">'
 
 
 def require(path: Path, *needles: str) -> str:
@@ -30,7 +31,7 @@ def main() -> None:
         'maxlength="600"',
         'href="privacy/"',
         "Сайт і форма не є екстреною службою",
-        '<meta name="robots" content="noindex, nofollow">',
+        PUBLIC_ROBOTS,
         'href="assets/css/site.privacy.v3-2.css"',
         'href="assets/css/site.intake.v3-2.css"',
     )
@@ -43,7 +44,7 @@ def main() -> None:
         'maxlength="600"',
         'href="privacy/"',
         "Сайт и форма не являются экстренной службой",
-        '<meta name="robots" content="noindex, nofollow">',
+        PUBLIC_ROBOTS,
         'href="../assets/css/site.privacy.v3-2.css"',
         'href="../assets/css/site.intake.v3-2.css"',
     )
@@ -53,7 +54,7 @@ def main() -> None:
         'href="https://alinahorb.com/privacy/"',
         'hreflang="ru" href="https://alinahorb.com/ru/privacy/"',
         "Неекстрений характер сайту",
-        '<meta name="robots" content="noindex, nofollow">',
+        PUBLIC_ROBOTS,
     )
     require(
         ROOT / "ru/privacy/index.html",
@@ -61,7 +62,7 @@ def main() -> None:
         'href="https://alinahorb.com/ru/privacy/"',
         'hreflang="uk" href="https://alinahorb.com/privacy/"',
         "Неэкстренный характер сайта",
-        '<meta name="robots" content="noindex, nofollow">',
+        PUBLIC_ROBOTS,
     )
     require(
         ROOT / "assets/js/site.v2.js",
@@ -102,6 +103,11 @@ def main() -> None:
         if OLD_EMAIL in text:
             raise AssertionError(f"Old public Gmail remains in {path.relative_to(ROOT)}")
 
+    for path in (ROOT / "index.html", ROOT / "ru/index.html", ROOT / "privacy/index.html", ROOT / "ru/privacy/index.html"):
+        text = path.read_text(encoding="utf-8")
+        if "noindex" in text.lower():
+            raise AssertionError(f"Indexing remains blocked in {path.relative_to(ROOT)}")
+
     if ua.count('name="website"') != 1 or ru.count('name="website"') != 1:
         raise AssertionError("Expected exactly one honeypot per homepage form")
     if ua.count('href="privacy/"') < 2 or ru.count('href="privacy/"') < 2:
@@ -111,7 +117,7 @@ def main() -> None:
     if 'turnstileSiteKey: "0x4AAAAAAD2wlldaSXK8Bp9f"' not in config:
         raise AssertionError("Approved public Turnstile site key must remain explicit")
 
-    print("Privacy, public email, safe intake and Turnstile validation: OK")
+    print("Privacy, public email, safe intake, Turnstile and indexing validation: OK")
 
 
 if __name__ == "__main__":
