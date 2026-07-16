@@ -6,6 +6,8 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 PUBLIC_EMAIL = "hello@alinahorb.com"
 OLD_EMAIL = "alinahorb1991@gmail.com"
+FORM_ENDPOINT = "https://formspree.io/f/mvzezana"
+TURNSTILE_SITE_KEY = "0x4AAAAAAD2wlldaSXK8Bp9f"
 
 
 def require(path: Path, *needles: str) -> str:
@@ -67,6 +69,7 @@ def main() -> None:
         "elapsed < 1500",
         "[name='website']",
         'document.querySelector("#about")',
+        '"cf-turnstile-response": turnstileToken',
     )
     require(
         ROOT / "assets/js/site.chrome.v3.js",
@@ -75,7 +78,13 @@ def main() -> None:
         'privacy: "Конфіденційність"',
         'privacy: "Конфиденциальность"',
     )
-    config = require(ROOT / "assets/js/site-config.v2.js", PUBLIC_EMAIL)
+    config = require(
+        ROOT / "assets/js/site-config.v2.js",
+        PUBLIC_EMAIL,
+        FORM_ENDPOINT,
+        TURNSTILE_SITE_KEY,
+        'formMode: "formspree"',
+    )
     require(ROOT / "assets/css/site.intake.v3-2.css", ".form-honeypot", ".form-guidance", ".form-consent a")
     require(ROOT / "assets/css/site.privacy.v3-2.css", ".privacy-main", ".privacy-content")
 
@@ -97,10 +106,12 @@ def main() -> None:
         raise AssertionError("Expected exactly one honeypot per homepage form")
     if ua.count('href="privacy/"') < 2 or ru.count('href="privacy/"') < 2:
         raise AssertionError("Privacy link must appear in both form consent and footer")
-    if "formEndpoint: \"\"" not in config or 'formMode: "mailto"' not in config:
-        raise AssertionError("Endpoint must remain explicit and configurable until provider setup")
+    if 'formEndpoint: "https://formspree.io/f/mvzezana"' not in config:
+        raise AssertionError("Approved Formspree endpoint must remain explicit")
+    if 'turnstileSiteKey: "0x4AAAAAAD2wlldaSXK8Bp9f"' not in config:
+        raise AssertionError("Approved public Turnstile site key must remain explicit")
 
-    print("Privacy, public email and safe intake validation: OK")
+    print("Privacy, public email, safe intake and Turnstile validation: OK")
 
 
 if __name__ == "__main__":

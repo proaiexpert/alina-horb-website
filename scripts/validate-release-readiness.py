@@ -91,8 +91,10 @@ for css_relative in ("assets/css/site.v2.css", "assets/css/site.v3-1.css"):
     require(".skip-link:focus" in css and "translateY(0)" in css, f"{css_relative}: skip-link focus reveal missing")
 
 config = (ROOT / "assets/js/site-config.v2.js").read_text(encoding="utf-8")
-require("appendStylesheet" not in config and "createElement(\"link\")" not in config, "site-config: runtime CSS/favicon injection remains")
-require('formEndpoint: ""' in config and 'formMode: "mailto"' in config, "site-config: unapproved form endpoint or fallback mode")
+require("appendStylesheet" not in config and 'createElement("link")' not in config, "site-config: runtime CSS/favicon injection remains")
+require('formEndpoint: "https://formspree.io/f/mvzezana"' in config, "site-config: approved Formspree endpoint missing")
+require('formMode: "formspree"' in config, "site-config: production form mode missing")
+require('turnstileSiteKey: "0x4AAAAAAD2wlldaSXK8Bp9f"' in config, "site-config: approved Turnstile site key missing")
 require('email: "hello@alinahorb.com"' in config, "site-config: public email mismatch")
 
 sitemap_path = ROOT / "sitemap.xml"
@@ -114,6 +116,7 @@ if robots_path.is_file():
     require(f"Sitemap: {BASE}/sitemap.xml" in robots, "robots.txt sitemap directive missing")
 
 workflow = (ROOT / ".github/workflows/deploy-pages.yml").read_text(encoding="utf-8")
+require("python3 scripts/apply-turnstile-v3-2.py" in workflow, "Turnstile runtime builder not wired into deployment")
 require("python3 scripts/validate-release-readiness.py" in workflow, "deployment validator not wired")
 require("cp sitemap.xml _site/" in workflow and "cp robots.txt _site/" in workflow, "deployment does not copy sitemap/robots")
 require("test -f _site/sitemap.xml" in workflow and "test -f _site/robots.txt" in workflow, "deployment does not assert sitemap/robots")
@@ -124,4 +127,4 @@ if errors:
         print(f"- {error}")
     raise SystemExit(1)
 
-print(f"Release readiness validation passed for {len(ROUTES)} routes")
+print(f"Release readiness validation passed for {len(ROUTES)} routes; indexing remains gated")

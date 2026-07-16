@@ -18,6 +18,12 @@ required = [
     'mailtoFallback(payload)',
     'setState("success", text.sent)',
     'source: window.location.href',
+    'const turnstileSiteKey = String(config.turnstileSiteKey || "").trim();',
+    'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit',
+    '"cf-turnstile-response": turnstileToken',
+    'window.turnstile.render',
+    'resetTurnstile();',
+    'text.verification',
 ]
 
 missing = [needle for needle in required if needle not in js]
@@ -26,11 +32,15 @@ if missing:
 
 if js.count('form.addEventListener("submit"') != 1:
     raise SystemExit("Expected exactly one form submit handler")
-if 'formEndpoint: ""' not in config or 'formMode: "mailto"' not in config:
-    raise SystemExit("Endpoint must remain disabled until the approved provider URL is supplied")
+if 'formEndpoint: "https://formspree.io/f/mvzezana"' not in config:
+    raise SystemExit("Approved Formspree endpoint is not configured")
+if 'formMode: "formspree"' not in config:
+    raise SystemExit("Production form mode is not enabled")
+if 'turnstileSiteKey: "0x4AAAAAAD2wlldaSXK8Bp9f"' not in config:
+    raise SystemExit("Approved public Turnstile site key is not configured")
 if 'noindex, nofollow' not in (ROOT / "index.html").read_text(encoding="utf-8"):
     raise SystemExit("Indexing gate changed unexpectedly")
 if 'noindex, nofollow' not in (ROOT / "ru/index.html").read_text(encoding="utf-8"):
     raise SystemExit("RU indexing gate changed unexpectedly")
 
-print("Production form hardening validation: OK")
+print("Production Formspree and Cloudflare Turnstile integration: OK; indexing remains gated")
