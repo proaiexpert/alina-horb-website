@@ -41,10 +41,14 @@ jobs:
       - name: Enable production indexing
         run: python3 scripts/apply-indexing-launch-v3-2.py
 
+      - name: Build localized social previews and favicon fallbacks
+        run: python3 scripts/apply-social-favicon-v3-3.py
+
       - name: Validate production site contract
         run: |
           python3 scripts/validate-assets.py
           python3 scripts/validate-social-previews.py
+          python3 scripts/validate-favicon-social-v3-3.py
           python3 scripts/validate-public-email.py
           python3 scripts/validate-privacy-intake.py
           python3 scripts/validate-form-hardening.py
@@ -65,6 +69,9 @@ jobs:
           mkdir -p _site
           cp index.html _site/
           cp favicon.svg _site/
+          cp favicon.ico _site/
+          cp favicon-16x16.png _site/
+          cp favicon-32x32.png _site/
           cp robots.txt _site/
           cp sitemap.xml _site/
           cp -R assets _site/
@@ -74,11 +81,16 @@ jobs:
           touch _site/.nojekyll
           test -f _site/index.html
           test -f _site/favicon.svg
+          test -f _site/favicon.ico
+          test -f _site/favicon-16x16.png
+          test -f _site/favicon-32x32.png
           test -f _site/robots.txt
           test -f _site/sitemap.xml
           test -f _site/assets/css/site.notes-hub.v3-2.css
           test -f _site/assets/css/site.notes-images.v3.css
           test -f _site/assets/js/site.notes-images.v3-1.js
+          test -f _site/assets/images/social/alina-horb-og-ua-v2.jpg
+          test -f _site/assets/images/social/alina-horb-og-ru-v2.jpg
           test -f _site/assets/images/notes/alina-horb-note-first-consultation-v3.webp
           test -f _site/assets/images/notes/alina-horb-note-conversation-v3.webp
           test -f _site/assets/images/notes/alina-horb-note-observation-v3.webp
@@ -98,6 +110,10 @@ jobs:
           test -f _site/ru/privacy/index.html
           grep -q 'content="index, follow, max-image-preview:large"' _site/index.html
           grep -q 'content="index, follow, max-image-preview:large"' _site/ru/index.html
+          grep -q 'alina-horb-og-ua-v2.jpg' _site/index.html
+          grep -q 'alina-horb-og-ru-v2.jpg' _site/ru/index.html
+          grep -q 'href="/favicon.ico"' _site/index.html
+          grep -q 'href="/favicon.ico"' _site/ru/index.html
 
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
