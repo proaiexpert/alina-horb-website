@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - automation/stage-notes-images-highres-v3-2
+  pull_request:
+    branches:
+      - automation/stage-notes-images-highres-v3-2
 
 permissions:
   contents: write
