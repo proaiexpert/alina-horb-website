@@ -5,6 +5,7 @@ on:
     branches:
       - release/v3-2-form-indexing
       - release/v3-2-indexing-launch
+      - fix/social-preview-favicons-v3-3
   pull_request:
     branches:
       - main
@@ -29,8 +30,16 @@ jobs:
       - name: Enable production indexing
         run: python3 scripts/apply-indexing-launch-v3-2.py
 
+      - name: Build localized social previews and favicon fallbacks
+        run: python3 scripts/apply-social-favicon-v3-3.py
+
       - name: Validate assets
         run: python3 scripts/validate-assets.py
+
+      - name: Validate social previews and favicons
+        run: |
+          python3 scripts/validate-social-previews.py
+          python3 scripts/validate-favicon-social-v3-3.py
 
       - name: Validate public email
         run: python3 scripts/validate-public-email.py
