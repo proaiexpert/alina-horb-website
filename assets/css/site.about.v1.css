@@ -31,6 +31,7 @@ html.js .page-about-profile [data-reveal].is-visible {
 
 .profile-hero {
   position: relative;
+  overflow: hidden;
   padding: clamp(46px, 6vw, 84px) 0 clamp(64px, 7vw, 104px);
   border-bottom: 1px solid var(--line);
 }
@@ -388,12 +389,27 @@ html.js .page-about-profile [data-reveal].is-visible {
 .profile-diploma { width: min(100%, 430px); margin: 0; justify-self: center; }
 
 .profile-diploma a {
-  display: block;
+  aspect-ratio: 4 / 5;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
   border: 1px solid rgba(47,48,45,.2);
   padding: 18px;
   background: rgba(255,255,255,.58);
   box-shadow: 0 28px 70px rgba(47,48,45,.12);
   transition: transform .3s var(--ease), box-shadow .3s ease;
+}
+
+.profile-diploma picture {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.profile-diploma img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
 }
 
 .profile-diploma a:hover {
