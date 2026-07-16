@@ -1,0 +1,73 @@
+name: Patch production indexing validators
+
+on:
+  push:
+    branches:
+      - fix/production-validator-indexing-v3-4
+
+permissions:
+  contents: write
+
+jobs:
+  patch-and-simulate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/production-validator-indexing-v3-4
+          fetch-depth: 0
+
+      - name: Patch validators
+        run: python3 scripts/patch-production-indexing-validators-v3-4.py
+
+      - name: Validate source indexing state
+        run: |
+          python3 scripts/validate-article-v32.py
+          python3 scripts/validate-article-start-conversation.py
+          python3 scripts/validate-article-coping-support.py
+          python3 scripts/validate-article-relocation.py
+          python3 scripts/validate-notes-hub-v32.py
+
+      - name: Commit validator fixes
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add \
+            scripts/validate-article-v32.py \
+            scripts/validate-article-start-conversation.py \
+            scripts/validate-article-coping-support.py \
+            scripts/validate-article-relocation.py \
+            scripts/validate-notes-hub-v32.py
+          git diff --cached --quiet && exit 0
+          git commit -m "Allow validators in source and production indexing states"
+          git push origin HEAD:fix/production-validator-indexing-v3-4
+
+      - name: Simulate production build
+        run: |
+          python3 scripts/apply-notes-images-v3-1.py
+          python3 scripts/patch-notes-validator-expectations-v3-1.py
+          node --check assets/js/site.notes-images.v3-1.js
+          python3 scripts/validate-notes-images-v3-1.py
+          python3 scripts/apply-turnstile-v3-2.py
+          node --check assets/js/site.v2.js
+          python3 scripts/apply-indexing-launch-v3-2.py
+          python3 scripts/apply-social-favicon-v3-3.py
+
+      - name: Validate simulated production site
+        run: |
+          python3 scripts/validate-assets.py
+          python3 scripts/validate-social-previews.py
+          python3 scripts/validate-favicon-social-v3-3.py
+          python3 scripts/validate-public-email.py
+          python3 scripts/validate-privacy-intake.py
+          python3 scripts/validate-form-hardening.py
+          python3 scripts/validate-notes-images-v3.py
+          python3 scripts/validate-notes-images-v3-1.py
+          python3 scripts/validate-article-v32.py
+          python3 scripts/validate-article-start-conversation.py
+          python3 scripts/validate-article-coping-support.py
+          python3 scripts/validate-article-relocation.py
+          python3 scripts/validate-notes-hub-v32.py
+          python3 scripts/validate-release-readiness.py
