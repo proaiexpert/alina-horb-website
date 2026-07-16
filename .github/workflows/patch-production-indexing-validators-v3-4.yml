@@ -4,6 +4,9 @@ on:
   push:
     branches:
       - fix/production-validator-indexing-v3-4
+  pull_request:
+    branches:
+      - main
 
 permissions:
   contents: write
