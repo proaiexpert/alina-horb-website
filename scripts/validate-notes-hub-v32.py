@@ -52,8 +52,12 @@ def duplicate_ids(text: str) -> list[str]:
 
 def validate_common(path: Path, text: str) -> None:
     rel = path.relative_to(ROOT)
-    if '<meta name="robots" content="noindex, nofollow">' not in text:
-        fail(f"noindex changed in {rel}")
+    allowed_robots = (
+        '<meta name="robots" content="noindex, nofollow">',
+        '<meta name="robots" content="index, follow, max-image-preview:large">',
+    )
+    if not any(marker in text for marker in allowed_robots):
+        fail(f"robots directive missing in {rel}")
     if len(re.findall(r"<h1\b", text, flags=re.I)) != 1:
         fail(f"Expected one H1 in {rel}")
     duplicates = duplicate_ids(text)

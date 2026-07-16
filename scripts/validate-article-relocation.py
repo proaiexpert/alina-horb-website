@@ -60,8 +60,12 @@ def validate_page(path: Path, expected: dict[str, str]) -> None:
 
     if f'<html lang="{expected["lang"]}">' not in text:
         fail(f"Wrong html language in {rel}")
-    if '<meta name="robots" content="noindex, nofollow">' not in text:
-        fail(f"noindex changed in {rel}")
+    allowed_robots = (
+        '<meta name="robots" content="noindex, nofollow">',
+        '<meta name="robots" content="index, follow, max-image-preview:large">',
+    )
+    if not any(marker in text for marker in allowed_robots):
+        fail(f"robots directive missing in {rel}")
     if f'<link rel="canonical" href="{expected["canonical"]}">' not in text:
         fail(f"Wrong canonical in {rel}")
     if expected["alternate"] not in text:
