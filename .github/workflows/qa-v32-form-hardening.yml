@@ -25,13 +25,20 @@ jobs:
           python3 scripts/apply-turnstile-v3-2.py
           node --check assets/js/site.v2.js
 
-      - name: Validate production contracts
-        run: |
-          python3 scripts/validate-assets.py
-          python3 scripts/validate-public-email.py
-          python3 scripts/validate-privacy-intake.py
-          python3 scripts/validate-release-readiness.py
-          python3 scripts/validate-form-hardening.py
+      - name: Validate assets
+        run: python3 scripts/validate-assets.py
+
+      - name: Validate public email
+        run: python3 scripts/validate-public-email.py
+
+      - name: Validate privacy intake
+        run: python3 scripts/validate-privacy-intake.py
+
+      - name: Validate release readiness
+        run: python3 scripts/validate-release-readiness.py
+
+      - name: Validate form hardening
+        run: python3 scripts/validate-form-hardening.py
 
       - name: Upload hardened runtime
         uses: actions/upload-artifact@v4
