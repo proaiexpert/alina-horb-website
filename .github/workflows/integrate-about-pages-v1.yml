@@ -39,8 +39,7 @@ jobs:
             scripts/apply-indexing-launch-v3-2.py \
             scripts/apply-social-favicon-v3-3.py \
             scripts/validate-favicon-social-v3-3.py \
-            scripts/validate-release-readiness.py \
-            .github/workflows/deploy-pages.yml
+            scripts/validate-release-readiness.py
           git diff --cached --quiet && exit 0
           git commit -m "Integrate bilingual About pages across site"
           git push origin HEAD:feature/about-pages-v1
