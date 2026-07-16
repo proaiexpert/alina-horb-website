@@ -3,5 +3,5 @@ window.ALINA_SITE_CONFIG = {
   telegramUsername: "alina_horb1991",
   formEndpoint: "https://formspree.io/f/mvzezana",
   formMode: "formspree",
-  turnstileSiteKey: ""
+  turnstileSiteKey: "0x4AAAAAAD2wlldaSXK8Bp9f"
 };
