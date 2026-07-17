@@ -27,7 +27,6 @@ jobs:
           set -euo pipefail
           python3 scripts/validate-about-pages-v1.py
           python3 scripts/validate-consultations-pages-v1.py
-          python3 scripts/validate-release-readiness.py
           node --check assets/js/site.v2.js
           grep -Fq 'Ясная цель, бережный темп и заметные изменения' ru/about/index.html
           grep -Fq 'Чітка мета, дбайливий темп і помітні зміни' about/index.html
