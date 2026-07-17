@@ -41,12 +41,11 @@ jobs:
           grep -Fq 'https://alinahorb.com/consultations/' sitemap.xml
           grep -Fq 'cp -R consultations _site/' .github/workflows/deploy-pages.yml
 
-      - name: Commit clean feature implementation
+      - name: Commit production implementation
         shell: bash
         run: |
           set -euo pipefail
           rm -rf .tmp/consultations-v1
-          rm .github/workflows/build-consultations-pages-v1.yml
           rm scripts/integrate-consultations-v1.py
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
