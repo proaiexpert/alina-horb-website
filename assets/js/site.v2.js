@@ -184,26 +184,100 @@
     const contact = document.querySelector("#contact");
     const footer = document.querySelector(".site-footer");
     if (!cta || !heroCta || !contact) return;
+
     const mobile = window.matchMedia("(max-width: 800px)");
     let frame = 0;
     let hideTimer = 0;
-    const setVisible = (visible) => {
-      window.clearTimeout(hideTimer);
-      if (visible) { cta.hidden = false; window.requestAnimationFrame(() => cta.classList.add("is-visible")); cta.setAttribute("aria-hidden", "false"); return; }
-      cta.classList.remove("is-visible"); cta.setAttribute("aria-hidden", "true");
-      hideTimer = window.setTimeout(() => { cta.hidden = true; }, reducedMotion ? 0 : 240);
+    let idleTimer = 0;
+    let autoHideTimer = 0;
+    let visible = false;
+    let lastScrollY = Math.max(window.scrollY, 0);
+
+    Object.assign(cta.style, {
+      left: "50%",
+      right: "auto",
+      bottom: "calc(18px + env(safe-area-inset-bottom))",
+      width: "min(280px, calc(100% - 32px))",
+      minHeight: "50px",
+      borderRadius: "999px",
+      transform: "translate(-50%, calc(100% + 40px))"
+    });
+
+    const clearBehaviorTimers = () => {
+      window.clearTimeout(idleTimer);
+      window.clearTimeout(autoHideTimer);
     };
-    const inViewport = (element) => { if (!element) return false; const rect = element.getBoundingClientRect(); return rect.top < window.innerHeight && rect.bottom > 0; };
+
+    const setVisible = (nextVisible) => {
+      window.clearTimeout(hideTimer);
+      if (visible === nextVisible && (nextVisible || cta.hidden)) return;
+      visible = nextVisible;
+      if (nextVisible) {
+        cta.hidden = false;
+        window.requestAnimationFrame(() => {
+          cta.classList.add("is-visible");
+          cta.style.transform = "translate(-50%, 0)";
+        });
+        cta.setAttribute("aria-hidden", "false");
+        return;
+      }
+      cta.classList.remove("is-visible");
+      cta.style.transform = "translate(-50%, calc(100% + 40px))";
+      cta.setAttribute("aria-hidden", "true");
+      hideTimer = window.setTimeout(() => { cta.hidden = true; }, reducedMotion ? 0 : 280);
+    };
+
+    const inViewport = (element) => {
+      if (!element) return false;
+      const rect = element.getBoundingClientRect();
+      return rect.top < window.innerHeight && rect.bottom > 0;
+    };
+
+    const canShow = () => mobile.matches
+      && heroCta.getBoundingClientRect().bottom < 0
+      && !inViewport(about)
+      && !inViewport(contact)
+      && !inViewport(footer);
+
+    const showTemporarily = () => {
+      window.clearTimeout(autoHideTimer);
+      if (!canShow()) { setVisible(false); return; }
+      setVisible(true);
+      autoHideTimer = window.setTimeout(() => setVisible(false), 4200);
+    };
+
     const update = () => {
       frame = 0;
-      if (!mobile.matches) { setVisible(false); return; }
-      setVisible(heroCta.getBoundingClientRect().bottom < 0 && !inViewport(about) && !inViewport(contact) && !inViewport(footer));
+      const currentScrollY = Math.max(window.scrollY, 0);
+      const delta = currentScrollY - lastScrollY;
+      lastScrollY = currentScrollY;
+
+      window.clearTimeout(idleTimer);
+      if (!canShow()) {
+        clearBehaviorTimers();
+        setVisible(false);
+        return;
+      }
+
+      if (delta > 3) setVisible(false);
+      else if (delta < -3) showTemporarily();
+
+      idleTimer = window.setTimeout(() => showTemporarily(), 650);
     };
-    const requestUpdate = () => { if (frame) return; frame = window.requestAnimationFrame(update); };
+
+    const requestUpdate = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(update);
+    };
+
     window.addEventListener("scroll", requestUpdate, { passive: true });
     window.addEventListener("resize", requestUpdate);
+    window.visualViewport?.addEventListener("resize", requestUpdate);
     mobile.addEventListener?.("change", requestUpdate);
-    cta.addEventListener("click", () => setVisible(false));
+    cta.addEventListener("click", () => {
+      clearBehaviorTimers();
+      setVisible(false);
+    });
     update();
   };
 
