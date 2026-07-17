@@ -6,6 +6,7 @@ import xml.etree.ElementTree as ET
 ROOT = Path(__file__).resolve().parents[1]
 BASE = "https://alinahorb.com"
 ROBOTS_META = "index, follow, max-image-preview:large"
+VERSION = "20260717-ux1"
 
 ROUTES = [
     ("index.html", f"{BASE}/", f"{BASE}/", f"{BASE}/ru/"),
@@ -28,10 +29,7 @@ ROUTES = [
     ("ru/privacy/index.html", f"{BASE}/ru/privacy/", f"{BASE}/privacy/", f"{BASE}/ru/privacy/"),
 ]
 
-ARTICLE_PATHS = {
-    path for path, *_ in ROUTES
-    if "notes/" in path and path not in {"notes/index.html", "ru/notes/index.html"}
-}
+ARTICLE_PATHS = {path for path, *_ in ROUTES if "notes/" in path and path not in {"notes/index.html", "ru/notes/index.html"}}
 errors = []
 
 
@@ -50,6 +48,8 @@ for relative, canonical, ua_url, ru_url in ROUTES:
     if not path.is_file():
         continue
     text = path.read_text(encoding="utf-8")
+    depth = len(Path(relative).parent.parts)
+    asset = "../" * depth + "assets/"
 
     require(count(r"<title>.*?</title>", text) == 1, f"{relative}: expected one title")
     require(count(r'<meta\s+name="description"\s+content="[^"]+"\s*/?>', text) == 1, f"{relative}: expected one meta description")
@@ -65,6 +65,15 @@ for relative, canonical, ua_url, ru_url in ROUTES:
     require(not duplicates, f"{relative}: duplicate IDs {duplicates}")
     require("financialstreamllc@gmail.com" not in text and "alinahorb1991@gmail.com" not in text, f"{relative}: legacy Gmail found")
 
+    require(f'{asset}css/site.global-chrome.v1.css?v={VERSION}' in text, f"{relative}: direct global chrome CSS missing")
+    require(f'{asset}css/site.navigation.v1.css?v={VERSION}' in text, f"{relative}: direct navigation CSS missing")
+    require(f'{asset}js/site.navigation.v1.js?v={VERSION}' in text, f"{relative}: direct navigation JS missing")
+    require("site.global-chrome.v1.js" not in text, f"{relative}: runtime chrome renderer remains")
+    require("site.chrome.v3.js" not in text, f"{relative}: utility mutation runtime remains")
+    require("site.notes-images.v3-1.js" not in text, f"{relative}: image mutation runtime remains")
+    require('data-site-footer="canonical"' in text, f"{relative}: canonical footer marker missing")
+    require("favicon-ag.svg" in text, f"{relative}: SVG favicon missing")
+
     if relative in ARTICLE_PATHS:
         require('"@type": "Article"' in text, f"{relative}: Article schema missing")
         require('"@type": "BreadcrumbList"' in text, f"{relative}: BreadcrumbList schema missing")
@@ -74,22 +83,18 @@ for relative, canonical, ua_url, ru_url in ROUTES:
         require(count(r'<meta\s+property="og:image"\s+content="https://alinahorb\.com/[^"]+"\s*/?>', text) == 1, f"{relative}: OG image missing")
         require(count(r'<meta\s+property="og:image:width"\s+content="\d+"\s*/?>', text) == 1, f"{relative}: OG image width missing")
         require(count(r'<meta\s+property="og:image:height"\s+content="\d+"\s*/?>', text) == 1, f"{relative}: OG image height missing")
+        require('has-editorial-rail' in text and 'editorial-rail-placeholder' in text, f"{relative}: stable article rail geometry missing")
 
 for home in (ROOT / "index.html", ROOT / "ru/index.html"):
     if home.is_file():
         text = home.read_text(encoding="utf-8")
         for css_name in (
-            "site.v3-1.css",
-            "site.v3-1-stability.css",
-            "site.global-chrome.v1.css",
-            "site.privacy.v3-2.css",
-            "site.intake.v3-2.css",
-            "site.notes-hub.v3-2.css",
+            "site.v3-1.css", "site.v3-1-stability.css", "site.global-chrome.v1.css",
+            "site.navigation.v1.css", "site.privacy.v3-2.css", "site.intake.v3-2.css",
+            "site.notes-hub.v3-2.css", "site.notes-images.v3.css",
         ):
             require(css_name in text, f"{home.relative_to(ROOT)}: explicit stylesheet missing: {css_name}")
         require("site.footer.v3-2.css" not in text, f"{home.relative_to(ROOT)}: legacy footer stylesheet remains")
-        require('data-site-footer="canonical"' in text, f"{home.relative_to(ROOT)}: canonical footer marker missing")
-        require("favicon-ag.svg" in text, f"{home.relative_to(ROOT)}: SVG favicon missing")
         require('"@type": "WebSite"' in text, f"{home.relative_to(ROOT)}: WebSite schema missing")
         require('"@type": "Person"' in text, f"{home.relative_to(ROOT)}: Person schema missing")
 
