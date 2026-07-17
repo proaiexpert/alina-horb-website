@@ -18,19 +18,27 @@ jobs:
       - uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
-      - name: Simulate production form build
+      - name: Simulate exact production form build
         run: |
-          python3 scripts/apply-notes-images-v3-1.py
-          python3 scripts/patch-notes-validator-expectations-v3-1.py
+          python3 scripts/apply-v32-form-hardening.py
           python3 scripts/apply-turnstile-v3-2.py
+          node --check assets/js/site.v2.js
           python3 scripts/apply-indexing-launch-v3-2.py
           python3 scripts/apply-social-favicon-v3-3.py
       - name: Capture privacy validation result
         run: |
           set +e
-          python3 scripts/validate-privacy-intake.py > qa-chrome-privacy-diagnostic.txt 2>&1
-          status=$?
-          echo "exit_status=${status}" >> qa-chrome-privacy-diagnostic.txt
+          {
+            echo "head=$(git rev-parse HEAD)"
+            python3 scripts/validate-privacy-intake.py
+            status=$?
+            echo "exit_status=${status}"
+            echo "--- relevant runtime markers ---"
+            grep -n 'ALINA_GLOBAL_CHROME_LOADER_V1\|site.global-chrome.v1.js' assets/js/site.v2.js assets/js/site.chrome.v3.js || true
+            echo "--- homepage privacy markers ---"
+            grep -n 'data-site-footer="canonical"\|href="./privacy/"\|href="privacy/"' index.html ru/index.html || true
+            exit "$status"
+          } > qa-chrome-privacy-diagnostic.txt 2>&1
           cat qa-chrome-privacy-diagnostic.txt
           exit 0
       - name: Commit diagnostic result
@@ -38,5 +46,5 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add qa-chrome-privacy-diagnostic.txt
-          git commit -m "Record chrome privacy compatibility diagnostic"
+          git commit -m "Record exact chrome privacy diagnostic" || true
           git push origin HEAD:${{ github.event.pull_request.head.ref }}
