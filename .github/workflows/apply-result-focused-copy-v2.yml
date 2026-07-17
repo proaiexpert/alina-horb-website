@@ -1,0 +1,52 @@
+name: Finalize result-focused bilingual copy v2
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  apply-validate-clean:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Apply approved bilingual copy
+        run: python3 scripts/apply-result-focused-copy-v1.py
+
+      - name: Validate affected public pages
+        run: |
+          set -euo pipefail
+          python3 scripts/validate-about-pages-v1.py
+          python3 scripts/validate-consultations-pages-v1.py
+          python3 scripts/validate-release-readiness.py
+          node --check assets/js/site.v2.js
+          grep -Fq 'Работа с ясной целью и вниманием к результату' ru/about/index.html
+          grep -Fq 'Робота з чіткою метою та увагою до результату' about/index.html
+          grep -Fq 'Ориентация на результат' ru/index.html
+          grep -Fq 'Орієнтація на результат' index.html
+          grep -Fq 'Ориентация на результат' ru/consultations/index.html
+          grep -Fq 'Орієнтація на результат' consultations/index.html
+
+      - name: Remove temporary machinery and restore deployment
+        run: |
+          set -euo pipefail
+          git show 59e00efe3a2de63eeaff39cb20036f123ce701c8:.github/workflows/deploy-pages.yml > .github/workflows/deploy-pages.yml
+          rm -f .github/workflows/apply-result-focused-copy-v1.yml
+          rm -f .github/workflows/apply-result-focused-copy-v2.yml
+          rm -f scripts/apply-result-focused-copy-v1.py
+          rm -f .tmp/result-copy-trigger.txt
+          rm -f .tmp/result-copy-v2-trigger.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Reframe professional responsibility around measurable progress'
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
