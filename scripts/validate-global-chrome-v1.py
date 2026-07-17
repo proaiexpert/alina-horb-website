@@ -1,4 +1,5 @@
 #!/usr/bin/env python3
+# Production gate for every canonical UA/RU header and footer template.
 from pathlib import Path
 import re
 
