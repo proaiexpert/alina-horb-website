@@ -1,0 +1,59 @@
+name: Apply final UX V1
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'scripts/apply-final-ux-v1.py'
+      - 'scripts/patch-final-ux-validation-v1.py'
+      - '.github/workflows/apply-final-ux-v1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Build static Notes imagery
+        run: |
+          python3 scripts/apply-notes-images-v3-1.py
+          python3 scripts/patch-notes-validator-expectations-v3-1.py
+
+      - name: Apply final UX architecture
+        run: |
+          python3 scripts/apply-final-ux-v1.py
+          python3 scripts/patch-final-ux-validation-v1.py
+
+      - name: Validate static production system
+        run: |
+          python3 scripts/validate-global-chrome-v1.py
+          python3 scripts/validate-editorial-navigation-v1.py
+          python3 scripts/validate-interlinking-v1.py
+          python3 scripts/validate-notes-images-v3.py
+          python3 scripts/validate-notes-images-v3-1.py
+          node --check assets/js/site.v2.js
+          node --check assets/js/site.navigation.v1.js
+          node --check assets/js/site.chrome.v3.js
+          node --check scripts/audit-final-ux-v1.mjs
+
+      - name: Remove one-time migration machinery
+        run: |
+          rm scripts/apply-final-ux-v1.py
+          rm scripts/patch-final-ux-validation-v1.py
+          rm .github/workflows/apply-final-ux-v1.yml
+
+      - name: Commit final UX architecture
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Stabilize final responsive UX architecture"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
