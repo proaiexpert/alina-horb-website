@@ -1,0 +1,1 @@
+Trigger live verification for the bilingual consultations pages.
