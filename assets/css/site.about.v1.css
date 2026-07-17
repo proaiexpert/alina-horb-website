@@ -946,7 +946,6 @@ html.js .page-about-profile [data-reveal].is-visible {
 }
 
 
-
 /* About-page mobile booking CTA: compact footprint and safe final-section spacing. */
 @media (max-width: 700px) {
   .page-about-profile .mobile-booking-cta {
