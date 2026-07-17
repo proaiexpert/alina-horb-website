@@ -87,6 +87,6 @@ for relative in rail_pages:
 for relative in ("notes/index.html", "ru/notes/index.html"):
     text = (ROOT / relative).read_text(encoding="utf-8")
     require("notes-hub-hero-grid" in text, f"{relative}: notes rail host missing")
-    require("mobile-navigation" in text, f"{relative}: notes mobile navigation host missing")
+    require("site.chrome.v3.js" in text, f"{relative}: shared chrome runtime missing")
 
 print("Editorial navigation production validation passed.")
