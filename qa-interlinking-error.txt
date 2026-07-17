@@ -1,1 +1,0 @@
-ru/notes/first-consultation/index.html: author About link missing
