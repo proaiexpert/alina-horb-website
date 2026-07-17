@@ -220,4 +220,17 @@
   document.addEventListener("click", (event) => {
     if (!menu.hidden && !event.target.closest(".inner-page-header")) closeMenu();
   });
+
+
+  /* ALINA_EDITORIAL_NAV_LOADER_V1 */
+  (() => {
+    if (document.querySelector('script[data-editorial-navigation-v1]')) return;
+    const projectMarker = "/alina-horb-website/";
+    const rootPath = window.location.pathname.includes(projectMarker) ? projectMarker : "/";
+    const navigationScript = document.createElement("script");
+    navigationScript.src = `${rootPath}assets/js/site.navigation.v1.js?v=20260717-nav1`;
+    navigationScript.defer = true;
+    navigationScript.dataset.editorialNavigationV1 = "";
+    document.head.appendChild(navigationScript);
+  })();
 })();
