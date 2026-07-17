@@ -2,6 +2,7 @@
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
+# Permanent contract for the completed Step 2 bilingual interlinking system.
 
 
 def require(condition: bool, message: str) -> None:
