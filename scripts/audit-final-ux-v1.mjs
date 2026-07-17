@@ -85,10 +85,22 @@ try {
 
       await page.addInitScript(() => {
         window.__UX_AUDIT_CLS__ = 0;
+        window.__UX_AUDIT_SHIFTS__ = [];
         try {
           new PerformanceObserver((list) => {
             for (const entry of list.getEntries()) {
-              if (!entry.hadRecentInput) window.__UX_AUDIT_CLS__ += entry.value;
+              if (entry.hadRecentInput) continue;
+              window.__UX_AUDIT_CLS__ += entry.value;
+              const sources = (entry.sources || []).map((source) => {
+                const node = source.node;
+                let selector = null;
+                if (node instanceof Element) {
+                  selector = node.id ? `#${node.id}` : `${node.tagName.toLowerCase()}${node.classList.length ? `.${[...node.classList].join(".")}` : ""}`;
+                }
+                const serializeRect = (rect) => rect ? ({ x: rect.x, y: rect.y, width: rect.width, height: rect.height }) : null;
+                return { selector, previousRect: serializeRect(source.previousRect), currentRect: serializeRect(source.currentRect) };
+              });
+              window.__UX_AUDIT_SHIFTS__.push({ value: entry.value, sources });
             }
           }).observe({ type: "layout-shift", buffered: true });
         } catch {}
@@ -204,6 +216,7 @@ try {
           h1Rect,
           h1Overflows: Boolean(h1Rect && (h1Rect.left < -1 || h1Rect.right > width + 1)),
           cls: Number(window.__UX_AUDIT_CLS__ || 0),
+          shiftSources: window.__UX_AUDIT_SHIFTS__ || [],
           bodyClass: document.body.className
         };
       }, { width: viewport.width, route });
