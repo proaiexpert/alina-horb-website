@@ -1,0 +1,64 @@
+name: Integrate About consultation image v2
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  integrate:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Update bilingual About pages
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          replacements = {
+              Path('about/index.html'): {
+                  '../assets/images/notes/alina-horb-note-observation-v3.webp': '../assets/images/about/alina-horb-consultation-space-v1.webp',
+                  'width="1800" height="1200"': 'width="700" height="525"',
+                  'Відкритий блокнот і олівець у спокійному світлому просторі': 'Два крісла для розмови у спокійному світлому просторі',
+                  'Спокійний простір для розмови, зосередження й нотаток.': 'Простір для уважної розмови, тиші й внутрішньої опори.'
+              },
+              Path('ru/about/index.html'): {
+                  '../../assets/images/notes/alina-horb-note-observation-v3.webp': '../../assets/images/about/alina-horb-consultation-space-v1.webp',
+                  'width="1800" height="1200"': 'width="700" height="525"',
+                  'Открытый блокнот и карандаш в спокойном светлом пространстве': 'Два кресла для разговора в спокойном светлом пространстве',
+                  'Спокойное пространство для разговора, сосредоточенности и заметок.': 'Пространство для внимательного разговора, тишины и внутренней опоры.'
+              },
+          }
+
+          for path, items in replacements.items():
+              text = path.read_text(encoding='utf-8')
+              for old, new in items.items():
+                  if old not in text:
+                      raise SystemExit(f'Missing expected text in {path}: {old}')
+                  text = text.replace(old, new, 1)
+              path.write_text(text, encoding='utf-8')
+          PY
+
+          test -s assets/images/about/alina-horb-consultation-space-v1.webp
+          file assets/images/about/alina-horb-consultation-space-v1.webp | grep -Fq 'Web/P image'
+          python3 scripts/validate-about-pages-v1.py
+
+      - name: Commit clean production update
+        run: |
+          set -euo pipefail
+          rm .github/workflows/integrate-about-consultation-image-v2.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add about/index.html ru/about/index.html assets/images/about/alina-horb-consultation-space-v1.webp .github/workflows/integrate-about-consultation-image-v2.yml
+          git commit -m "Integrate consultation space image on About pages"
+          git push origin HEAD:main
