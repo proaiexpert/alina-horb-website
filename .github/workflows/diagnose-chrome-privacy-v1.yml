@@ -1,0 +1,42 @@
+name: Diagnose chrome privacy compatibility
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/diagnose-chrome-privacy-v1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  diagnose:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Simulate production form build
+        run: |
+          python3 scripts/apply-notes-images-v3-1.py
+          python3 scripts/patch-notes-validator-expectations-v3-1.py
+          python3 scripts/apply-turnstile-v3-2.py
+          python3 scripts/apply-indexing-launch-v3-2.py
+          python3 scripts/apply-social-favicon-v3-3.py
+      - name: Capture privacy validation result
+        run: |
+          set +e
+          python3 scripts/validate-privacy-intake.py > qa-chrome-privacy-diagnostic.txt 2>&1
+          status=$?
+          echo "exit_status=${status}" >> qa-chrome-privacy-diagnostic.txt
+          cat qa-chrome-privacy-diagnostic.txt
+          exit 0
+      - name: Commit diagnostic result
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add qa-chrome-privacy-diagnostic.txt
+          git commit -m "Record chrome privacy compatibility diagnostic"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
