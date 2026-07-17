@@ -73,6 +73,7 @@ for relative, canonical, ua_url, ru_url in ROUTES:
     require("site.notes-images.v3-1.js" not in text, f"{relative}: image mutation runtime remains")
     require('data-site-footer="canonical"' in text, f"{relative}: canonical footer marker missing")
     require("favicon-ag.svg" in text, f"{relative}: SVG favicon missing")
+    require("&display=optional" in text and "&display=swap" not in text, f"{relative}: stable font-display policy missing")
 
     if relative in ARTICLE_PATHS:
         require('"@type": "Article"' in text, f"{relative}: Article schema missing")

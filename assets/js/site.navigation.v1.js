@@ -148,7 +148,7 @@
 
   const fallbackDesktopNav = document.querySelector(".inner-desktop-nav");
   if (rail) {
-    fallbackDesktopNav?.remove();
+    fallbackDesktopNav?.setAttribute("hidden", "");
   } else if (fallbackDesktopNav) {
     fallbackDesktopNav.setAttribute("aria-label", text.fallbackNav);
     fallbackDesktopNav.innerHTML = `
