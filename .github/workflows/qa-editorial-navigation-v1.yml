@@ -1,0 +1,41 @@
+name: QA editorial navigation V1
+
+on:
+  pull_request:
+    paths:
+      - 'assets/css/site.navigation.v1.css'
+      - 'assets/js/site.navigation.v1.js'
+      - 'assets/js/site.v2.js'
+      - 'assets/js/site.chrome.v3.js'
+      - '**/*.html'
+      - 'scripts/validate-editorial-navigation-v1.py'
+      - '.github/workflows/qa-editorial-navigation-v1.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'assets/css/site.navigation.v1.css'
+      - 'assets/js/site.navigation.v1.js'
+      - 'assets/js/site.v2.js'
+      - 'assets/js/site.chrome.v3.js'
+      - '**/*.html'
+      - 'scripts/validate-editorial-navigation-v1.py'
+      - '.github/workflows/qa-editorial-navigation-v1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-navigation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate editorial navigation
+        run: |
+          set -euo pipefail
+          python3 scripts/validate-editorial-navigation-v1.py
+          node --check assets/js/site.v2.js
+          node --check assets/js/site.chrome.v3.js
+          node --check assets/js/site.navigation.v1.js
+          grep -Fq '.editorial-rail .rail-booking-link' assets/css/site.navigation.v1.css
+          grep -Fq 'pageKey === "home"' assets/js/site.navigation.v1.js
