@@ -25,6 +25,7 @@ EXPECTED_APEX_IPS = {
     "185.199.110.153",
     "185.199.111.153",
 }
+TURNSTILE_SITE_KEY = "0x4AAAAAAD2wlldaSXK8Bp9f"
 ROUTES = [
     "/", "/ru/", "/about/", "/ru/about/", "/consultations/", "/ru/consultations/",
     "/notes/", "/ru/notes/", "/notes/first-consultation/", "/ru/notes/first-consultation/",
@@ -167,8 +168,16 @@ def main() -> int:
     config_meta, config_body = fetch_text(f"{APEX_ORIGIN}/assets/js/site-config.v2.js")
     runtime_meta, runtime_body = fetch_text(f"{APEX_ORIGIN}/assets/js/site.v2.js")
     report["live_assets"] = {
-        "config": {**config_meta, "formspree": "https://formspree.io/f/mvzezana" in config_body, "public_email": "hello@alinahorb.com" in config_body},
-        "runtime": {**runtime_meta, "turnstile": "turnstile" in runtime_body.lower(), "site_key": "0x4AAAAAAD2wlldaSXK8Bp9f" in runtime_body},
+        "config": {
+            **config_meta,
+            "formspree": "https://formspree.io/f/mvzezana" in config_body,
+            "public_email": "hello@alinahorb.com" in config_body,
+            "turnstile_site_key": TURNSTILE_SITE_KEY in config_body,
+        },
+        "runtime": {
+            **runtime_meta,
+            "turnstile": "turnstile" in runtime_body.lower(),
+        },
     }
 
     robots_meta, robots_body = fetch_text(f"{APEX_ORIGIN}/robots.txt")
@@ -225,10 +234,12 @@ def main() -> int:
         if not result.get("ok") or result.get("final_url") != canonical_for(route):
             report["critical"].append(f"www redirect failed for {route}: {result.get('final_url')}")
 
-    if not report["live_assets"]["config"].get("ok") or not report["live_assets"]["config"].get("formspree") or not report["live_assets"]["config"].get("public_email"):
+    config = report["live_assets"]["config"]
+    runtime = report["live_assets"]["runtime"]
+    if not config.get("ok") or not config.get("formspree") or not config.get("public_email"):
         report["critical"].append("Production form configuration is missing or stale")
-    if not report["live_assets"]["runtime"].get("ok") or not report["live_assets"]["runtime"].get("turnstile") or not report["live_assets"]["runtime"].get("site_key"):
-        report["critical"].append("Production Turnstile runtime is missing or stale")
+    if not config.get("turnstile_site_key") or not runtime.get("ok") or not runtime.get("turnstile"):
+        report["critical"].append("Production Turnstile configuration/runtime is missing or stale")
     if not report["live_robots"].get("ok") or not report["live_robots"].get("allows_all") or not report["live_robots"].get("sitemap"):
         report["critical"].append("Live robots.txt is invalid")
     if report["live_sitemap"].get("locations") != report["live_sitemap"].get("expected"):
@@ -247,6 +258,7 @@ def main() -> int:
     OUTPUT.mkdir(parents=True, exist_ok=True)
     (OUTPUT / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
+    turnstile_ok = config.get("turnstile_site_key") and runtime.get("turnstile")
     lines = [
         "Alina Horb launch readiness V1",
         f"Generated: {report['generated_at']}",
@@ -257,8 +269,8 @@ def main() -> int:
         f"WWW DNS: {'ok' if 'proaiexpert.github.io' in www_cnames else 'mismatch'}",
         f"Apex TLS: {'ok' if report['tls']['apex'].get('ok') else 'unavailable'}",
         f"WWW TLS: {'ok' if report['tls']['www'].get('ok') else 'unavailable'}",
-        f"Formspree config: {'ok' if report['live_assets']['config'].get('formspree') else 'missing'}",
-        f"Turnstile runtime: {'ok' if report['live_assets']['runtime'].get('turnstile') and report['live_assets']['runtime'].get('site_key') else 'missing'}",
+        f"Formspree config: {'ok' if config.get('formspree') else 'missing'}",
+        f"Turnstile config/runtime: {'ok' if turnstile_ok else 'missing'}",
         "",
         "Critical:",
         *([f"- {item}" for item in report["critical"]] or ["- none"]),
