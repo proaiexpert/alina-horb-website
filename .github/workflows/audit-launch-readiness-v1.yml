@@ -1,0 +1,36 @@
+name: Audit launch readiness V1
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'scripts/audit-launch-readiness-v1.py'
+      - '.github/workflows/audit-launch-readiness-v1.yml'
+      - 'CNAME'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout tested commit
+        uses: actions/checkout@v4
+
+      - name: Run strict external launch audit
+        env:
+          AUDIT_STRICT: '1'
+        run: python3 scripts/audit-launch-readiness-v1.py
+
+      - name: Upload launch report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: launch-readiness-v1
+          path: qa/launch-readiness
+          retention-days: 14
+          if-no-files-found: warn
