@@ -1,0 +1,90 @@
+name: Build bilingual consultations pages v1
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Decode prepared production files
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p consultations ru/consultations assets/css scripts
+          base64 -d .tmp/consultations-v1/ua.html.gz.b64 | gzip -d > consultations/index.html
+          base64 -d .tmp/consultations-v1/ru.html.gz.b64 | gzip -d > ru/consultations/index.html
+          base64 -d .tmp/consultations-v1/css.gz.b64 | gzip -d > assets/css/site.consultations.v1.css
+          base64 -d .tmp/consultations-v1/validator.gz.b64 | gzip -d > scripts/validate-consultations-pages-v1.py
+          base64 -d .tmp/consultations-v1/integrate.py.gz.b64 | gzip -d > scripts/integrate-consultations-v1.py
+          chmod +x scripts/validate-consultations-pages-v1.py scripts/integrate-consultations-v1.py
+
+      - name: Integrate routes, navigation and shared form
+        run: python3 scripts/integrate-consultations-v1.py
+
+      - name: Validate source pages
+        shell: bash
+        run: |
+          set -euo pipefail
+          python3 -m py_compile scripts/validate-consultations-pages-v1.py
+          python3 scripts/validate-consultations-pages-v1.py
+          python3 scripts/validate-about-pages-v1.py
+          node --check assets/js/site.v2.js
+
+      - name: Validate complete production build in isolation
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/alina-production-check
+          mkdir -p /tmp/alina-production-check
+          tar --exclude=.git -cf - . | tar -xf - -C /tmp/alina-production-check
+          cd /tmp/alina-production-check
+          python3 scripts/apply-notes-images-v3-1.py
+          python3 scripts/patch-notes-validator-expectations-v3-1.py
+          node --check assets/js/site.notes-images.v3-1.js
+          python3 scripts/validate-notes-images-v3-1.py
+          python3 scripts/apply-turnstile-v3-2.py
+          node --check assets/js/site.v2.js
+          python3 scripts/apply-indexing-launch-v3-2.py
+          python3 scripts/apply-social-favicon-v3-3.py
+          python3 scripts/validate-assets.py
+          python3 scripts/validate-about-pages-v1.py
+          python3 scripts/validate-consultations-pages-v1.py
+          python3 scripts/validate-social-previews.py
+          python3 scripts/validate-favicon-social-v3-3.py
+          python3 scripts/validate-public-email.py
+          python3 scripts/validate-privacy-intake.py
+          python3 scripts/validate-form-hardening.py
+          python3 scripts/validate-notes-images-v3.py
+          python3 scripts/validate-notes-images-v3-1.py
+          python3 scripts/validate-article-v32.py
+          python3 scripts/validate-article-start-conversation.py
+          python3 scripts/validate-article-coping-support.py
+          python3 scripts/validate-article-relocation.py
+          python3 scripts/validate-notes-hub-v32.py
+          python3 scripts/validate-release-readiness.py
+
+      - name: Commit clean production implementation
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf .tmp/consultations-v1
+          rm .github/workflows/build-consultations-pages-v1.yml
+          rm scripts/integrate-consultations-v1.py
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Add bilingual consultations and conditions pages"
+          git push origin HEAD:main
