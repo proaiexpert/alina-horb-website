@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Production gate for every canonical UA/RU header and footer template.
+# Final verification trigger after locale-route normalization.
 from pathlib import Path
 import re
 
