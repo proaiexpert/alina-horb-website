@@ -1,0 +1,2 @@
+Privacy, public email, safe intake, Turnstile and indexing validation: OK
+exit_status=0
