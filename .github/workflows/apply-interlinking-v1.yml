@@ -40,3 +40,5 @@ jobs:
           git add -A
           git commit -m "Build bilingual interlinking system"
           git push origin HEAD:${{ github.ref_name }}
+
+# Default-branch trigger after the workflow became active.
