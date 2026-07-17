@@ -3,7 +3,7 @@ name: Apply result-focused bilingual copy v1
 on:
   push:
     branches:
-      - content/result-focused-copy-v1
+      - main
 
 permissions:
   contents: write
@@ -13,10 +13,10 @@ jobs:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout branch
+      - name: Checkout main
         uses: actions/checkout@v4
         with:
-          ref: content/result-focused-copy-v1
+          ref: main
           fetch-depth: 0
 
       - name: Apply bilingual copy update
@@ -46,4 +46,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Reframe professional responsibility around measurable progress"
-          git push origin HEAD:content/result-focused-copy-v1
+          git push origin HEAD:main
