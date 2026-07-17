@@ -1,0 +1,55 @@
+name: Verify live bilingual consultations pages
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  verify-live:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Wait for bilingual production pages
+        run: |
+          set -euo pipefail
+          verified=0
+          for attempt in $(seq 1 30); do
+            curl -fsSL --max-time 20 "https://alinahorb.com/consultations/?v=consultations-v1-${attempt}" -o /tmp/consultations-ua.html || true
+            curl -fsSL --max-time 20 "https://alinahorb.com/ru/consultations/?v=consultations-v1-${attempt}" -o /tmp/consultations-ru.html || true
+            if grep -Fq 'Зрозумілий і спокійний шлях' /tmp/consultations-ua.html \
+              && grep -Fq 'Понятный и спокойный путь' /tmp/consultations-ru.html \
+              && grep -Fq 'name="service"' /tmp/consultations-ua.html \
+              && grep -Fq 'name="timezone"' /tmp/consultations-ua.html \
+              && grep -Fq 'name="service"' /tmp/consultations-ru.html \
+              && grep -Fq 'name="timezone"' /tmp/consultations-ru.html \
+              && grep -Fq 'content="index, follow, max-image-preview:large"' /tmp/consultations-ua.html \
+              && grep -Fq 'content="index, follow, max-image-preview:large"' /tmp/consultations-ru.html; then
+              verified=1
+              echo "Both live consultations pages verified on attempt ${attempt}."
+              break
+            fi
+            echo "Attempt ${attempt}: production update not visible yet"
+            sleep 20
+          done
+          test "$verified" -eq 1
+
+      - name: Remove temporary verifier
+        run: |
+          set -euo pipefail
+          rm .github/workflows/verify-live-consultations-v1.yml
+          rm -f .tmp/verify-live-consultations-trigger.txt
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Confirm live bilingual consultations pages"
+          git push origin HEAD:main
