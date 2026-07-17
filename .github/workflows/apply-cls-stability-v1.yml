@@ -1,0 +1,51 @@
+name: Apply CLS stability V1
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'scripts/apply-cls-stability-v1.py'
+      - '.github/workflows/apply-cls-stability-v1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Apply CLS stability patch
+        run: python3 scripts/apply-cls-stability-v1.py
+
+      - name: Validate patched production assets
+        run: |
+          node --check assets/js/site.v2.js
+          node --check assets/js/site.navigation.v1.js
+          python3 scripts/validate-global-chrome-v1.py
+          python3 scripts/validate-editorial-navigation-v1.py
+          python3 scripts/validate-interlinking-v1.py
+          python3 scripts/validate-notes-images-v3.py
+          python3 scripts/validate-notes-images-v3-1.py
+          grep -q 'CLS stability V1' assets/css/site.navigation.v1.css
+          test "$(grep -R --include='index.html' -l 'display=optional' . | wc -l)" -eq 18
+
+      - name: Commit final CLS stabilization
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add assets/css/site.navigation.v1.css \
+            index.html ru/index.html \
+            about/index.html ru/about/index.html \
+            consultations/index.html ru/consultations/index.html \
+            privacy/index.html ru/privacy/index.html \
+            notes/index.html ru/notes/index.html \
+            notes/*/index.html ru/notes/*/index.html
+          git commit -m "Eliminate final Notes and article layout shifts"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
