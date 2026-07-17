@@ -20,7 +20,21 @@ jobs:
           fetch-depth: 0
 
       - name: Apply approved bilingual copy
-        run: python3 scripts/apply-result-focused-copy-v1.py
+        shell: bash
+        run: |
+          set +e
+          mkdir -p .tmp
+          python3 scripts/apply-result-focused-copy-v1.py > .tmp/result-copy-run.log 2>&1
+          status=$?
+          cat .tmp/result-copy-run.log
+          if [ "$status" -ne 0 ]; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add .tmp/result-copy-run.log
+            git commit -m 'Record result-copy diagnostic'
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+            exit "$status"
+          fi
 
       - name: Validate affected public pages
         run: |
@@ -46,6 +60,7 @@ jobs:
           rm -f .tmp/result-copy-trigger.txt
           rm -f .tmp/result-copy-v2-trigger.txt
           rm -f .tmp/result-copy-v2-pr-ready.txt
+          rm -f .tmp/result-copy-run.log
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
