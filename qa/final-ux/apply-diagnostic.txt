@@ -1,0 +1,32 @@
+=== global-chrome ===
+Static global chrome and direct navigation validation passed.
+exit_status=0
+=== editorial-navigation ===
+Editorial navigation files are present and non-empty.
+exit_status=0
+=== interlinking ===
+Interlinking V1 validation passed.
+exit_status=0
+=== notes-images-v3 ===
+Static Notes editorial image validation: OK
+exit_status=0
+=== notes-images-v3-1 ===
+Static Notes image integration and paths: OK
+exit_status=0
+=== site-js ===
+/home/runner/work/alina-horb-website/alina-horb-website/assets/js/site.v2.js:49
+  };
+   ^
+
+SyntaxError: Unexpected token ';'
+    at wrapSafe (node:internal/modules/cjs/loader:1713:18)
+    at checkSyntax (node:internal/main/check_syntax:78:3)
+
+Node.js v22.23.1
+exit_status=1
+=== navigation-js ===
+exit_status=0
+=== utility-js ===
+exit_status=0
+=== audit-js ===
+exit_status=0
