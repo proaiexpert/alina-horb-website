@@ -1,1 +1,1 @@
-Trigger the consultations finalizer with the clean push step.
+Trigger the consultations finalizer without committing workflow changes.
