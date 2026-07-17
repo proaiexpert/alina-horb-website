@@ -945,3 +945,20 @@ html.js .page-about-profile [data-reveal].is-visible {
   }
 }
 
+
+/* About-page mobile booking CTA: compact footprint and safe final-section spacing. */
+@media (max-width: 700px) {
+  .page-about-profile .mobile-booking-cta {
+    right: 16px;
+    bottom: calc(12px + env(safe-area-inset-bottom));
+    left: 16px;
+    width: auto;
+    min-height: 52px;
+    border-radius: 999px;
+    box-shadow: 0 14px 38px rgba(47, 48, 45, .2);
+  }
+
+  .page-about-profile .profile-final-inner {
+    padding-bottom: calc(58px + env(safe-area-inset-bottom));
+  }
+}
