@@ -1,0 +1,50 @@
+name: Apply About position cleanup
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  apply-validate-clean:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+          fetch-depth: 0
+
+      - name: Apply approved cleanup
+        run: python3 scripts/apply-about-position-cleanup-v1.py
+
+      - name: Validate bilingual pages and runtime
+        run: |
+          set -euo pipefail
+          python3 scripts/validate-about-pages-v1.py
+          python3 scripts/validate-consultations-pages-v1.py
+          python3 scripts/validate-release-readiness.py
+          node --check assets/js/site.v2.js
+          grep -Fq 'Ясная цель, бережный темп и заметные изменения' ru/about/index.html
+          grep -Fq 'Чітка мета, дбайливий темп і помітні зміни' about/index.html
+          ! grep -Fq 'profile-position section-block' ru/about/index.html
+          ! grep -Fq 'profile-position section-block' about/index.html
+          ! grep -Fq '#position' ru/about/index.html
+          ! grep -Fq '#position' about/index.html
+          grep -Fq 'Нужно ли заранее формулировать точный запрос?' ru/consultations/index.html
+          grep -Fq 'Чи потрібно заздалегідь формулювати точний запит?' consultations/index.html
+
+      - name: Commit finished files and remove temporary machinery
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/apply-about-position-cleanup-v1.yml
+          rm -f scripts/apply-about-position-cleanup-v1.py
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Simplify About positioning and improve mobile clarity'
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
