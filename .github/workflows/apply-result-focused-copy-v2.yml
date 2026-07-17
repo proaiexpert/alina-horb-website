@@ -25,6 +25,16 @@ jobs:
         run: |
           set +e
           mkdir -p .tmp
+          python3 - <<'PY'
+          from pathlib import Path
+          path = Path('index.html')
+          text = path.read_text(encoding='utf-8')
+          text = text.replace(
+              '— без самодіагностики й обіцянок результату.',
+              '— без самодіагностики та обіцянок результату.',
+          )
+          path.write_text(text, encoding='utf-8')
+          PY
           python3 scripts/apply-result-focused-copy-v1.py > .tmp/result-copy-run.log 2>&1
           status=$?
           cat .tmp/result-copy-run.log
