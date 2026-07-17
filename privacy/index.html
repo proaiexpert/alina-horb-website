@@ -16,11 +16,19 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/site.v2.css">
   <link rel="stylesheet" href="../assets/css/site.privacy.v3-2.css">
-  <script src="../assets/js/site.chrome.v3.js?v=20260717-nav1" defer></script>
+  <link rel="stylesheet" href="../assets/css/site.global-chrome.v1.css?v=20260717-chrome1">
+  <script src="../assets/js/site.chrome.v3.js?v=20260717-chrome1" defer></script>
 </head>
 <body class="page-ua privacy-page">
   <a class="skip-link" href="#main-content">Перейти до змісту</a>
-  <header class="site-header"><div class="page-shell header-row"><a class="brand" href="../" aria-label="Аліна Горб — головна"><img src="../assets/images/logos/alina-horb-logo-ua-dark.png" width="512" height="156" alt="Аліна Горб"></a><div class="header-tools"><div class="language-switch" aria-label="Вибір мови"><span aria-current="page">UA</span><span aria-hidden="true">/</span><a href="../ru/privacy/" lang="ru" hreflang="ru">RU</a></div></div></div></header>
+  <header class="site-header site-header--canonical inner-page-header" id="top">
+    <div class="page-shell header-row">
+      <a class="brand" href="../" aria-label="Аліна Горб — головна"><img src="../assets/images/logos/alina-horb-logo-ua-dark.png" width="512" height="156" alt="Аліна Горб"></a>
+      <nav class="inner-desktop-nav" aria-label="Основні розділи сайту"><a href="../about/">Про Аліну</a><a href="../consultations/">Консультації</a><a href="../notes/">Нотатки</a><a class="editorial-header-booking" href="../consultations/#contact">Записатися</a></nav>
+      <div class="header-tools"><div class="language-switch" aria-label="Вибір мови"><span aria-current="page">UA</span><span aria-hidden="true">/</span><a href="../ru/privacy/" lang="ru" hreflang="ru">RU</a></div><button class="mobile-nav-toggle" type="button" aria-label="Відкрити меню" aria-expanded="false" aria-controls="mobile-navigation" data-menu-toggle><span class="menu-icon" aria-hidden="true"></span></button></div>
+      <nav class="mobile-navigation" id="mobile-navigation" aria-label="Основні розділи сайту" data-mobile-nav hidden></nav>
+    </div>
+  </header>
 
   <main class="privacy-main" id="main-content">
     <section class="privacy-hero">
@@ -106,6 +114,13 @@
     </div>
   </main>
 
-  <footer class="site-footer"><div class="page-shell footer-row"><a class="footer-brand" href="../"><img src="../assets/images/logos/alina-horb-logo-ua-dark.png" width="512" height="156" alt="Аліна Горб"></a><span>alinahorb.com</span><a href="mailto:hello@alinahorb.com">hello@alinahorb.com</a><span>© Аліна Горб, 2026</span></div></footer>
+  <footer class="site-footer" data-site-footer="canonical">
+    <div class="page-shell footer-editorial-grid">
+      <div class="footer-identity"><a class="footer-brand" href="../" aria-label="Аліна Горб — головна"><img src="../assets/images/logos/alina-horb-logo-ua-dark.png" width="512" height="156" alt="Аліна Горб"></a><p>Психологічні консультації українською та російською мовами · онлайн.</p></div>
+      <nav class="footer-navigation" aria-label="Основні розділи сайту"><p class="footer-label">Розділи</p><a href="../">Головна</a><a href="../about/">Про Аліну</a><a href="../consultations/">Консультації</a><a href="../notes/">Нотатки</a></nav>
+      <div class="footer-contact"><p class="footer-label">Перший контакт</p><a class="footer-booking" href="../consultations/#contact"><span>Записатися на консультацію</span><span aria-hidden="true">→</span></a><div class="footer-contact-links"><a href="mailto:hello@alinahorb.com">Email</a><a href="https://t.me/alina_horb1991" target="_blank" rel="noopener noreferrer">Telegram</a><a href="https://instagram.com/ng_alina_dp" target="_blank" rel="noopener noreferrer">Instagram</a></div></div>
+    </div>
+    <div class="page-shell footer-utility"><div class="footer-utility-links"><a href="../">alinahorb.com</a><a href="../privacy/" aria-current="page">Конфіденційність</a><span class="footer-language-label">Мова</span><div class="language-switch" aria-label="Вибір мови"><span aria-current="page">UA</span><span aria-hidden="true">/</span><a href="../ru/privacy/" lang="ru" hreflang="ru">RU</a></div></div><div class="footer-legal"><span>© Аліна Горб, 2026</span><span class="maker-credit"><small>Розроблено</small><a href="https://proai-expert.com/" target="_blank" rel="noopener noreferrer">ProAI Expert</a></span></div></div>
+  </footer>
 </body>
 </html>

@@ -34,11 +34,11 @@
   <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,500&family=Manrope:wght@400;500;600&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="../assets/css/site.v3-1.css">
   <link rel="stylesheet" href="../assets/css/site.v3-1-stability.css">
-  <link rel="stylesheet" href="../assets/css/site.footer.v3-2.css">
-  <link rel="stylesheet" href="../assets/css/site.privacy.v3-2.css">
+<link rel="stylesheet" href="../assets/css/site.privacy.v3-2.css">
   <link rel="stylesheet" href="../assets/css/site.intake.v3-2.css">
   <link rel="stylesheet" href="../assets/css/site.notes-hub.v3-2.css">
-  <script>document.documentElement.classList.remove("no-js");document.documentElement.classList.add("js");</script><script src="../assets/js/site-config.v2.js" defer></script><script src="../assets/js/site.v2.js?v=20260717-nav1" defer></script>
+  <link rel="stylesheet" href="../assets/css/site.global-chrome.v1.css?v=20260717-chrome1">
+  <script>document.documentElement.classList.remove("no-js");document.documentElement.classList.add("js");</script><script src="../assets/js/site-config.v2.js" defer></script><script src="../assets/js/site.v2.js?v=20260717-chrome1" defer></script>
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
@@ -71,7 +71,14 @@
 </head>
 <body class="page-ru">
   <a class="skip-link" href="#main-content">Перейти к содержанию</a>
-  <header class="site-header" id="top"><div class="page-shell header-row"><a class="brand" href="#top" aria-label="Алина Горб — психолог"><img src="../assets/images/logos/alina-horb-logo-ru-dark.png" width="512" height="156" alt="Алина Горб — психологическая поддержка"></a><div class="header-tools"><div class="language-switch" aria-label="Выбор языка"><a href="../" lang="uk" hreflang="uk">UA</a><span aria-hidden="true">/</span><span lang="ru" aria-current="page">RU</span></div><button class="mobile-nav-toggle" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-navigation" data-menu-toggle><span class="menu-icon" aria-hidden="true"></span></button></div><nav class="mobile-navigation" id="mobile-navigation" aria-label="Навигация по странице" data-mobile-nav hidden><a href="#support">Поддержка</a><a href="consultations/">Консультации</a><a href="about/">Об Алине</a><a href="#notes">Заметки</a><a href="#contact">Контакты</a></nav></div></header>
+  <header class="site-header site-header--canonical" id="top">
+    <div class="page-shell header-row">
+      <a class="brand" href="../ru/" aria-label="Алина Горб — главная"><img src="../assets/images/logos/alina-horb-logo-ru-dark.png" width="512" height="156" alt="Алина Горб"></a>
+      <nav class="inner-desktop-nav" aria-label="Основные разделы сайта"><a href="../ru/about/">Об Алине</a><a href="../ru/consultations/">Консультации</a><a href="../ru/notes/">Заметки</a><a class="editorial-header-booking" href="../ru/consultations/#contact">Записаться</a></nav>
+      <div class="header-tools"><div class="language-switch" aria-label="Выбор языка"><a href="../" lang="uk" hreflang="uk">UA</a><span aria-hidden="true">/</span><span aria-current="page">RU</span></div><button class="mobile-nav-toggle" type="button" aria-label="Открыть меню" aria-expanded="false" aria-controls="mobile-navigation" data-menu-toggle><span class="menu-icon" aria-hidden="true"></span></button></div>
+      <nav class="mobile-navigation" id="mobile-navigation" aria-label="Основные разделы сайта" data-mobile-nav hidden></nav>
+    </div>
+  </header>
 
   <section class="hero" aria-labelledby="hero-title"><div class="page-shell hero-layout">
     <nav class="side-navigation" aria-label="Навигация по странице"><a href="#support"><b>01</b><span>Поддержка</span></a><a href="#topics"><b>02</b><span>Запросы</span></a><a href="#about"><b>03</b><span>Об Алине</span></a><a href="#process"><b>04</b><span>Процесс</span></a><a href="#notes"><b>05</b><span>Заметки</span></a><a href="#contact"><b>06</b><span>Контакты</span></a></nav>
@@ -127,6 +134,13 @@
   </main>
 
   <a class="mobile-booking-cta" href="#contact" data-mobile-booking-cta hidden>Записаться</a>
-  <footer class="site-footer"><div class="page-shell footer-main"><a class="footer-brand" href="#top" aria-label="Алина Горб — психолог"><img src="../assets/images/logos/alina-horb-logo-ru-dark.png" width="512" height="156" alt="Алина Горб"></a><nav class="footer-links" aria-label="Контакты и язык"><div class="language-switch"><a href="../" lang="uk" hreflang="uk">UA</a><span>/</span><span aria-current="page">RU</span></div><a href="about/">Об Алине</a><a href="consultations/">Консультации</a><a href="mailto:hello@alinahorb.com">Email</a><a href="privacy/">Конфиденциальность</a><a href="https://t.me/alina_horb1991" target="_blank" rel="noopener noreferrer">Telegram</a><a href="https://instagram.com/ng_alina_dp" target="_blank" rel="noopener noreferrer">Instagram</a></nav><div class="footer-meta"><span>© Алина Горб, 2026</span></div></div><div class="page-shell footer-bottom"><span>alinahorb.com</span><span class="maker-credit"><small>Разработано</small><a href="https://proai-expert.com/" target="_blank" rel="noopener noreferrer">ProAI Expert</a></span></div></footer>
+  <footer class="site-footer" data-site-footer="canonical">
+    <div class="page-shell footer-editorial-grid">
+      <div class="footer-identity"><a class="footer-brand" href="../ru/" aria-label="Алина Горб — главная"><img src="../assets/images/logos/alina-horb-logo-ru-dark.png" width="512" height="156" alt="Алина Горб"></a><p>Психологические консультации на русском и украинском языках · онлайн.</p></div>
+      <nav class="footer-navigation" aria-label="Основные разделы сайта"><p class="footer-label">Разделы</p><a href="../ru/" aria-current="page">Главная</a><a href="../ru/about/">Об Алине</a><a href="../ru/consultations/">Консультации</a><a href="../ru/notes/">Заметки</a></nav>
+      <div class="footer-contact"><p class="footer-label">Первый контакт</p><a class="footer-booking" href="../ru/consultations/#contact"><span>Записаться на консультацию</span><span aria-hidden="true">→</span></a><div class="footer-contact-links"><a href="mailto:hello@alinahorb.com">Email</a><a href="https://t.me/alina_horb1991" target="_blank" rel="noopener noreferrer">Telegram</a><a href="https://instagram.com/ng_alina_dp" target="_blank" rel="noopener noreferrer">Instagram</a></div></div>
+    </div>
+    <div class="page-shell footer-utility"><div class="footer-utility-links"><a href="../ru/">alinahorb.com</a><a href="../ru/privacy/">Конфиденциальность</a><span class="footer-language-label">Язык</span><div class="language-switch" aria-label="Выбор языка"><a href="../" lang="uk" hreflang="uk">UA</a><span aria-hidden="true">/</span><span aria-current="page">RU</span></div></div><div class="footer-legal"><span>© Алина Горб, 2026</span><span class="maker-credit"><small>Разработано</small><a href="https://proai-expert.com/" target="_blank" rel="noopener noreferrer">ProAI Expert</a></span></div></div>
+  </footer>
 </body>
 </html>
