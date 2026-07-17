@@ -1,0 +1,42 @@
+name: Verify live editorial navigation V1
+
+on:
+  pull_request:
+    branches:
+      - main
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Wait for production navigation assets
+        run: |
+          set -euo pipefail
+          verified=0
+          for attempt in $(seq 1 30); do
+            curl -fsSL --max-time 20 "https://alinahorb.com/assets/js/site.v2.js?v=editorial-nav-${attempt}" -o /tmp/site-v2.js || true
+            curl -fsSL --max-time 20 "https://alinahorb.com/assets/js/site.chrome.v3.js?v=editorial-nav-${attempt}" -o /tmp/site-chrome.js || true
+            curl -fsSL --max-time 20 "https://alinahorb.com/assets/js/site.navigation.v1.js?v=editorial-nav-${attempt}" -o /tmp/site-navigation.js || true
+            curl -fsSL --max-time 20 "https://alinahorb.com/assets/css/site.navigation.v1.css?v=editorial-nav-${attempt}" -o /tmp/site-navigation.css || true
+            curl -fsSL --max-time 20 "https://alinahorb.com/?v=editorial-nav-${attempt}" -o /tmp/home.html || true
+            curl -fsSL --max-time 20 "https://alinahorb.com/ru/about/?v=editorial-nav-${attempt}" -o /tmp/about-ru.html || true
+            curl -fsSL --max-time 20 "https://alinahorb.com/notes/?v=editorial-nav-${attempt}" -o /tmp/notes.html || true
+            if grep -Fq 'ALINA_EDITORIAL_NAV_LOADER_V1' /tmp/site-v2.js \
+              && grep -Fq 'ALINA_EDITORIAL_NAV_LOADER_V1' /tmp/site-chrome.js \
+              && grep -Fq 'Розділи сайту' /tmp/site-navigation.js \
+              && grep -Fq 'Разделы сайта' /tmp/site-navigation.js \
+              && grep -Fq '.editorial-rail .rail-booking-link' /tmp/site-navigation.css \
+              && grep -Fq 'site.v2.js?v=20260717-nav1' /tmp/home.html \
+              && grep -Fq 'site.v2.js?v=20260717-nav1' /tmp/about-ru.html \
+              && grep -Fq 'site.chrome.v3.js?v=20260717-nav1' /tmp/notes.html; then
+              verified=1
+              echo "Live editorial navigation V1 verified on attempt ${attempt}."
+              break
+            fi
+            echo "Attempt ${attempt}: production update not visible yet"
+            sleep 15
+          done
+          test "$verified" -eq 1
