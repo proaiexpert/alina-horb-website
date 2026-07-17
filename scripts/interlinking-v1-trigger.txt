@@ -1,2 +1,0 @@
-Run the approved bilingual interlinking migration for Step 2.
-Retry after enabling post-generation QA diagnosis.
