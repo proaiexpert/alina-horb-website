@@ -17,7 +17,6 @@ SLUGS = {
     "when-coping-stops-helping": "observation",
     "stress-relocation-and-lost-support": "transition",
 }
-
 for slug, key in SLUGS.items():
     PAGES[Path("notes") / slug / "index.html"] = ("../../assets/", key)
     PAGES[Path("ru/notes") / slug / "index.html"] = ("../../../assets/", key)
@@ -38,11 +37,10 @@ for page, (asset_prefix, article_key) in PAGES.items():
     path = ROOT / page
     text = path.read_text(encoding="utf-8")
     css = f'{asset_prefix}css/site.notes-images.v3.css?v=3.1'
-    js = f'{asset_prefix}js/site.notes-images.v3-1.js'
     if css not in text:
-        raise SystemExit(f"Missing versioned Notes CSS in {page}: {css}")
-    if js not in text:
-        raise SystemExit(f"Missing cache-safe Notes runtime in {page}: {js}")
+        raise SystemExit(f"Missing versioned static Notes CSS in {page}: {css}")
+    if "site.notes-images.v3-1.js" in text:
+        raise SystemExit(f"Runtime Notes image replacement remains in {page}")
 
     note_sources = re.findall(r'(?:src|srcset)="([^"]*assets/images/notes/[^"]+)"', text)
     if page in (Path("index.html"), Path("ru/index.html"), Path("notes/index.html"), Path("ru/notes/index.html")):
@@ -66,8 +64,8 @@ for page, (asset_prefix, article_key) in PAGES.items():
         if f'data-note="{data_note}"' not in text:
             raise SystemExit(f"Missing article data-note in {page}")
 
-runtime = (ROOT / "assets/js/site.notes-images.v3-1.js").read_text(encoding="utf-8")
-if 'new URL("../images/notes/", script.src)' not in runtime:
-    raise SystemExit("Notes runtime does not resolve assets from its own versioned script URL")
+apply_script = (ROOT / "scripts/apply-notes-images-v3-1.py").read_text(encoding="utf-8")
+if "site.notes-images.v3-1.js" in apply_script:
+    raise SystemExit("Deployment still injects the obsolete Notes image runtime")
 
 print("Static Notes image integration and paths: OK")
