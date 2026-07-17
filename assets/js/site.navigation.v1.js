@@ -21,10 +21,12 @@
   const relativePath = pathname.startsWith(rootPath) ? pathname.slice(rootPath.length) : pathname.replace(/^\//, "");
   const isRu = document.documentElement.lang.toLowerCase().startsWith("ru") || relativePath.startsWith("ru/");
   const cleanPath = relativePath.replace(/^ru\//, "");
-  const pageKey = cleanPath.startsWith("about/") ? "about"
-    : cleanPath.startsWith("consultations/") ? "consultations"
-      : cleanPath.startsWith("notes/") ? "notes"
-        : "home";
+  const isHome = cleanPath === "" || cleanPath === "index.html";
+  const pageKey = isHome ? "home"
+    : cleanPath.startsWith("about/") ? "about"
+      : cleanPath.startsWith("consultations/") ? "consultations"
+        : cleanPath.startsWith("notes/") ? "notes"
+          : "other";
 
   const localeRoot = `${rootPath}${isRu ? "ru/" : ""}`;
   const pages = [
