@@ -30,16 +30,19 @@ for relative, text in (("assets/js/site.v2.js", site_js), ("assets/js/site.chrom
     require(text.count("ALINA_EDITORIAL_NAV_LOADER_V1") == 1, f"{relative}: navigation loader missing or duplicated")
     require("site.navigation.v1.js?v=20260717-nav1" in text, f"{relative}: cache-safe navigation runtime missing")
 
-core_pages = (
+rail_pages = (
     "index.html", "ru/index.html", "about/index.html", "ru/about/index.html",
     "consultations/index.html", "ru/consultations/index.html",
-    "notes/index.html", "ru/notes/index.html",
 )
-for relative in core_pages:
+for relative in rail_pages:
     text = (ROOT / relative).read_text(encoding="utf-8")
     require("mobile-navigation" in text, f"{relative}: mobile navigation host missing")
-    if "notes/" not in relative:
-        require("side-navigation" in text, f"{relative}: desktop rail host missing")
+    require("side-navigation" in text, f"{relative}: desktop rail host missing")
+
+for relative in ("notes/index.html", "ru/notes/index.html"):
+    text = (ROOT / relative).read_text(encoding="utf-8")
+    require("notes-hub-hero-grid" in text, f"{relative}: notes rail host missing")
+    require("site.chrome.v3.js?v=20260717-nav1" in text, f"{relative}: cache-safe chrome runtime missing")
 
 for path in ROOT.rglob("*.html"):
     text = path.read_text(encoding="utf-8")
