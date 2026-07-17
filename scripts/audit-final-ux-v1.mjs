@@ -218,6 +218,7 @@ try {
       if (!metrics.skipTargetExists) pushIssue(critical, viewport, route, "skip-link target is missing");
       if (metrics.failedImages.length) pushIssue(critical, viewport, route, `failed local images: ${metrics.failedImages.join(", ")}`);
       if (metrics.h1Overflows) pushIssue(critical, viewport, route, "H1 extends outside the viewport");
+      if (viewport.width >= 1181 && metrics.h1Rect?.width < 280) pushIssue(critical, viewport, route, `desktop H1 is squeezed into ${Math.round(metrics.h1Rect.width)}px`);
       if (metrics.cls > 0.25) pushIssue(critical, viewport, route, `excessive CLS ${metrics.cls.toFixed(3)}`);
       else if (metrics.cls > 0.1) pushIssue(warnings, viewport, route, `elevated CLS ${metrics.cls.toFixed(3)}`);
       if (metrics.formWidth && viewport.width >= 900 && metrics.formWidth > 680) {

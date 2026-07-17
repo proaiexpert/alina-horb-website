@@ -273,6 +273,24 @@
     gap: clamp(28px, 3.1vw, 48px);
   }
 
+  .notes-hub-hero-grid.has-editorial-rail > .editorial-rail,
+  .article-hero-grid.has-editorial-rail > .editorial-rail {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .notes-hub-hero-grid.has-editorial-rail > .notes-hub-heading,
+  .article-hero-grid.has-editorial-rail > .article-hero-copy {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .notes-hub-hero-grid.has-editorial-rail > .notes-hub-index,
+  .article-hero-grid.has-editorial-rail > .article-hero-visual {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
   .notes-hub-hero-grid > .editorial-rail,
   .article-hero-grid > .editorial-rail {
     min-height: 100%;
