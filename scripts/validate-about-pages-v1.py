@@ -34,13 +34,13 @@ PAGES = {
 }
 
 REQUIRED_IDS = (
-    "about", "path", "position", "methods", "education", "scope",
+    "about", "path", "methods", "education", "scope",
     "boundaries", "contact", "main-content",
 )
 
 REQUIRED_CLASSES = (
     "profile-hero", "profile-hero-portrait", "profile-hero-facts",
-    "profile-timeline", "position-principles", "profile-method-list",
+    "profile-timeline", "profile-editorial", "profile-method-list",
     "profile-diploma", "scope-index", "boundaries-card", "profile-final",
 )
 
@@ -87,6 +87,9 @@ for relative, expected in PAGES.items():
     require("hello@alinahorb.com" in text, f"{relative}: public email missing")
     require("alinahorb1991@gmail.com" not in text, f"{relative}: legacy Gmail found")
     require("TODO" not in text and "placeholder" not in text.lower(), f"{relative}: unfinished marker found")
+    require('#position' not in text and 'profile-position section-block' not in text, f"{relative}: removed professional-position section still present")
+    require('position-principles' not in text, f"{relative}: removed principle grid still present")
+    require(('Чітка мета, дбайливий темп і помітні зміни' in text) or ('Ясная цель, бережный темп и заметные изменения' in text), f"{relative}: refined editorial positioning missing")
 
     ids = re.findall(r'\bid="([^"]+)"', text)
     duplicates = sorted({value for value in ids if ids.count(value) > 1})
@@ -97,7 +100,7 @@ for relative, expected in PAGES.items():
         require(class_name in text, f"{relative}: required component missing: {class_name}")
 
     section_count = len(re.findall(r'<section\b', text, flags=re.I))
-    require(section_count >= 9, f"{relative}: profile page is structurally incomplete ({section_count} sections)")
+    require(section_count >= 8, f"{relative}: profile page is structurally incomplete ({section_count} sections)")
 
 ua = (ROOT / "about/index.html").read_text(encoding="utf-8") if (ROOT / "about/index.html").is_file() else ""
 ru = (ROOT / "ru/about/index.html").read_text(encoding="utf-8") if (ROOT / "ru/about/index.html").is_file() else ""
@@ -111,7 +114,7 @@ require(css_path.is_file(), "About page stylesheet missing")
 if css_path.is_file():
     css = css_path.read_text(encoding="utf-8")
     for selector in (
-        ".profile-hero-layout", ".profile-section-grid", ".position-principles",
+        ".profile-hero-layout", ".profile-section-grid", ".profile-editorial-layout",
         ".profile-method-list", ".profile-education-layout", ".scope-index",
         ".boundaries-layout", ".profile-final-inner",
     ):
