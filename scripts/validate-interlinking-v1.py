@@ -15,11 +15,11 @@ def read(relative: str) -> str:
     return path.read_text(encoding="utf-8")
 
 
-# Home fallbacks expose the real About page while preserving local homepage anchors.
+# Canonical homepage chrome exposes the real About page while local content keeps its anchors.
 ua_home = read("index.html")
 ru_home = read("ru/index.html")
-require('<a href="about/">Про Аліну</a>' in ua_home, "UA home fallback About route missing")
-require('<a href="about/">Об Алине</a>' in ru_home, "RU home fallback About route missing")
+require('<a href="./about/">Про Аліну</a>' in ua_home, "UA home canonical About route missing")
+require('<a href="./about/">Об Алине</a>' in ru_home, "RU home canonical About route missing")
 
 # About pages use the canonical conversion destination and still connect to Notes.
 for relative in ("about/index.html", "ru/about/index.html"):
