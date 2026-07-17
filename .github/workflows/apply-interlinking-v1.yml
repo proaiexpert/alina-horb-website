@@ -7,6 +7,12 @@ on:
     paths:
       - 'scripts/apply-interlinking-v1.py'
       - '.github/workflows/apply-interlinking-v1.yml'
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'scripts/apply-interlinking-v1.py'
+      - '.github/workflows/apply-interlinking-v1.yml'
 
 permissions:
   contents: write
@@ -35,5 +41,3 @@ jobs:
           git add -A
           git commit -m "Build bilingual interlinking system"
           git push origin HEAD:feature/interlinking-v1
-
-# Triggered after the migration and validation files are present.
