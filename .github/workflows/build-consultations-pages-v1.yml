@@ -1,22 +1,23 @@
 name: Finalize bilingual consultations pages v1
 
 on:
-  push:
+  pull_request:
     branches:
       - main
+    types: [opened, synchronize, reopened]
 
 permissions:
   contents: write
 
 jobs:
   finalize:
-    if: github.actor != 'github-actions[bot]'
+    if: github.head_ref == 'feature/finalize-consultations-v1' && github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout main
+      - name: Checkout feature branch
         uses: actions/checkout@v4
         with:
-          ref: main
+          ref: feature/finalize-consultations-v1
           fetch-depth: 0
 
       - name: Decode prepared production files
@@ -43,7 +44,7 @@ jobs:
           grep -Fq 'https://alinahorb.com/consultations/' sitemap.xml
           grep -Fq 'cp -R consultations _site/' .github/workflows/deploy-pages.yml
 
-      - name: Commit clean production implementation
+      - name: Commit clean feature implementation
         shell: bash
         run: |
           set -euo pipefail
@@ -54,4 +55,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Publish bilingual consultations and conditions pages"
-          git push origin HEAD:main
+          git push origin HEAD:feature/finalize-consultations-v1
