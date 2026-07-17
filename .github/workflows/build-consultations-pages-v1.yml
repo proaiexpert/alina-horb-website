@@ -47,6 +47,7 @@ jobs:
           set -euo pipefail
           rm -rf .tmp/consultations-v1
           rm scripts/integrate-consultations-v1.py
+          git checkout HEAD -- .github/workflows/deploy-pages.yml
           git config user.name "github-actions[bot]"
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
