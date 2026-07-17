@@ -30,13 +30,15 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate editorial navigation
+      - name: Check JavaScript syntax
         run: |
-          set -euo pipefail
-          python3 scripts/validate-editorial-navigation-v1.py
           node --check assets/js/site.v2.js
           node --check assets/js/site.chrome.v3.js
           node --check assets/js/site.navigation.v1.js
+      - name: Validate navigation contract
+        run: python3 scripts/validate-editorial-navigation-v1.py
+      - name: Verify production CSS and runtime markers
+        run: |
           grep -Fq '.editorial-rail .rail-booking-link' assets/css/site.navigation.v1.css
           grep -Fq '@media (max-width: 1180px)' assets/css/site.navigation.v1.css
           grep -Fq 'setBackgroundInert' assets/js/site.navigation.v1.js
