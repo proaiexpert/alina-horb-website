@@ -1,0 +1,71 @@
+name: Apply About consultation image
+
+on:
+  push:
+    branches:
+      - image/about-consultation-v1
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: image/about-consultation-v1
+          fetch-depth: 0
+
+      - name: Update bilingual About pages
+        run: |
+          set -euo pipefail
+          python3 - <<'PY'
+          from pathlib import Path
+
+          replacements = {
+              Path('about/index.html'): (
+                  '../assets/images/notes/alina-horb-note-observation-v3.webp',
+                  '../assets/images/about/alina-horb-consultation-space-v1.webp',
+                  'Відкритий блокнот і олівець у спокійному світлому просторі',
+                  'Два крісла для розмови у спокійному світлому просторі',
+                  'Спокійний простір для розмови, зосередження й нотаток.',
+                  'Простір для уважної розмови, тиші й внутрішньої опори.'
+              ),
+              Path('ru/about/index.html'): (
+                  '../../assets/images/notes/alina-horb-note-observation-v3.webp',
+                  '../../assets/images/about/alina-horb-consultation-space-v1.webp',
+                  'Открытый блокнот и карандаш в спокойном светлом пространстве',
+                  'Два кресла для разговора в спокойном светлом пространстве',
+                  'Спокойное пространство для разговора, сосредоточенности и заметок.',
+                  'Пространство для внимательного разговора, тишины и внутренней опоры.'
+              ),
+          }
+
+          for path, values in replacements.items():
+              old_src, new_src, old_alt, new_alt, old_caption, new_caption = values
+              text = path.read_text(encoding='utf-8')
+              for old, new in ((old_src, new_src), (old_alt, new_alt), (old_caption, new_caption)):
+                  if old not in text:
+                      raise SystemExit(f'Missing expected text in {path}: {old}')
+                  text = text.replace(old, new, 1)
+              path.write_text(text, encoding='utf-8')
+          PY
+
+          test -s assets/images/about/alina-horb-consultation-space-v1.webp
+          test "$(stat -c%s assets/images/about/alina-horb-consultation-space-v1.webp)" -lt 150000
+          file assets/images/about/alina-horb-consultation-space-v1.webp | grep -Fq 'Web/P image'
+          python3 scripts/validate-about-pages-v1.py
+
+      - name: Commit page integration and clean staging files
+        run: |
+          set -euo pipefail
+          rm -rf .tmp/about-image
+          rm .github/workflows/apply-about-consultation-image-v1.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add about/index.html ru/about/index.html assets/images/about/alina-horb-consultation-space-v1.webp .tmp .github/workflows/apply-about-consultation-image-v1.yml
+          git commit -m "Integrate refined consultation image on About pages"
+          git push origin HEAD:image/about-consultation-v1
