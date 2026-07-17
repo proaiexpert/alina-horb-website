@@ -4,6 +4,12 @@
   --editorial-header-height: 86px;
 }
 
+
+.editorial-rail-placeholder {
+  visibility: hidden;
+  pointer-events: none;
+}
+
 .editorial-rail {
   --rail-line: rgba(47, 48, 45, .22);
   --rail-muted: rgba(47, 48, 45, .58);

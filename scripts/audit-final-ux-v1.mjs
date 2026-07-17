@@ -141,9 +141,15 @@ try {
         };
         const ids = [...document.querySelectorAll("[id]")].map((element) => element.id);
         const duplicates = [...new Set(ids.filter((id, index) => ids.indexOf(id) !== index))];
+        const textLineWidth = (element) => {
+          const range = document.createRange();
+          range.selectNodeContents(element);
+          const widths = [...range.getClientRects()].map((value) => value.width).filter((value) => value > 0);
+          return widths.length ? Math.max(...widths) : 0;
+        };
         const paragraphs = [...document.querySelectorAll("main p, main li")]
           .filter(visible)
-          .map((element) => ({ width: element.getBoundingClientRect().width, text: element.textContent.trim().slice(0, 90) }))
+          .map((element) => ({ width: textLineWidth(element), text: element.textContent.trim().slice(0, 90) }))
           .sort((a, b) => b.width - a.width);
         const form = document.querySelector("form[data-contact-form], .contact-form");
         const h1 = document.querySelector("h1");

@@ -94,7 +94,7 @@ def validate_page(path: Path, expected: dict[str, str]) -> None:
         if marker not in text:
             fail(f"Missing {marker} in {rel}")
 
-    if 'https://alinahorb.com/assets/images/notes/alina-horb-notes-editorial-v2.jpg' not in text:
+    if 'https://alinahorb.com/assets/images/notes/alina-horb-note-first-consultation-v3.webp' not in text:
         fail(f"Production social image missing in {rel}")
 
     scripts = re.findall(r'<script type="application/ld\+json">\s*(.*?)\s*</script>', text, flags=re.S)

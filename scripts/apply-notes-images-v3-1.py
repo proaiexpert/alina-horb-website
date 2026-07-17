@@ -61,11 +61,8 @@ def picture(asset_prefix: str, key: str, lang: str, eager: bool = False) -> str:
 
 def inject_assets(text: str, asset_prefix: str) -> str:
     css_href = f'{asset_prefix}css/site.notes-images.v3.css?v=3.1'
-    js_src = f'{asset_prefix}js/site.notes-images.v3-1.js'
     if css_href not in text:
         text = text.replace("</head>", f'  <link rel="stylesheet" href="{css_href}">\n</head>', 1)
-    if js_src not in text:
-        text = text.replace("</body>", f'  <script src="{js_src}" defer></script>\n</body>', 1)
     return text
 
 

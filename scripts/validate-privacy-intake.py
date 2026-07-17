@@ -60,7 +60,7 @@ def main() -> None:
         "Неекстрений характер сайту",
         PUBLIC_ROBOTS,
         'data-site-footer="canonical"',
-        'href="./">alinahorb.com</a>',
+        'href="../">alinahorb.com</a>',
     )
     require(
         ROOT / "ru/privacy/index.html",
@@ -70,7 +70,7 @@ def main() -> None:
         "Неэкстренный характер сайта",
         PUBLIC_ROBOTS,
         'data-site-footer="canonical"',
-        'href="../../ru/">alinahorb.com</a>',
+        'href="../">alinahorb.com</a>',
     )
     require(
         ROOT / "assets/js/site.v2.js",
