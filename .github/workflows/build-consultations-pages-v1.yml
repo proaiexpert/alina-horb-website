@@ -25,11 +25,28 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p consultations ru/consultations assets/css scripts
-          base64 -d .tmp/consultations-v1/ua.html.gz.b64 | gzip -d > consultations/index.html
-          base64 -d .tmp/consultations-v1/ru.html.gz.b64 | gzip -d > ru/consultations/index.html
-          base64 -d .tmp/consultations-v1/css.gz.b64 | gzip -d > assets/css/site.consultations.v1.css
-          base64 -d .tmp/consultations-v1/validator.gz.b64 | gzip -d > scripts/validate-consultations-pages-v1.py
-          base64 -d .tmp/consultations-v1/integrate.py.gz.b64 | gzip -d > scripts/integrate-consultations-v1.py
+          python3 - <<'PY'
+          from pathlib import Path
+          import base64
+          import gzip
+
+          files = {
+              '.tmp/consultations-v1/ua.html.gz.b64': 'consultations/index.html',
+              '.tmp/consultations-v1/ru.html.gz.b64': 'ru/consultations/index.html',
+              '.tmp/consultations-v1/css.gz.b64': 'assets/css/site.consultations.v1.css',
+              '.tmp/consultations-v1/validator.gz.b64': 'scripts/validate-consultations-pages-v1.py',
+              '.tmp/consultations-v1/integrate.py.gz.b64': 'scripts/integrate-consultations-v1.py',
+          }
+          for source, destination in files.items():
+              encoded = ''.join(Path(source).read_text(encoding='utf-8').split())
+              encoded += '=' * (-len(encoded) % 4)
+              print(f'Decoding {source}: {len(encoded)} base64 characters')
+              payload = gzip.decompress(base64.b64decode(encoded, validate=False))
+              target = Path(destination)
+              target.parent.mkdir(parents=True, exist_ok=True)
+              target.write_bytes(payload)
+              print(f'Wrote {destination}: {len(payload)} bytes')
+          PY
           chmod +x scripts/validate-consultations-pages-v1.py scripts/integrate-consultations-v1.py
 
       - name: Integrate and validate
