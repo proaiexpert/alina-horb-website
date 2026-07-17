@@ -46,5 +46,5 @@ for path in ROOT.rglob("*.html"):
     for match in re.finditer(r'(site\.(?:v2|chrome\.v3)\.js)([^"\']*)', text):
         require("v=20260717-nav1" in match.group(2), f"{path.relative_to(ROOT)}: stale shared script reference")
 
-require("inner-desktop-nav") in chrome_js, "site.chrome.v3.js structure unexpectedly changed")
+require("inner-desktop-nav" in chrome_js, "site.chrome.v3.js structure unexpectedly changed")
 print("Editorial navigation V1 validation passed.")
