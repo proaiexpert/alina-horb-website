@@ -1,1 +1,1 @@
-Trigger the pull-request consultations finalizer after split diagnostics update.
+Trigger the consultations finalizer with committed validator and integration scripts.
