@@ -1,0 +1,51 @@
+name: Verify live result-focused bilingual copy
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  verify-live:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Wait for bilingual production update
+        run: |
+          set -euo pipefail
+          verified=0
+          for attempt in $(seq 1 30); do
+            curl -fsSL --max-time 20 "https://alinahorb.com/about/?v=result-copy-${attempt}" -o /tmp/about-ua.html || true
+            curl -fsSL --max-time 20 "https://alinahorb.com/ru/about/?v=result-copy-${attempt}" -o /tmp/about-ru.html || true
+            if grep -Fq 'Робота з чіткою метою та увагою до результату' /tmp/about-ua.html \
+              && grep -Fq 'Работа с ясной целью и вниманием к результату' /tmp/about-ru.html \
+              && ! grep -Fq 'Я не обіцяю миттєвого результату' /tmp/about-ua.html \
+              && ! grep -Fq 'Я не обещаю мгновенного результата' /tmp/about-ru.html; then
+              verified=1
+              echo "Both live About pages verified on attempt ${attempt}."
+              break
+            fi
+            echo "Attempt ${attempt}: production update not visible yet"
+            sleep 15
+          done
+          test "$verified" -eq 1
+
+      - name: Remove temporary verifier
+        run: |
+          set -euo pipefail
+          rm .github/workflows/verify-live-result-copy-v1.yml
+          rm -f .tmp/verify-live-result-copy-v1.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Confirm live result-focused bilingual copy'
+          git push origin HEAD:main
