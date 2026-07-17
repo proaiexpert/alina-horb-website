@@ -73,11 +73,15 @@ def main() -> None:
         '"cf-turnstile-response": turnstileToken',
     )
     require(
-        ROOT / "assets/js/site.chrome.v3.js",
+        ROOT / "assets/js/site.global-chrome.v1.js",
         PUBLIC_EMAIL,
         "privacyHref",
         'privacy: "Конфіденційність"',
         'privacy: "Конфиденциальность"',
+    )
+    require(
+        ROOT / "assets/js/site.chrome.v3.js",
+        'site.global-chrome.v1.js?v=20260717-chrome1',
     )
     config = require(
         ROOT / "assets/js/site-config.v2.js",
@@ -97,6 +101,7 @@ def main() -> None:
         ROOT / "assets/js/site.v2.js",
         ROOT / "assets/js/site-config.v2.js",
         ROOT / "assets/js/site.chrome.v3.js",
+        ROOT / "assets/js/site.global-chrome.v1.js",
     ]
     for path in production_files:
         text = path.read_text(encoding="utf-8")
@@ -110,8 +115,11 @@ def main() -> None:
 
     if ua.count('name="website"') != 1 or ru.count('name="website"') != 1:
         raise AssertionError("Expected exactly one honeypot per homepage form")
-    if ua.count('href="privacy/"') < 2 or ru.count('href="privacy/"') < 2:
-        raise AssertionError("Privacy link must appear in both form consent and footer")
+    if ua.count('href="privacy/"') < 1 or ru.count('href="privacy/"') < 1:
+        raise AssertionError("Privacy link must remain in both form-consent blocks")
+    for locale, page in (("UA", ua), ("RU", ru)):
+        if 'data-site-footer="canonical"' not in page or 'href="./privacy/"' not in page:
+            raise AssertionError(f"{locale} canonical footer privacy route missing")
     if 'formEndpoint: "https://formspree.io/f/mvzezana"' not in config:
         raise AssertionError("Approved Formspree endpoint must remain explicit")
     if 'turnstileSiteKey: "0x4AAAAAAD2wlldaSXK8Bp9f"' not in config:

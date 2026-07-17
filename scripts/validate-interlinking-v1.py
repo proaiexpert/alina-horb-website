@@ -15,11 +15,11 @@ def read(relative: str) -> str:
     return path.read_text(encoding="utf-8")
 
 
-# Home fallbacks expose the real About page while preserving local homepage anchors.
+# Canonical homepage chrome exposes the real About page while local content keeps its anchors.
 ua_home = read("index.html")
 ru_home = read("ru/index.html")
-require('<a href="about/">Про Аліну</a>' in ua_home, "UA home fallback About route missing")
-require('<a href="about/">Об Алине</a>' in ru_home, "RU home fallback About route missing")
+require('<a href="./about/">Про Аліну</a>' in ua_home, "UA home canonical About route missing")
+require('<a href="./about/">Об Алине</a>' in ru_home, "RU home canonical About route missing")
 
 # About pages use the canonical conversion destination and still connect to Notes.
 for relative in ("about/index.html", "ru/about/index.html"):
@@ -78,11 +78,13 @@ for slug in sorted(ua_articles):
 require('href="../../consultations/#process"' in read("notes/first-consultation/index.html"), "UA first article process link missing")
 require('href="../../consultations/#process"' in read("ru/notes/first-consultation/index.html"), "RU first article process link missing")
 
-# Shared chrome fallbacks must not point global traffic to legacy homepage anchors.
+# Canonical global chrome owns global routes; the Notes utility runtime only delegates.
+global_chrome = read("assets/js/site.global-chrome.v1.js")
+require('href: `${localeRoot}about/`' in global_chrome, "global About route missing")
+require('const bookingHref = `${localeRoot}consultations/#contact`;' in global_chrome, "global booking route missing")
+require('`${localeRoot}#about`' not in global_chrome, "legacy global About anchor remains")
+require('`${localeRoot}#contact`' not in global_chrome, "legacy global Contact anchor remains")
 chrome = read("assets/js/site.chrome.v3.js")
-require('[text.about, `${homeHref}about/`]' in chrome, "shared About route missing")
-require('[text.contact, `${homeHref}consultations/#contact`]' in chrome, "shared booking route missing")
-require('[text.about, `${homeHref}#about`]' not in chrome, "legacy shared About anchor remains")
-require('[text.contact, `${homeHref}#contact`]' not in chrome, "legacy shared Contact anchor remains")
+require('site.global-chrome.v1.js?v=20260717-chrome1' in chrome, "Notes utility runtime does not delegate to global chrome")
 
 print("Interlinking V1 validation passed.")

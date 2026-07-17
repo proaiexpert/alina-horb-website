@@ -1,0 +1,45 @@
+name: QA global chrome V1
+
+on:
+  pull_request:
+    paths:
+      - '**/*.html'
+      - 'assets/js/site.global-chrome.v1.js'
+      - 'assets/js/site.chrome.v3.js'
+      - 'assets/js/site.v2.js'
+      - 'assets/js/site.navigation.v1.js'
+      - 'assets/css/site.global-chrome.v1.css'
+      - 'scripts/validate-global-chrome-v1.py'
+      - '.github/workflows/qa-global-chrome-v1.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.html'
+      - 'assets/js/site.global-chrome.v1.js'
+      - 'assets/js/site.chrome.v3.js'
+      - 'assets/js/site.v2.js'
+      - 'assets/js/site.navigation.v1.js'
+      - 'assets/css/site.global-chrome.v1.css'
+      - 'scripts/validate-global-chrome-v1.py'
+      - '.github/workflows/qa-global-chrome-v1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-global-chrome:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate canonical production chrome
+        run: python3 scripts/validate-global-chrome-v1.py
+      - name: Check JavaScript syntax
+        run: |
+          node --check assets/js/site.global-chrome.v1.js
+          node --check assets/js/site.chrome.v3.js
+          node --check assets/js/site.v2.js
+          node --check assets/js/site.navigation.v1.js
+      - name: Reject legacy footer markup
+        run: |
+          ! grep -R -n --include='index.html' 'footer-row\|class="footer-main"\|class="footer-bottom"' index.html ru about consultations privacy notes
