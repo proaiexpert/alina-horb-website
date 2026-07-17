@@ -41,6 +41,16 @@ def insert_after(text: str, marker: str, insertion: str, label: str) -> str:
     return text.replace(marker, marker + insertion, 1)
 
 
+def remove_between(text: str, start: str, end: str, label: str) -> str:
+    start_index = text.find(start)
+    if start_index < 0:
+        raise SystemExit(f"Missing start marker for {label}: {start}")
+    end_index = text.find(end, start_index)
+    if end_index < 0:
+        raise SystemExit(f"Missing end marker for {label}: {end}")
+    return text[:start_index] + text[end_index:]
+
+
 def normalize_page(relative: Path) -> None:
     path = ROOT / relative
     text = path.read_text(encoding="utf-8")
@@ -180,13 +190,17 @@ nav_path.write_text(nav, encoding="utf-8")
 # The primary runtime no longer competes for mobile menu or rail state and no longer swaps Notes imagery.
 site_path = ROOT / "assets/js/site.v2.js"
 site = site_path.read_text(encoding="utf-8")
-site = re.sub(r'\n\s*const initMobileNavigation = \(\) => \{.*?\n\s*};\n', "\n", site, count=1, flags=re.S)
-site = re.sub(r'\n\s*const initActiveNavigation = \(\) => \{.*?\n\s*};\n', "\n", site, count=1, flags=re.S)
-site = re.sub(r'\n\s*const initEditorialNotesImages = \(\) => \{.*?\n\s*};\n', "\n", site, count=1, flags=re.S)
+site = remove_between(site, "  const initMobileNavigation = () => {", "  const initReveals = () => {", "mobile navigation owner")
+site = remove_between(site, "  const initActiveNavigation = () => {", "  const initFaq = () => {", "active rail owner")
+site = remove_between(site, "  const initEditorialNotesImages = () => {", "  const init = () => {", "Notes image mutation owner")
 site = site.replace("    initMobileNavigation();\n", "")
 site = site.replace("    initEditorialNotesImages();\n", "")
 site = site.replace("    initActiveNavigation();\n", "")
-site = re.sub(r'\n\n\s*/\* ALINA_GLOBAL_CHROME_LOADER_V1 \*/.*?\n\s*}\)\(\);\n(?=\}\)\(\);)', "\n", site, count=1, flags=re.S)
+loader_marker = "\n\n  /* ALINA_GLOBAL_CHROME_LOADER_V1 */"
+loader_start = site.find(loader_marker)
+if loader_start < 0:
+    raise SystemExit("Global chrome loader marker missing")
+site = site[:loader_start] + "\n})();\n"
 site_path.write_text(site, encoding="utf-8")
 
 # Static Notes markup is now the source of truth; deployment must not re-inject a runtime.
