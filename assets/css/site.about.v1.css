@@ -3,6 +3,7 @@
 .page-about-profile {
   background:
     radial-gradient(circle at 82% 8%, rgba(135, 146, 127, .11), transparent 25rem),
+    linear-gradient(180deg, rgba(255,255,255,.3), rgba(255,255,255,0) 32rem),
     var(--ivory);
 }
 
@@ -152,7 +153,7 @@ html.js .page-about-profile [data-reveal].is-visible {
   max-width: 610px;
   color: var(--muted);
   font-size: 16px;
-  line-height: 1.78;
+  line-height: 1.72;
 }
 
 .profile-hero-copy .profile-lead {
@@ -337,6 +338,63 @@ html.js .page-about-profile [data-reveal].is-visible {
   line-height: 1.76;
 }
 
+.profile-editorial {
+  border-block: 1px solid var(--line);
+  background: linear-gradient(180deg, rgba(250,247,241,.8), rgba(244,239,231,.78));
+}
+
+.profile-editorial-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.02fr) minmax(300px, .98fr);
+  gap: clamp(44px, 7vw, 102px);
+  align-items: center;
+}
+
+.profile-editorial-voice h2 {
+  max-width: 760px;
+  margin-bottom: 28px;
+  font-size: clamp(44px, 4.8vw, 68px);
+  line-height: .96;
+  letter-spacing: -.02em;
+}
+
+.profile-editorial-quote { max-width: 720px; margin: 0; }
+
+.profile-editorial-quote p {
+  margin: 0;
+  color: var(--graphite);
+  font-family: var(--serif);
+  font-size: clamp(34px, 3.5vw, 52px);
+  font-style: italic;
+  line-height: 1.12;
+}
+
+.profile-editorial-quote footer {
+  margin-top: 22px;
+  color: var(--muted);
+  font-size: 13px;
+  letter-spacing: .03em;
+  text-transform: uppercase;
+}
+
+.profile-editorial-figure { width: 100%; margin: 0; }
+
+.profile-editorial-figure img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  display: block;
+  object-fit: cover;
+  border-radius: 26px;
+  box-shadow: 0 24px 64px rgba(47,48,45,.1);
+}
+
+.profile-editorial-figure figcaption {
+  margin-top: 14px;
+  color: var(--muted);
+  font-size: 13px;
+  line-height: 1.6;
+}
+
 .profile-methods { background: var(--ivory); }
 
 .profile-section-heading--sticky {
@@ -371,12 +429,15 @@ html.js .page-about-profile [data-reveal].is-visible {
   margin: 0;
   color: var(--muted);
   font-size: 16px;
-  line-height: 1.82;
+  line-height: 1.72;
 }
 
 .profile-education {
   border-block: 1px solid var(--line);
-  background: linear-gradient(120deg, var(--stone) 0 43%, var(--ivory-soft) 43% 100%);
+  background:
+    radial-gradient(circle at 14% 16%, rgba(135, 146, 127, .12), transparent 20rem),
+    linear-gradient(180deg, rgba(255,255,255,.46), rgba(255,255,255,.08)),
+    var(--stone);
 }
 
 .profile-education-layout {
@@ -393,11 +454,11 @@ html.js .page-about-profile [data-reveal].is-visible {
   display: grid;
   place-items: center;
   overflow: hidden;
-  border: 1px solid rgba(47,48,45,.2);
-  padding: 18px;
-  background: rgba(255,255,255,.58);
-  box-shadow: 0 28px 70px rgba(47,48,45,.12);
-  transition: transform .3s var(--ease), box-shadow .3s ease;
+  border: 1px solid rgba(47,48,45,.16);
+  padding: 22px;
+  background: rgba(255,255,255,.82);
+  box-shadow: 0 20px 50px rgba(47,48,45,.08);
+  transition: transform .3s var(--ease), box-shadow .3s ease, border-color .3s ease;
 }
 
 .profile-diploma picture {
@@ -413,8 +474,9 @@ html.js .page-about-profile [data-reveal].is-visible {
 }
 
 .profile-diploma a:hover {
-  transform: translateY(-5px) rotate(-.3deg);
-  box-shadow: 0 36px 82px rgba(47,48,45,.16);
+  transform: translateY(-4px);
+  border-color: rgba(47,48,45,.26);
+  box-shadow: 0 26px 60px rgba(47,48,45,.12);
 }
 
 .profile-diploma figcaption {
@@ -433,12 +495,12 @@ html.js .page-about-profile [data-reveal].is-visible {
 
 .education-note {
   max-width: 610px;
-  margin: 34px 0 24px;
-  border-left: 2px solid var(--terracotta);
-  padding: 2px 0 2px 24px;
+  margin: 32px 0 24px;
+  border-left: 1px solid rgba(198,83,63,.55);
+  padding: 2px 0 2px 22px;
 }
 
-.education-note p { margin: 0; color: var(--muted); line-height: 1.8; }
+.education-note p { margin: 0; color: var(--muted); line-height: 1.74; }
 
 .profile-scope { background: var(--ivory-soft); }
 
@@ -537,7 +599,7 @@ html.js .page-about-profile [data-reveal].is-visible {
   padding-top: 24px;
 }
 
-.format-copy p { margin-bottom: 20px; font-size: 16px; line-height: 1.82; }
+.format-copy p { margin-bottom: 20px; font-size: 16px; line-height: 1.74; }
 
 .profile-final {
   position: relative;
@@ -569,9 +631,9 @@ html.js .page-about-profile [data-reveal].is-visible {
 
 .profile-final .section-kicker { color: #f0b3a8; }
 .profile-final h2 { max-width: 780px; margin-bottom: 24px; }
-.profile-final p { max-width: 630px; color: rgba(250,247,241,.7); font-size: 16px; line-height: 1.8; }
+.profile-final p { max-width: 630px; color: rgba(250,247,241,.7); font-size: 16px; line-height: 1.74; }
 .profile-final-action { display: flex; flex-direction: column; align-items: flex-start; gap: 16px; }
-.profile-final-action p { margin-bottom: 12px; }
+.profile-final-action p { margin-bottom: 10px; }
 .profile-final .text-link { color: var(--ivory-soft); border-color: rgba(250,247,241,.38); }
 
 @media (max-width: 1080px) {
@@ -620,7 +682,8 @@ html.js .page-about-profile [data-reveal].is-visible {
   .scope-heading,
   .boundaries-layout,
   .format-layout,
-  .profile-final-inner {
+  .profile-final-inner,
+  .profile-editorial-layout {
     grid-template-columns: minmax(0, 1fr);
     gap: 42px;
   }
@@ -634,7 +697,11 @@ html.js .page-about-profile [data-reveal].is-visible {
     padding: 24px 0;
   }
   .profile-timeline li:last-child { border-bottom: 0; }
-  .profile-education { background: linear-gradient(180deg, var(--stone) 0 46%, var(--ivory-soft) 46% 100%); }
+  .profile-education {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,.36), rgba(255,255,255,.06)),
+      var(--stone);
+  }
   .profile-diploma { width: min(100%, 390px); }
   .scope-heading > p { margin-bottom: 0; }
 }
@@ -672,6 +739,7 @@ html.js .page-about-profile [data-reveal].is-visible {
   .position-principles h3 { margin-top: 18px; }
 
   .profile-method-list article { grid-template-columns: 42px minmax(0, 1fr); gap: 12px; }
+  .profile-editorial-quote p { font-size: clamp(30px, 7.2vw, 40px); }
   .profile-method-list h3 { font-size: 32px; }
   .profile-method-list p { font-size: 15px; }
 
