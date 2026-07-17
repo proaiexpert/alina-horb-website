@@ -29,12 +29,6 @@ jobs:
       - name: Decode consultations stylesheet
         run: python3 -c "from pathlib import Path; import base64,gzip; s=''.join(Path('.tmp/consultations-v1/css.gz.b64').read_text().split()); Path('assets/css').mkdir(parents=True,exist_ok=True); Path('assets/css/site.consultations.v1.css').write_bytes(gzip.decompress(base64.b64decode(s + '=' * (-len(s) % 4))))"
 
-      - name: Decode consultations validator
-        run: python3 -c "from pathlib import Path; import base64,gzip; s=''.join(Path('.tmp/consultations-v1/validator.gz.b64').read_text().split()); Path('scripts').mkdir(exist_ok=True); Path('scripts/validate-consultations-pages-v1.py').write_bytes(gzip.decompress(base64.b64decode(s + '=' * (-len(s) % 4))))"
-
-      - name: Decode integration script
-        run: python3 -c "from pathlib import Path; import base64,gzip; s=''.join(Path('.tmp/consultations-v1/integrate.py.gz.b64').read_text().split()); Path('scripts/integrate-consultations-v1.py').write_bytes(gzip.decompress(base64.b64decode(s + '=' * (-len(s) % 4))))"
-
       - name: Integrate and validate
         shell: bash
         run: |
