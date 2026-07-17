@@ -21,7 +21,7 @@ HUBS = {
         "alternate": "https://alinahorb.com/ru/notes/",
         "og_locale": "uk_UA",
         "og_url": "https://alinahorb.com/notes/",
-        "social": "alina-horb-og-ua-v1.jpg",
+        "social": "alina-horb-note-first-consultation-v3.webp",
         "home": "../",
     },
     ROOT / "ru/notes/index.html": {
@@ -30,7 +30,7 @@ HUBS = {
         "alternate": "https://alinahorb.com/notes/",
         "og_locale": "ru_RU",
         "og_url": "https://alinahorb.com/ru/notes/",
-        "social": "alina-horb-og-ru-v1.jpg",
+        "social": "alina-horb-note-first-consultation-v3.webp",
         "home": "../",
     },
 }
@@ -94,8 +94,8 @@ def validate_hub(path: Path, expected: dict[str, str]) -> None:
         fail(f"Expected three supporting cards in {rel}")
     if len(re.findall(r'class="notes-hub-feature"', text)) != 1:
         fail(f"Expected one featured story in {rel}")
-    if text.count("alina-horb-notes-editorial-v2") != 2:
-        fail(f"Featured photography must appear once as source+fallback in {rel}")
+    if "alina-horb-note-first-consultation-v3.webp" not in text:
+        fail(f"Static featured photography missing in {rel}")
 
     for modifier in ("note-identity--conversation", "note-identity--observation", "note-identity--transition"):
         if text.count(modifier) != 1:
@@ -134,8 +134,8 @@ def validate_home(path: Path, expected: dict[str, str]) -> None:
         fail(f"Expected one homepage featured story in {rel}")
     if text.count('class="home-note-entry"') != 3:
         fail(f"Expected three homepage supporting stories in {rel}")
-    if text.count("alina-horb-notes-editorial-v2") != 2:
-        fail(f"Homepage featured photography must appear once as source+fallback in {rel}")
+    if "alina-horb-note-first-consultation-v3.webp" not in text:
+        fail(f"Static homepage featured photography missing in {rel}")
     if 'class="note-featured"' in text or 'class="notes-compact"' in text:
         fail(f"Legacy repeated-card system remains in {rel}")
 

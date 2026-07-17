@@ -30,19 +30,6 @@
     }
   };
 
-  const initMobileNavigation = () => {
-    const toggle = document.querySelector("[data-menu-toggle]");
-    const nav = document.querySelector("[data-mobile-nav]");
-    if (!toggle || !nav) return;
-    const setOpen = (open) => { toggle.setAttribute("aria-expanded", String(open)); nav.hidden = !open; };
-    setOpen(false);
-    toggle.addEventListener("click", () => setOpen(toggle.getAttribute("aria-expanded") !== "true"));
-    nav.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => setOpen(false)));
-    document.addEventListener("keydown", (event) => {
-      if (event.key === "Escape" && toggle.getAttribute("aria-expanded") === "true") { setOpen(false); toggle.focus(); }
-    });
-  };
-
   const initReveals = () => {
     const portrait = document.querySelector(".hero-portrait");
     const elements = document.querySelectorAll("[data-reveal], .process-timeline");
@@ -52,25 +39,6 @@
       entries.forEach((entry) => { if (!entry.isIntersecting) return; entry.target.classList.add("is-visible"); observer.unobserve(entry.target); });
     }, { threshold: .14, rootMargin: "0px 0px -6%" });
     elements.forEach((element) => observer.observe(element));
-  };
-
-  const initActiveNavigation = () => {
-    const links = [...document.querySelectorAll(".side-navigation a")];
-    if (!links.length || !("IntersectionObserver" in window)) return;
-    const sections = links.map((link) => document.querySelector(link.getAttribute("href"))).filter(Boolean);
-    const nav = document.querySelector(".side-navigation");
-    const activate = (id) => {
-      const index = links.findIndex((link) => link.getAttribute("href") === `#${id}`);
-      if (index < 0) return;
-      links.forEach((link, linkIndex) => link.classList.toggle("is-active", linkIndex === index));
-      if (nav) nav.style.setProperty("--nav-progress", `${9 + (index / Math.max(links.length - 1, 1)) * 82}%`);
-    };
-    const observer = new IntersectionObserver((entries) => {
-      const visible = entries.filter((entry) => entry.isIntersecting).sort((a, b) => b.intersectionRatio - a.intersectionRatio);
-      if (visible[0]) activate(visible[0].target.id);
-    }, { threshold: [.2, .45, .7], rootMargin: "-20% 0px -55%" });
-    sections.forEach((section) => observer.observe(section));
-    if (sections[0]) activate(sections[0].id);
   };
 
   const initFaq = () => {
@@ -281,39 +249,8 @@
     update();
   };
 
-  const initEditorialNotesImages = () => {
-    const section = document.querySelector(".home-notes-editorial");
-    if (!section) return;
-    const projectMarker = "/alina-horb-website/";
-    const rootPath = window.location.pathname.includes(projectMarker) ? projectMarker : "/";
-    const assetRoot = new URL(`${rootPath}assets/`, window.location.origin).href;
-    const stylesheetHref = `${assetRoot}css/site.notes-images.v3.css`;
-    if (!document.querySelector(`link[href="${stylesheetHref}"]`)) {
-      const stylesheet = document.createElement("link"); stylesheet.rel = "stylesheet"; stylesheet.href = stylesheetHref; document.head.appendChild(stylesheet);
-    }
-    const isRu = document.documentElement.lang.toLowerCase().startsWith("ru");
-    const base = `${assetRoot}images/notes/`;
-    const images = {
-      first: ["alina-horb-note-first-consultation-v3.webp", isRu ? "Два кресла в спокойном светлом пространстве для первой консультации" : "Два крісла у спокійному світлому просторі для першої консультації"],
-      conversation: ["alina-horb-note-conversation-v3.webp", isRu ? "Открытый блокнот как образ начала трудного разговора" : "Відкритий нотатник як образ початку складної розмови"],
-      observation: ["alina-horb-note-observation-v3.webp", isRu ? "Блокнот и ручка как образ внимательного наблюдения за своим состоянием" : "Нотатник і ручка як образ уважного спостереження за власним станом"],
-      transition: ["alina-horb-note-transition-v3.webp", isRu ? "Коробка, карта и ключ как образ переезда и восстановления опоры" : "Коробка, мапа і ключ як образ переїзду та відновлення опори"]
-    };
-    const picture = (key) => `<picture><img src="${base}${images[key][0]}" width="1200" height="800" loading="lazy" decoding="async" alt="${images[key][1]}"></picture>`;
-    const feature = section.querySelector(".home-note-feature-media");
-    if (feature) { const index = feature.querySelector(".home-note-index")?.outerHTML || ""; feature.innerHTML = `${picture("first")}${index}`; }
-    ["conversation", "observation", "transition"].forEach((key) => {
-      const element = section.querySelector(`.note-identity--${key}`);
-      if (!element) return;
-      element.classList.add("note-photo", `note-photo--${key}`); element.innerHTML = picture(key);
-    });
-  };
-
   const init = () => {
-    initMobileNavigation();
-    initEditorialNotesImages();
     initReveals();
-    initActiveNavigation();
     initFaq();
     initTelegram();
     initContactForm();
@@ -323,16 +260,4 @@
   if (document.readyState === "loading") document.addEventListener("DOMContentLoaded", init, { once: true });
   else init();
 
-
-  /* ALINA_GLOBAL_CHROME_LOADER_V1 */
-  (() => {
-    if (document.querySelector('script[data-global-chrome-v1]')) return;
-    const projectMarker = "/alina-horb-website/";
-    const rootPath = window.location.pathname.includes(projectMarker) ? projectMarker : "/";
-    const globalChrome = document.createElement("script");
-    globalChrome.src = `${rootPath}assets/js/site.global-chrome.v1.js?v=20260717-chrome1`;
-    globalChrome.defer = true;
-    globalChrome.dataset.globalChromeV1 = "";
-    document.head.appendChild(globalChrome);
-  })();
 })();

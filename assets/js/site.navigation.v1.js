@@ -4,17 +4,6 @@
   if (window.__ALINA_EDITORIAL_NAV_V1__) return;
   window.__ALINA_EDITORIAL_NAV_V1__ = true;
 
-  const script = document.currentScript;
-  if (!script) return;
-
-  const stylesheetHref = new URL("../css/site.navigation.v1.css?v=20260717-nav2", script.src).href;
-  if (!document.querySelector(`link[href="${stylesheetHref}"]`)) {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = stylesheetHref;
-    document.head.appendChild(link);
-  }
-
   const pathname = window.location.pathname;
   const projectMarker = "/alina-horb-website/";
   const rootPath = pathname.includes(projectMarker) ? projectMarker : "/";
@@ -96,13 +85,14 @@
         href: link.getAttribute("href"),
         label: link.querySelector("span")?.textContent?.trim() || link.textContent.trim()
       }));
-    } else if (isNotesHub) {
+    }
+    if (!source.length && isNotesHub) {
       source = [...document.querySelectorAll('.notes-hub-index a[href^="#"]')].map((link) => ({
         href: link.getAttribute("href"),
         label: link.textContent.trim()
       }));
       document.body.classList.add("notes-hub-page");
-    } else if (isArticle) {
+    } else if (!source.length && isArticle) {
       source = [...document.querySelectorAll('.article-toc a[href^="#"]')].map((link) => ({
         href: link.getAttribute("href"),
         label: link.textContent.trim()
@@ -140,6 +130,8 @@
   let rail = document.querySelector(".side-navigation");
   if (rail) {
     rail.classList.add("editorial-rail");
+    rail.classList.remove("editorial-rail-placeholder");
+    rail.removeAttribute("aria-hidden");
     rail.setAttribute("aria-label", text.nav);
     rail.innerHTML = railMarkup;
   } else {
@@ -156,7 +148,7 @@
 
   const fallbackDesktopNav = document.querySelector(".inner-desktop-nav");
   if (rail) {
-    fallbackDesktopNav?.remove();
+    fallbackDesktopNav?.setAttribute("hidden", "");
   } else if (fallbackDesktopNav) {
     fallbackDesktopNav.setAttribute("aria-label", text.fallbackNav);
     fallbackDesktopNav.innerHTML = `
@@ -199,7 +191,7 @@
 
   let lockedScrollY = 0;
   let bodyStyleSnapshot = null;
-  const inertTargets = [...document.querySelectorAll("main, .site-footer, [data-mobile-booking-cta]")];
+  const inertTargets = [...document.body.children].filter((element) => element !== header && !["SCRIPT", "STYLE", "LINK"].includes(element.tagName));
   const inertSnapshot = inertTargets.map((element) => ({
     element,
     hadInert: element.hasAttribute("inert")
@@ -266,22 +258,20 @@
     menuWasOpen = open;
   };
 
-  const closeMenu = ({ restoreFocus = false } = {}) => {
+  const setMenuOpen = (open, { restoreFocus = false, focusFirst = false } = {}) => {
     if (!mobileToggle || !mobileMenu) return;
-    mobileMenu.hidden = true;
-    mobileToggle.setAttribute("aria-expanded", "false");
-    syncMenuState();
-    if (restoreFocus) mobileToggle.focus({ preventScroll: true });
+    mobileMenu.hidden = !open;
+    mobileToggle.setAttribute("aria-expanded", String(open));
+    syncMenuState({ focusFirst });
+    if (!open && restoreFocus) mobileToggle.focus({ preventScroll: true });
   };
 
+  const closeMenu = ({ restoreFocus = false } = {}) => setMenuOpen(false, { restoreFocus });
+
   if (mobileToggle && mobileMenu) {
-    new MutationObserver(() => syncMenuState()).observe(mobileToggle, {
-      attributes: true,
-      attributeFilter: ["aria-expanded"]
-    });
-    new MutationObserver(() => syncMenuState()).observe(mobileMenu, {
-      attributes: true,
-      attributeFilter: ["hidden"]
+    mobileToggle.addEventListener("click", () => {
+      const open = mobileToggle.getAttribute("aria-expanded") === "true" && !mobileMenu.hidden;
+      setMenuOpen(!open, { focusFirst: !open });
     });
     syncMenuState();
   }

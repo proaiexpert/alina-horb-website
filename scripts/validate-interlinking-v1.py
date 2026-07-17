@@ -15,19 +15,16 @@ def read(relative: str) -> str:
     return path.read_text(encoding="utf-8")
 
 
-# Canonical homepage chrome exposes the real About page while local content keeps its anchors.
 ua_home = read("index.html")
 ru_home = read("ru/index.html")
 require('<a href="./about/">Про Аліну</a>' in ua_home, "UA home canonical About route missing")
 require('<a href="./about/">Об Алине</a>' in ru_home, "RU home canonical About route missing")
 
-# About pages use the canonical conversion destination and still connect to Notes.
 for relative in ("about/index.html", "ru/about/index.html"):
     text = read(relative)
     require('href="../consultations/#contact"' in text, f"{relative}: canonical booking CTA missing")
     require('href="../notes/"' in text, f"{relative}: Notes link missing")
 
-# Consultation pages connect specialist context, the first-consultation article, privacy and booking.
 for relative in ("consultations/index.html", "ru/consultations/index.html"):
     text = read(relative)
     require('href="../about/"' in text, f"{relative}: About link missing")
@@ -35,7 +32,6 @@ for relative in ("consultations/index.html", "ru/consultations/index.html"):
     require('href="../privacy/"' in text, f"{relative}: privacy link missing")
     require('href="#contact"' in text, f"{relative}: local consultation form route missing")
 
-# Notes catalog has a clear editorial bridge into the canonical form.
 for relative in ("notes/index.html", "ru/notes/index.html"):
     text = read(relative)
     require('class="notes-hub-conversion"' in text, f"{relative}: conversion bridge missing")
@@ -50,8 +46,6 @@ for token in (
 ):
     require(token in css, f"Notes conversion CSS missing: {token}")
 
-# Article pairs must stay mirrored by slug. Both locale trees navigate two levels
-# upward to their own locale root: /notes/<slug>/ -> / and /ru/notes/<slug>/ -> /ru/.
 ua_articles = {path.parent.name: path for path in (ROOT / "notes").glob("*/index.html")}
 ru_articles = {path.parent.name: path for path in (ROOT / "ru/notes").glob("*/index.html")}
 require(ua_articles, "no UA articles found")
@@ -74,17 +68,17 @@ for slug in sorted(ua_articles):
         require("https://alinahorb.com/#about" not in text, f"{relative}: stale absolute About anchor remains")
         require("https://alinahorb.com/ru/#about" not in text, f"{relative}: stale RU absolute About anchor remains")
 
-# The first-consultation article specifically connects its service explanation to Consultations.
 require('href="../../consultations/#process"' in read("notes/first-consultation/index.html"), "UA first article process link missing")
 require('href="../../consultations/#process"' in read("ru/notes/first-consultation/index.html"), "RU first article process link missing")
 
-# Canonical global chrome owns global routes; the Notes utility runtime only delegates.
-global_chrome = read("assets/js/site.global-chrome.v1.js")
-require('href: `${localeRoot}about/`' in global_chrome, "global About route missing")
-require('const bookingHref = `${localeRoot}consultations/#contact`;' in global_chrome, "global booking route missing")
-require('`${localeRoot}#about`' not in global_chrome, "legacy global About anchor remains")
-require('`${localeRoot}#contact`' not in global_chrome, "legacy global Contact anchor remains")
-chrome = read("assets/js/site.chrome.v3.js")
-require('site.global-chrome.v1.js?v=20260717-chrome1' in chrome, "Notes utility runtime does not delegate to global chrome")
+# Editorial navigation is the single global route owner and is loaded directly by every page.
+navigation = read("assets/js/site.navigation.v1.js")
+require('{ key: "about", label:' in navigation and 'href: `${localeRoot}about/`' in navigation, "global About route missing")
+require('const bookingHref = `${localeRoot}consultations/#contact`;' in navigation, "global booking route missing")
+require('`${localeRoot}#about`' not in navigation, "legacy global About anchor remains")
+require('`${localeRoot}#contact`' not in navigation, "legacy global Contact anchor remains")
+for path in [ROOT / "index.html", ROOT / "ru/index.html", *ua_articles.values(), *ru_articles.values()]:
+    text = path.read_text(encoding="utf-8")
+    require('site.navigation.v1.js?v=20260717-ux1' in text, f"{path.relative_to(ROOT)}: direct navigation runtime missing")
 
 print("Interlinking V1 validation passed.")

@@ -1,0 +1,65 @@
+# Permanent browser-level release gate for the canonical UA/RU site.
+# Includes stable header tracks, font-swap policy, desktop editorial geometry, CLS diagnostics and responsive interaction checks.
+name: Audit final UX V1
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**/*.html'
+      - 'assets/css/**'
+      - 'assets/js/**'
+      - 'scripts/audit-final-ux-v1.mjs'
+      - '.github/workflows/audit-final-ux-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout tested commit
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install browser audit runtime
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Serve the static site
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/alina-final-ux-server.log 2>&1 &
+          echo $! > /tmp/alina-final-ux-server.pid
+          for attempt in {1..20}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/alina-final-ux-server.log
+          exit 1
+
+      - name: Run strict responsive production audit
+        env:
+          AUDIT_BASE_URL: http://127.0.0.1:4173
+          AUDIT_SCREENSHOTS: '0'
+          AUDIT_STRICT: '1'
+        run: node scripts/audit-final-ux-v1.mjs
+
+      - name: Upload audit report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-ux-audit-v1
+          path: qa/final-ux
+          retention-days: 14
+          if-no-files-found: warn

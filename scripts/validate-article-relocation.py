@@ -134,7 +134,7 @@ def validate_page(path: Path, expected: dict[str, str]) -> None:
         if forbidden in lower:
             fail(f"Universal adaptation claim {forbidden!r} in {rel}")
 
-    if 'https://alinahorb.com/assets/images/notes/alina-horb-notes-editorial-v2.jpg' not in text:
+    if 'https://alinahorb.com/assets/images/notes/alina-horb-note-transition-v3.webp' not in text:
         fail(f"Production social image missing in {rel}")
 
     scripts = re.findall(r'<script type="application/ld\+json">\s*(.*?)\s*</script>', text, flags=re.S)
