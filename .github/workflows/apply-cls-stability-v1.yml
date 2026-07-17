@@ -1,0 +1,45 @@
+name: Apply CLS stability V1
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'scripts/apply-cls-stability-v1.py'
+      - '.github/workflows/apply-cls-stability-v1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Apply final layout stability fixes
+        run: python3 scripts/apply-cls-stability-v1.py
+
+      - name: Validate production architecture
+        run: |
+          node --check assets/js/site.navigation.v1.js
+          python3 scripts/validate-global-chrome-v1.py
+          python3 scripts/validate-editorial-navigation-v1.py
+          python3 scripts/validate-release-readiness.py
+
+      - name: Remove one-time stability machinery
+        run: |
+          rm scripts/apply-cls-stability-v1.py
+          rm .github/workflows/apply-cls-stability-v1.yml
+
+      - name: Commit stable font and header architecture
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Eliminate residual header and font layout shifts"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
