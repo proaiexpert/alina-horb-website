@@ -1,10 +1,8 @@
 #!/usr/bin/env python3
-# Production gate for every canonical UA/RU header and footer template.
-# Final verification trigger after locale-route normalization.
 from pathlib import Path
-import re
 
 ROOT = Path(__file__).resolve().parents[1]
+VERSION = "20260717-ux1"
 
 
 def require(condition: bool, message: str) -> None:
@@ -32,96 +30,95 @@ def production_pages() -> list[Path]:
     return pages
 
 
-def page_context(path: Path) -> tuple[bool, str, str, str]:
+def context(path: Path) -> tuple[bool, str, str, str]:
     relative = path.relative_to(ROOT)
-    parent_parts = relative.parent.parts
-    depth = len(parent_parts)
+    depth = len(relative.parent.parts)
     root_prefix = "../" * depth
-    is_ru = bool(parent_parts and parent_parts[0] == "ru")
-    clean_parts = parent_parts[1:] if is_ru else parent_parts
+    is_ru = bool(relative.parent.parts and relative.parent.parts[0] == "ru")
+    clean_parts = relative.parent.parts[1:] if is_ru else relative.parent.parts
     clean_route = "/".join(clean_parts)
     if clean_route:
         clean_route += "/"
     locale_home = (("../" * max(depth - 1, 0)) or "./") if is_ru else (root_prefix or "./")
     alternate = f"{root_prefix}{clean_route}" if is_ru else f"{root_prefix}ru/{clean_route}"
-    if not alternate:
-        alternate = "./"
-    return is_ru, root_prefix, locale_home, alternate
+    return is_ru, root_prefix, locale_home, alternate or "./"
 
 
 for path in production_pages():
     relative = path.relative_to(ROOT).as_posix()
     text = path.read_text(encoding="utf-8")
-    is_ru, root_prefix, locale_home, alternate = page_context(path)
-    asset_prefix = f"{root_prefix}assets/"
+    is_ru, root_prefix, locale_home, alternate = context(path)
+    asset = f"{root_prefix}assets/"
 
     require(text.count('<header class="site-header') == 1, f"{relative}: canonical header count is not one")
     require('site-header--canonical' in text, f"{relative}: canonical header class missing")
-    require('data-menu-toggle' in text and 'data-mobile-nav' in text, f"{relative}: canonical mobile header controls missing")
+    require('data-menu-toggle' in text and 'data-mobile-nav' in text, f"{relative}: mobile header controls missing")
     require(text.count('<footer class="site-footer"') == 1, f"{relative}: canonical footer count is not one")
     require('data-site-footer="canonical"' in text, f"{relative}: canonical footer marker missing")
 
     for token in (
-        'footer-editorial-grid',
-        'footer-identity',
-        'footer-navigation',
-        'footer-contact',
-        'footer-booking',
-        'footer-utility',
-        'maker-credit',
+        'footer-editorial-grid', 'footer-identity', 'footer-navigation', 'footer-contact',
+        'footer-booking', 'footer-utility', 'maker-credit',
     ):
         require(token in text, f"{relative}: footer token missing: {token}")
 
-    require('footer-row' not in text, f"{relative}: legacy footer-row remains")
-    require('class="footer-main"' not in text, f"{relative}: legacy footer-main remains")
-    require('class="footer-bottom"' not in text, f"{relative}: legacy footer-bottom remains")
-    require('site.footer.v3-2.css' not in text, f"{relative}: legacy footer stylesheet remains")
-
-    global_css = f'{asset_prefix}css/site.global-chrome.v1.css?v=20260717-chrome1'
-    require(text.count(global_css) == 1, f"{relative}: global chrome stylesheet missing or duplicated")
-    require('site.v2.js?v=20260717-chrome1' in text or 'site.chrome.v3.js?v=20260717-chrome1' in text, f"{relative}: cache-safe runtime version missing")
+    global_css = f'{asset}css/site.global-chrome.v1.css?v={VERSION}'
+    nav_css = f'{asset}css/site.navigation.v1.css?v={VERSION}'
+    nav_js = f'{asset}js/site.navigation.v1.js?v={VERSION}'
+    require(text.count(global_css) == 1, f"{relative}: global chrome CSS missing or duplicated")
+    require(text.count(nav_css) == 1, f"{relative}: navigation CSS missing or duplicated")
+    require(text.count(nav_js) == 1, f"{relative}: navigation JS missing or duplicated")
+    require('site.global-chrome.v1.js' not in text, f"{relative}: runtime chrome renderer remains")
+    require('site.chrome.v3.js' not in text, f"{relative}: utility DOM mutation runtime remains")
+    require('site.notes-images.v3-1.js' not in text, f"{relative}: Notes image mutation runtime remains")
+    require(f'{asset}images/logos/favicon-ag.svg' in text, f"{relative}: canonical SVG favicon missing")
     require(f'href="{locale_home}consultations/#contact"' in text, f"{relative}: canonical booking route missing")
     require(f'href="{alternate}"' in text, f"{relative}: mirrored language route missing")
 
     if is_ru:
-        require('Об Алине' in text and 'Консультации' in text and 'Заметки' in text, f"{relative}: RU global navigation labels missing")
+        require('Об Алине' in text and 'Консультации' in text and 'Заметки' in text, f"{relative}: RU navigation labels missing")
         require('Психологические консультации на русском и украинском языках' in text, f"{relative}: RU footer positioning missing")
     else:
-        require('Про Аліну' in text and 'Консультації' in text and 'Нотатки' in text, f"{relative}: UA global navigation labels missing")
+        require('Про Аліну' in text and 'Консультації' in text and 'Нотатки' in text, f"{relative}: UA navigation labels missing")
         require('Психологічні консультації українською та російською мовами' in text, f"{relative}: UA footer positioning missing")
 
+    is_notes = relative in {"notes/index.html", "ru/notes/index.html"}
+    is_article = "/notes/" in relative and not is_notes
+    if is_notes or is_article:
+        require('has-editorial-rail' in text, f"{relative}: stable rail grid class missing")
+        require('editorial-rail-placeholder' in text, f"{relative}: stable rail placeholder missing")
+        require('site.notes-images.v3.css?v=3.1' in text, f"{relative}: static Notes imagery CSS missing")
 
-global_js = (ROOT / "assets/js/site.global-chrome.v1.js").read_text(encoding="utf-8")
+nav = (ROOT / "assets/js/site.navigation.v1.js").read_text(encoding="utf-8")
 for token in (
-    "__ALINA_GLOBAL_CHROME_V1__",
-    "site.global-chrome.v1.css?v=20260717-chrome1",
-    "footer.dataset.siteFooter = \"canonical\"",
-    "footer-editorial-grid",
-    "footer-booking",
-    "data-menu-toggle",
-    "site.navigation.v1.js?v=20260717-chrome1",
+    "__ALINA_EDITORIAL_NAV_V1__",
+    "setMenuOpen",
+    "editorial-menu-open",
+    "editorial-rail-placeholder",
+    "setBackgroundInert",
+    "consultations/#contact",
 ):
-    require(token in global_js, f"global chrome runtime token missing: {token}")
+    require(token in nav, f"navigation runtime token missing: {token}")
+require("appendStylesheet" not in nav and 'createElement("link")' not in nav, "navigation still injects CSS at runtime")
 
-site_js = (ROOT / "assets/js/site.v2.js").read_text(encoding="utf-8")
-require("ALINA_GLOBAL_CHROME_LOADER_V1" in site_js, "site.v2 global chrome loader marker missing")
-require("site.global-chrome.v1.js?v=20260717-chrome1" in site_js, "site.v2 global chrome source missing")
-require("site.navigation.v1.js?v=20260717-nav1" not in site_js, "site.v2 legacy navigation loader remains")
+site = (ROOT / "assets/js/site.v2.js").read_text(encoding="utf-8")
+for forbidden in (
+    "initMobileNavigation",
+    "initActiveNavigation",
+    "initEditorialNotesImages",
+    "ALINA_GLOBAL_CHROME_LOADER_V1",
+    "site.global-chrome.v1.js",
+):
+    require(forbidden not in site, f"primary runtime still contains competing owner: {forbidden}")
 
-chrome_js = (ROOT / "assets/js/site.chrome.v3.js").read_text(encoding="utf-8")
-require("site.global-chrome.v1.js?v=20260717-chrome1" in chrome_js, "utility chrome global loader missing")
-require("footer.innerHTML" not in chrome_js, "utility chrome still owns footer rendering")
-require("header.innerHTML" not in chrome_js, "utility chrome still owns header rendering")
-require("site.footer.v3-2.css" not in chrome_js, "utility chrome still loads legacy footer CSS")
+utility = (ROOT / "assets/js/site.chrome.v3.js").read_text(encoding="utf-8")
+require("__ALINA_STATIC_UTILITY_CHROME_V1__" in utility, "utility compatibility marker missing")
+require("innerHTML" not in utility and "appendStylesheet" not in utility, "utility runtime still mutates page chrome")
 
 css = (ROOT / "assets/css/site.global-chrome.v1.css").read_text(encoding="utf-8")
 for token in (
-    ".site-header--canonical",
-    ".footer-editorial-grid",
-    ".footer-navigation",
-    ".footer-booking",
-    ".footer-utility",
-    "@media (max-width: 620px)",
+    ".site-header--canonical", ".footer-editorial-grid", ".footer-navigation",
+    ".footer-booking", ".footer-utility", "@media (max-width: 620px)",
     "@media (prefers-reduced-motion: reduce)",
 ):
     require(token in css, f"global chrome CSS token missing: {token}")
@@ -130,4 +127,4 @@ ua_articles = {path.parent.name for path in (ROOT / "notes").glob("*/index.html"
 ru_articles = {path.parent.name for path in (ROOT / "ru/notes").glob("*/index.html")}
 require(ua_articles == ru_articles and len(ua_articles) == 4, "UA/RU article pairs are not mirrored")
 
-print("Global chrome V1 validation passed.")
+print("Static global chrome and direct navigation validation passed.")
