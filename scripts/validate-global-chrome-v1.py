@@ -41,7 +41,7 @@ def page_context(path: Path) -> tuple[bool, str, str, str]:
     clean_route = "/".join(clean_parts)
     if clean_route:
         clean_route += "/"
-    locale_home = f"{root_prefix}{'ru/' if is_ru else ''}" or "./"
+    locale_home = (("../" * max(depth - 1, 0)) or "./") if is_ru else (root_prefix or "./")
     alternate = f"{root_prefix}{clean_route}" if is_ru else f"{root_prefix}ru/{clean_route}"
     if not alternate:
         alternate = "./"

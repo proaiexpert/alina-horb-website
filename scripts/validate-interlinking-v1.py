@@ -78,11 +78,13 @@ for slug in sorted(ua_articles):
 require('href="../../consultations/#process"' in read("notes/first-consultation/index.html"), "UA first article process link missing")
 require('href="../../consultations/#process"' in read("ru/notes/first-consultation/index.html"), "RU first article process link missing")
 
-# Shared chrome fallbacks must not point global traffic to legacy homepage anchors.
+# Canonical global chrome owns global routes; the Notes utility runtime only delegates.
+global_chrome = read("assets/js/site.global-chrome.v1.js")
+require('href: `${localeRoot}about/`' in global_chrome, "global About route missing")
+require('const bookingHref = `${localeRoot}consultations/#contact`;' in global_chrome, "global booking route missing")
+require('`${localeRoot}#about`' not in global_chrome, "legacy global About anchor remains")
+require('`${localeRoot}#contact`' not in global_chrome, "legacy global Contact anchor remains")
 chrome = read("assets/js/site.chrome.v3.js")
-require('[text.about, `${homeHref}about/`]' in chrome, "shared About route missing")
-require('[text.contact, `${homeHref}consultations/#contact`]' in chrome, "shared booking route missing")
-require('[text.about, `${homeHref}#about`]' not in chrome, "legacy shared About anchor remains")
-require('[text.contact, `${homeHref}#contact`]' not in chrome, "legacy shared Contact anchor remains")
+require('site.global-chrome.v1.js?v=20260717-chrome1' in chrome, "Notes utility runtime does not delegate to global chrome")
 
 print("Interlinking V1 validation passed.")
