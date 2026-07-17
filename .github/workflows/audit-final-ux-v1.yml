@@ -1,4 +1,5 @@
 # Permanent browser-level release gate for the canonical UA/RU site.
+# Includes desktop editorial-column geometry and responsive interaction checks.
 name: Audit final UX V1
 
 on:
