@@ -1,0 +1,41 @@
+name: Apply CLS diagnostics V1
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'scripts/apply-cls-diagnostics-v1.py'
+      - '.github/workflows/apply-cls-diagnostics-v1.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Add layout-shift source diagnostics
+        run: python3 scripts/apply-cls-diagnostics-v1.py
+
+      - name: Validate audit syntax
+        run: node --check scripts/audit-final-ux-v1.mjs
+
+      - name: Remove one-time diagnostics machinery
+        run: |
+          rm scripts/apply-cls-diagnostics-v1.py
+          rm .github/workflows/apply-cls-diagnostics-v1.yml
+
+      - name: Commit permanent CLS diagnostics
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Expose layout-shift sources in UX reports"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
