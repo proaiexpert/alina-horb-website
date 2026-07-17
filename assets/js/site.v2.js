@@ -14,7 +14,7 @@
       invalid: "Перевірте, будь ласка, обов’язкові поля.",
       blocked: "Не вдалося надіслати форму. Зачекайте кілька секунд і спробуйте ще раз.",
       submit: "Надіслати звернення",
-      fields: { name: "Ім’я", reply: "Контакт", channel: "Спосіб зв’язку", language: "Мова", format: "Формат", message: "Повідомлення" }
+      fields: { name: "Ім’я", reply: "Контакт", channel: "Спосіб зв’язку", language: "Мова", format: "Формат", service: "Тип консультації", timezone: "Країна або часовий пояс", availability: "Зручний час", message: "Повідомлення" }
     },
     ru: {
       subject: "Обращение через сайт Алины Горб",
@@ -26,7 +26,7 @@
       invalid: "Проверьте, пожалуйста, обязательные поля.",
       blocked: "Не удалось отправить форму. Подождите несколько секунд и попробуйте ещё раз.",
       submit: "Отправить обращение",
-      fields: { name: "Имя", reply: "Контакт", channel: "Способ связи", language: "Язык", format: "Формат", message: "Сообщение" }
+      fields: { name: "Имя", reply: "Контакт", channel: "Способ связи", language: "Язык", format: "Формат", service: "Тип консультации", timezone: "Страна или часовой пояс", availability: "Удобное время", message: "Сообщение" }
     }
   };
 
@@ -112,7 +112,9 @@
       return {
         name: String(data.get("name") || "").trim(), reply: String(data.get("reply") || "").trim(),
         channel: String(data.get("channel") || "").trim(), language: String(data.get("language") || "").trim(),
-        format: String(data.get("format") || "").trim(), message: String(data.get("message") || "").trim(),
+        format: String(data.get("format") || "").trim(), service: String(data.get("service") || "").trim(),
+        timezone: String(data.get("timezone") || "").trim(), availability: String(data.get("availability") || "").trim(),
+        message: String(data.get("message") || "").trim(),
         consent: data.get("consent") === "on", locale, subject: text.subject, source: window.location.href
       };
     };
@@ -121,8 +123,12 @@
       const fields = text.fields;
       const body = [
         `${fields.name}: ${payload.name}`, `${fields.reply}: ${payload.reply}`, `${fields.channel}: ${payload.channel}`,
-        `${fields.language}: ${payload.language}`, `${fields.format}: ${payload.format}`, "", `${fields.message}:`, payload.message
-      ].join("\n");
+        `${fields.language}: ${payload.language}`, `${fields.format}: ${payload.format}`,
+        payload.service ? `${fields.service}: ${payload.service}` : null,
+        payload.timezone ? `${fields.timezone}: ${payload.timezone}` : null,
+        payload.availability ? `${fields.availability}: ${payload.availability}` : null,
+        "", `${fields.message}:`, payload.message
+      ].filter((line) => line !== null).join("\n");
       const email = String(config.email || "hello@alinahorb.com").trim();
       setState("success", text.success);
       window.location.href = `mailto:${email}?subject=${encodeURIComponent(text.subject)}&body=${encodeURIComponent(body)}`;
