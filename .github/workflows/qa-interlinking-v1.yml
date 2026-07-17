@@ -33,15 +33,30 @@ on:
       - '.github/workflows/qa-interlinking-v1.yml'
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   validate-interlinking:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - name: Validate bilingual routes and conversion paths
-        run: python3 scripts/validate-interlinking-v1.py
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+      - name: Diagnose bilingual routes and conversion paths
+        run: |
+          set +e
+          python3 scripts/validate-interlinking-v1.py > /tmp/interlinking-output.txt 2>&1
+          status=$?
+          cat /tmp/interlinking-output.txt
+          if [ "$status" -ne 0 ] && [ "${{ github.event_name }}" = "pull_request" ]; then
+            cp /tmp/interlinking-output.txt qa-interlinking-error.txt
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add qa-interlinking-error.txt
+            git commit -m "Record interlinking validation error" || true
+            git push origin HEAD:${{ github.event.pull_request.head.ref }}
+          fi
+          exit "$status"
       - name: Check shared JavaScript syntax
         run: |
           node --check assets/js/site.chrome.v3.js
