@@ -54,22 +54,42 @@ jobs:
         run: exit 1
 
       - name: Validate affected public pages
+        id: validate
         if: steps.apply.outputs.status == '0'
+        shell: bash
         run: |
-          set -euo pipefail
-          python3 scripts/validate-about-pages-v1.py
-          python3 scripts/validate-consultations-pages-v1.py
-          python3 scripts/validate-release-readiness.py
-          node --check assets/js/site.v2.js
-          grep -Fq 'Работа с ясной целью и вниманием к результату' ru/about/index.html
-          grep -Fq 'Робота з чіткою метою та увагою до результату' about/index.html
-          grep -Fq 'Ориентация на результат' ru/index.html
-          grep -Fq 'Орієнтація на результат' index.html
-          grep -Fq 'Ориентация на результат' ru/consultations/index.html
-          grep -Fq 'Орієнтація на результат' consultations/index.html
+          set +e
+          {
+            python3 scripts/validate-about-pages-v1.py
+            python3 scripts/validate-consultations-pages-v1.py
+            python3 scripts/validate-release-readiness.py
+            node --check assets/js/site.v2.js
+            grep -Fq 'Работа с ясной целью и вниманием к результату' ru/about/index.html
+            grep -Fq 'Робота з чіткою метою та увагою до результату' about/index.html
+            grep -Fq 'Ориентация на результат' ru/index.html
+            grep -Fq 'Орієнтація на результат' index.html
+            grep -Fq 'Ориентация на результат' ru/consultations/index.html
+            grep -Fq 'Орієнтація на результат' consultations/index.html
+          } > .tmp/result-copy-validation.log 2>&1
+          status=$?
+          cat .tmp/result-copy-validation.log
+          echo "status=${status}" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Upload validation diagnostic
+        if: steps.apply.outputs.status == '0' && steps.validate.outputs.status != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: result-copy-validation-diagnostic
+          path: .tmp/result-copy-validation.log
+          if-no-files-found: error
+
+      - name: Stop after validation failure
+        if: steps.apply.outputs.status == '0' && steps.validate.outputs.status != '0'
+        run: exit 1
 
       - name: Remove temporary machinery and restore deployment
-        if: steps.apply.outputs.status == '0'
+        if: steps.apply.outputs.status == '0' && steps.validate.outputs.status == '0'
         run: |
           set -euo pipefail
           git show 59e00efe3a2de63eeaff39cb20036f123ce701c8:.github/workflows/deploy-pages.yml > .github/workflows/deploy-pages.yml
@@ -80,6 +100,7 @@ jobs:
           rm -f .tmp/result-copy-v2-trigger.txt
           rm -f .tmp/result-copy-v2-pr-ready.txt
           rm -f .tmp/result-copy-run.log
+          rm -f .tmp/result-copy-validation.log
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
