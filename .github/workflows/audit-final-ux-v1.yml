@@ -1,3 +1,4 @@
+# Permanent browser-level release gate for the canonical UA/RU site.
 name: Audit final UX V1
 
 on:
