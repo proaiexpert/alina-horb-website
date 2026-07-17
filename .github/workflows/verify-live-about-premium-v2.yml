@@ -1,0 +1,48 @@
+name: Verify live premium About pages
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  verify-live:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Wait for Ukrainian and Russian live pages
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 30); do
+            ua=$(curl -fsSL --max-time 20 "https://alinahorb.com/about/?v=premium-pass-20260717-${attempt}" || true)
+            ru=$(curl -fsSL --max-time 20 "https://alinahorb.com/ru/about/?v=premium-pass-20260717-${attempt}" || true)
+            if printf '%s' "$ua" | grep -Fq 'коли внутрішню опору доводиться знаходити наново' \
+              && printf '%s' "$ua" | grep -Fq 'profile-editorial' \
+              && printf '%s' "$ru" | grep -Fq 'когда внутреннюю опору приходится находить заново' \
+              && printf '%s' "$ru" | grep -Fq 'profile-editorial'; then
+              echo "Both live About pages contain the premium pass."
+              exit 0
+            fi
+            echo "Attempt ${attempt}: deployment not visible yet"
+            sleep 20
+          done
+          echo "Live verification timed out" >&2
+          exit 1
+
+      - name: Remove temporary verification workflow
+        run: |
+          rm .github/workflows/verify-live-about-premium-v2.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add .github/workflows/verify-live-about-premium-v2.yml
+          git commit -m "Confirm live premium About pages"
+          git push origin HEAD:main
