@@ -20,34 +20,20 @@ jobs:
           ref: feature/finalize-consultations-v1
           fetch-depth: 0
 
-      - name: Decode prepared production files
-        shell: bash
-        run: |
-          set -euo pipefail
-          mkdir -p consultations ru/consultations assets/css scripts
-          python3 - <<'PY'
-          from pathlib import Path
-          import base64
-          import gzip
+      - name: Decode Ukrainian page
+        run: python3 -c "from pathlib import Path; import base64,gzip; s=''.join(Path('.tmp/consultations-v1/ua.html.gz.b64').read_text().split()); Path('consultations').mkdir(exist_ok=True); Path('consultations/index.html').write_bytes(gzip.decompress(base64.b64decode(s + '=' * (-len(s) % 4))))"
 
-          files = {
-              '.tmp/consultations-v1/ua.html.gz.b64': 'consultations/index.html',
-              '.tmp/consultations-v1/ru.html.gz.b64': 'ru/consultations/index.html',
-              '.tmp/consultations-v1/css.gz.b64': 'assets/css/site.consultations.v1.css',
-              '.tmp/consultations-v1/validator.gz.b64': 'scripts/validate-consultations-pages-v1.py',
-              '.tmp/consultations-v1/integrate.py.gz.b64': 'scripts/integrate-consultations-v1.py',
-          }
-          for source, destination in files.items():
-              encoded = ''.join(Path(source).read_text(encoding='utf-8').split())
-              encoded += '=' * (-len(encoded) % 4)
-              print(f'Decoding {source}: {len(encoded)} base64 characters')
-              payload = gzip.decompress(base64.b64decode(encoded, validate=False))
-              target = Path(destination)
-              target.parent.mkdir(parents=True, exist_ok=True)
-              target.write_bytes(payload)
-              print(f'Wrote {destination}: {len(payload)} bytes')
-          PY
-          chmod +x scripts/validate-consultations-pages-v1.py scripts/integrate-consultations-v1.py
+      - name: Decode Russian page
+        run: python3 -c "from pathlib import Path; import base64,gzip; s=''.join(Path('.tmp/consultations-v1/ru.html.gz.b64').read_text().split()); Path('ru/consultations').mkdir(parents=True,exist_ok=True); Path('ru/consultations/index.html').write_bytes(gzip.decompress(base64.b64decode(s + '=' * (-len(s) % 4))))"
+
+      - name: Decode consultations stylesheet
+        run: python3 -c "from pathlib import Path; import base64,gzip; s=''.join(Path('.tmp/consultations-v1/css.gz.b64').read_text().split()); Path('assets/css').mkdir(parents=True,exist_ok=True); Path('assets/css/site.consultations.v1.css').write_bytes(gzip.decompress(base64.b64decode(s + '=' * (-len(s) % 4))))"
+
+      - name: Decode consultations validator
+        run: python3 -c "from pathlib import Path; import base64,gzip; s=''.join(Path('.tmp/consultations-v1/validator.gz.b64').read_text().split()); Path('scripts').mkdir(exist_ok=True); Path('scripts/validate-consultations-pages-v1.py').write_bytes(gzip.decompress(base64.b64decode(s + '=' * (-len(s) % 4))))"
+
+      - name: Decode integration script
+        run: python3 -c "from pathlib import Path; import base64,gzip; s=''.join(Path('.tmp/consultations-v1/integrate.py.gz.b64').read_text().split()); Path('scripts/integrate-consultations-v1.py').write_bytes(gzip.decompress(base64.b64decode(s + '=' * (-len(s) % 4))))"
 
       - name: Integrate and validate
         shell: bash
