@@ -3,15 +3,11 @@ name: Apply bilingual interlinking V1
 on:
   push:
     branches:
+      - main
       - feature/interlinking-v1
     paths:
       - 'scripts/apply-interlinking-v1.py'
-      - '.github/workflows/apply-interlinking-v1.yml'
-  pull_request:
-    branches:
-      - main
-    paths:
-      - 'scripts/apply-interlinking-v1.py'
+      - 'scripts/fix-interlinking-footer-v1.py'
       - '.github/workflows/apply-interlinking-v1.yml'
 
 permissions:
@@ -22,17 +18,20 @@ jobs:
     if: github.actor != 'github-actions[bot]'
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout feature branch
+      - name: Checkout triggering branch
         uses: actions/checkout@v4
         with:
-          ref: feature/interlinking-v1
+          ref: ${{ github.ref_name }}
       - name: Apply bilingual interlinking migration
-        run: python3 scripts/apply-interlinking-v1.py
+        run: |
+          python3 scripts/apply-interlinking-v1.py
+          python3 scripts/fix-interlinking-footer-v1.py
       - name: Validate resulting architecture
         run: python3 scripts/validate-interlinking-v1.py
       - name: Remove one-time migration machinery
         run: |
           rm scripts/apply-interlinking-v1.py
+          rm scripts/fix-interlinking-footer-v1.py
           rm .github/workflows/apply-interlinking-v1.yml
       - name: Commit generated interlinking system
         run: |
@@ -40,4 +39,4 @@ jobs:
           git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git add -A
           git commit -m "Build bilingual interlinking system"
-          git push origin HEAD:feature/interlinking-v1
+          git push origin HEAD:${{ github.ref_name }}
