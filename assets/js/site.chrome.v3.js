@@ -72,10 +72,10 @@
   const links = [
     [text.home, homeHref],
     [text.topics, `${homeHref}#topics`],
-    [text.about, `${homeHref}#about`],
+    [text.about, `${homeHref}about/`],
     [text.process, `${homeHref}#process`],
     [text.notes, notesHref],
-    [text.contact, `${homeHref}#contact`]
+    [text.contact, `${homeHref}consultations/#contact`]
   ];
   const desktopLinks = [links[0], links[1], links[4], links[5]];
 
