@@ -39,6 +39,7 @@ jobs:
       - name: Commit clean implementation
         run: |
           set -euo pipefail
+          rm -f .tmp/result-copy-trigger.txt
           rm scripts/apply-result-focused-copy-v1.py
           rm .github/workflows/apply-result-focused-copy-v1.yml
           git config user.name "github-actions[bot]"
