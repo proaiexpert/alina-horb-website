@@ -12,6 +12,8 @@ ROUTES = [
     ("ru/index.html", f"{BASE}/ru/", f"{BASE}/", f"{BASE}/ru/"),
     ("about/index.html", f"{BASE}/about/", f"{BASE}/about/", f"{BASE}/ru/about/"),
     ("ru/about/index.html", f"{BASE}/ru/about/", f"{BASE}/about/", f"{BASE}/ru/about/"),
+    ("consultations/index.html", f"{BASE}/consultations/", f"{BASE}/consultations/", f"{BASE}/ru/consultations/"),
+    ("ru/consultations/index.html", f"{BASE}/ru/consultations/", f"{BASE}/consultations/", f"{BASE}/ru/consultations/"),
     ("notes/index.html", f"{BASE}/notes/", f"{BASE}/notes/", f"{BASE}/ru/notes/"),
     ("ru/notes/index.html", f"{BASE}/ru/notes/", f"{BASE}/notes/", f"{BASE}/ru/notes/"),
     ("notes/first-consultation/index.html", f"{BASE}/notes/first-consultation/", f"{BASE}/notes/first-consultation/", f"{BASE}/ru/notes/first-consultation/"),

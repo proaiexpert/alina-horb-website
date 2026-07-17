@@ -8,6 +8,8 @@ ROUTES = [
     "ru/index.html",
     "about/index.html",
     "ru/about/index.html",
+    "consultations/index.html",
+    "ru/consultations/index.html",
     "notes/index.html",
     "ru/notes/index.html",
     "notes/first-consultation/index.html",
