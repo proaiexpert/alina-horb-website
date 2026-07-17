@@ -1,0 +1,54 @@
+name: QA bilingual interlinking V1
+
+on:
+  pull_request:
+    paths:
+      - 'index.html'
+      - 'ru/index.html'
+      - 'about/**'
+      - 'ru/about/**'
+      - 'consultations/**'
+      - 'ru/consultations/**'
+      - 'notes/**'
+      - 'ru/notes/**'
+      - 'assets/js/site.chrome.v3.js'
+      - 'assets/css/site.notes-hub.v3-2.css'
+      - 'scripts/validate-interlinking-v1.py'
+      - '.github/workflows/qa-interlinking-v1.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - 'index.html'
+      - 'ru/index.html'
+      - 'about/**'
+      - 'ru/about/**'
+      - 'consultations/**'
+      - 'ru/consultations/**'
+      - 'notes/**'
+      - 'ru/notes/**'
+      - 'assets/js/site.chrome.v3.js'
+      - 'assets/css/site.notes-hub.v3-2.css'
+      - 'scripts/validate-interlinking-v1.py'
+      - '.github/workflows/qa-interlinking-v1.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate-interlinking:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Validate bilingual routes and conversion paths
+        run: python3 scripts/validate-interlinking-v1.py
+      - name: Check shared JavaScript syntax
+        run: |
+          node --check assets/js/site.chrome.v3.js
+          node --check assets/js/site.navigation.v1.js
+      - name: Verify editorial conversion markers
+        run: |
+          grep -Fq 'notes-hub-conversion' notes/index.html
+          grep -Fq 'notes-hub-conversion' ru/notes/index.html
+          grep -Fq 'consultations/#contact' notes/first-consultation/index.html
+          grep -Fq 'consultations/#contact' ru/notes/first-consultation/index.html
