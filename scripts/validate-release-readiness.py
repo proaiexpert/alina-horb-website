@@ -81,12 +81,14 @@ for home in (ROOT / "index.html", ROOT / "ru/index.html"):
         for css_name in (
             "site.v3-1.css",
             "site.v3-1-stability.css",
-            "site.footer.v3-2.css",
+            "site.global-chrome.v1.css",
             "site.privacy.v3-2.css",
             "site.intake.v3-2.css",
             "site.notes-hub.v3-2.css",
         ):
             require(css_name in text, f"{home.relative_to(ROOT)}: explicit stylesheet missing: {css_name}")
+        require("site.footer.v3-2.css" not in text, f"{home.relative_to(ROOT)}: legacy footer stylesheet remains")
+        require('data-site-footer="canonical"' in text, f"{home.relative_to(ROOT)}: canonical footer marker missing")
         require("favicon-ag.svg" in text, f"{home.relative_to(ROOT)}: SVG favicon missing")
         require('"@type": "WebSite"' in text, f"{home.relative_to(ROOT)}: WebSite schema missing")
         require('"@type": "Person"' in text, f"{home.relative_to(ROOT)}: Person schema missing")
@@ -124,7 +126,7 @@ if robots_path.is_file():
 
 workflow = (ROOT / ".github/workflows/deploy-pages.yml").read_text(encoding="utf-8")
 require("python3 scripts/apply-turnstile-v3-2.py" in workflow, "Turnstile runtime builder not wired into deployment")
-require("python3 scripts/apply-indexing-launch-v3-2.py" in workflow, "indexing launch step not wired into deployment")
+require("python3 scripts/apply-indexing-launch-v3-2.py" in workflow, "indexing launch step not wired")
 require("python3 scripts/validate-release-readiness.py" in workflow, "deployment validator not wired")
 require("cp sitemap.xml _site/" in workflow and "cp robots.txt _site/" in workflow, "deployment does not copy sitemap/robots")
 require("test -f _site/sitemap.xml" in workflow and "test -f _site/robots.txt" in workflow, "deployment does not assert sitemap/robots")
