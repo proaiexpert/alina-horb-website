@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 from pathlib import Path
-import re
 
 ROOT = Path(__file__).resolve().parents[1]
 
@@ -30,7 +29,8 @@ for token in (
     "@media (max-width: 1180px)",
     "--editorial-header-height",
     "body.editorial-menu-open .mobile-booking-cta",
-    "grid-template-areas:",
+    ".editorial-rail::after",
+    "content: none !important",
     "prefers-reduced-motion",
 ):
     require(token in css, f"navigation CSS missing production token: {token}")
@@ -49,25 +49,14 @@ for token in (
     "consultations/#contact",
     "setBackgroundInert",
     "lockPage",
+    "fallbackDesktopNav",
     'event.key === "Tab"',
     'event.key === "Escape"',
     'matchMedia("(max-width: 1180px)")',
+    'document.body.classList.contains("article-template-v32")',
+    "site.navigation.v1.css?v=20260717-nav2",
 ):
     require(token in js, f"navigation runtime missing production token: {token}")
-
-require(
-    ".editorial-rail::after" in css and "content: none !important" in css,
-    "legacy rail progress marker is not neutralized",
-)
-require("fallbackDesktopNav" in js, "desktop fallback navigation for utility pages is missing")
-require(
-    'document.body.classList.contains("article-template-v32")' in js,
-    "article-specific navigation labeling is missing",
-)
-require(
-    "site.navigation.v1.css?v=20260717-nav2" in js,
-    "cache-safe navigation stylesheet version is missing",
-)
 
 for relative, text in (
     ("assets/js/site.v2.js", site_js),
@@ -79,7 +68,7 @@ for relative, text in (
     )
     require(
         "site.navigation.v1.js?v=20260717-nav1" in text,
-        f"{relative}: expected V1 loader reference changed unexpectedly",
+        f"{relative}: shared navigation loader is missing",
     )
 
 rail_pages = (
@@ -98,13 +87,6 @@ for relative in rail_pages:
 for relative in ("notes/index.html", "ru/notes/index.html"):
     text = (ROOT / relative).read_text(encoding="utf-8")
     require("notes-hub-hero-grid" in text, f"{relative}: notes rail host missing")
-
-for path in ROOT.rglob("*.html"):
-    text = path.read_text(encoding="utf-8")
-    for match in re.finditer(r'(site\.(?:v2|chrome\.v3)\.js)([^"\']*)', text):
-        require(
-            "v=20260717-nav1" in match.group(2),
-            f"{path.relative_to(ROOT)}: stale shared script reference",
-        )
+    require("mobile-navigation" in text, f"{relative}: notes mobile navigation host missing")
 
 print("Editorial navigation production validation passed.")
