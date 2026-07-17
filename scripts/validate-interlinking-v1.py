@@ -50,7 +50,8 @@ for token in (
 ):
     require(token in css, f"Notes conversion CSS missing: {token}")
 
-# Article pairs must stay mirrored by slug.
+# Article pairs must stay mirrored by slug. Both locale trees navigate two levels
+# upward to their own locale root: /notes/<slug>/ -> / and /ru/notes/<slug>/ -> /ru/.
 ua_articles = {path.parent.name: path for path in (ROOT / "notes").glob("*/index.html")}
 ru_articles = {path.parent.name: path for path in (ROOT / "ru/notes").glob("*/index.html")}
 require(ua_articles, "no UA articles found")
@@ -61,7 +62,7 @@ for slug in sorted(ua_articles):
     for is_ru, path in ((False, ua_articles[slug]), (True, ru_articles[slug])):
         relative = path.relative_to(ROOT).as_posix()
         text = path.read_text(encoding="utf-8")
-        prefix = "../../../" if is_ru else "../../"
+        prefix = "../../"
         absolute_about = "https://alinahorb.com/ru/about/" if is_ru else "https://alinahorb.com/about/"
 
         require(f'href="{prefix}about/"' in text, f"{relative}: author About link missing")
@@ -75,7 +76,7 @@ for slug in sorted(ua_articles):
 
 # The first-consultation article specifically connects its service explanation to Consultations.
 require('href="../../consultations/#process"' in read("notes/first-consultation/index.html"), "UA first article process link missing")
-require('href="../../../consultations/#process"' in read("ru/notes/first-consultation/index.html"), "RU first article process link missing")
+require('href="../../consultations/#process"' in read("ru/notes/first-consultation/index.html"), "RU first article process link missing")
 
 # Shared chrome fallbacks must not point global traffic to legacy homepage anchors.
 chrome = read("assets/js/site.chrome.v3.js")
