@@ -38,4 +38,6 @@ jobs:
           node --check assets/js/site.chrome.v3.js
           node --check assets/js/site.navigation.v1.js
           grep -Fq '.editorial-rail .rail-booking-link' assets/css/site.navigation.v1.css
-          grep -Fq 'pageKey === "home"' assets/js/site.navigation.v1.js
+          grep -Fq '@media (max-width: 1180px)' assets/css/site.navigation.v1.css
+          grep -Fq 'setBackgroundInert' assets/js/site.navigation.v1.js
+          grep -Fq 'fallbackDesktopNav' assets/js/site.navigation.v1.js
