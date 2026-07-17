@@ -33,29 +33,13 @@ on:
       - '.github/workflows/qa-interlinking-v1.yml'
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   validate-interlinking:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
-      - name: Repair RU locale-relative routes
-        if: github.event_name == 'pull_request'
-        run: |
-          python3 - <<'PY'
-          from pathlib import Path
-          for path in sorted(Path('ru/notes').glob('*/index.html')):
-              text = path.read_text(encoding='utf-8')
-              revised = (text
-                  .replace('href="../../#about"', 'href="../../about/"')
-                  .replace('href="../../#contact"', 'href="../../consultations/#contact"')
-                  .replace('href="../../#process"', 'href="../../consultations/#process"'))
-              path.write_text(revised, encoding='utf-8')
-          Path('qa-interlinking-error.txt').unlink(missing_ok=True)
-          PY
       - name: Validate bilingual routes and conversion paths
         run: python3 scripts/validate-interlinking-v1.py
       - name: Check shared JavaScript syntax
@@ -68,13 +52,3 @@ jobs:
           grep -Fq 'notes-hub-conversion' ru/notes/index.html
           grep -Fq 'consultations/#contact' notes/first-consultation/index.html
           grep -Fq 'consultations/#contact' ru/notes/first-consultation/index.html
-      - name: Commit repaired locale routes
-        if: github.event_name == 'pull_request'
-        run: |
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add ru/notes qa-interlinking-error.txt || true
-          if ! git diff --cached --quiet; then
-            git commit -m "Fix RU article interlinking routes"
-            git push origin HEAD:${{ github.event.pull_request.head.ref }}
-          fi
