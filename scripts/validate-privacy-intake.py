@@ -34,6 +34,8 @@ def main() -> None:
         PUBLIC_ROBOTS,
         'href="assets/css/site.privacy.v3-2.css"',
         'href="assets/css/site.intake.v3-2.css"',
+        'href="./privacy/">Конфіденційність</a>',
+        'site.navigation.v1.js?v=20260717-ux1',
     )
     ru = require(
         ROOT / "ru/index.html",
@@ -47,6 +49,8 @@ def main() -> None:
         PUBLIC_ROBOTS,
         'href="../assets/css/site.privacy.v3-2.css"',
         'href="../assets/css/site.intake.v3-2.css"',
+        'href="./privacy/">Конфиденциальность</a>',
+        'site.navigation.v1.js?v=20260717-ux1',
     )
     require(
         ROOT / "privacy/index.html",
@@ -55,6 +59,8 @@ def main() -> None:
         'hreflang="ru" href="https://alinahorb.com/ru/privacy/"',
         "Неекстрений характер сайту",
         PUBLIC_ROBOTS,
+        'data-site-footer="canonical"',
+        'href="./">alinahorb.com</a>',
     )
     require(
         ROOT / "ru/privacy/index.html",
@@ -63,6 +69,8 @@ def main() -> None:
         'hreflang="uk" href="https://alinahorb.com/privacy/"',
         "Неэкстренный характер сайта",
         PUBLIC_ROBOTS,
+        'data-site-footer="canonical"',
+        'href="../../ru/">alinahorb.com</a>',
     )
     require(
         ROOT / "assets/js/site.v2.js",
@@ -71,17 +79,6 @@ def main() -> None:
         "[name='website']",
         'document.querySelector("#about")',
         '"cf-turnstile-response": turnstileToken',
-    )
-    require(
-        ROOT / "assets/js/site.global-chrome.v1.js",
-        PUBLIC_EMAIL,
-        "privacyHref",
-        'privacy: "Конфіденційність"',
-        'privacy: "Конфиденциальность"',
-    )
-    require(
-        ROOT / "assets/js/site.chrome.v3.js",
-        'site.global-chrome.v1.js?v=20260717-chrome1',
     )
     config = require(
         ROOT / "assets/js/site-config.v2.js",
@@ -100,8 +97,7 @@ def main() -> None:
         ROOT / "ru/privacy/index.html",
         ROOT / "assets/js/site.v2.js",
         ROOT / "assets/js/site-config.v2.js",
-        ROOT / "assets/js/site.chrome.v3.js",
-        ROOT / "assets/js/site.global-chrome.v1.js",
+        ROOT / "assets/js/site.navigation.v1.js",
     ]
     for path in production_files:
         text = path.read_text(encoding="utf-8")
@@ -117,9 +113,6 @@ def main() -> None:
         raise AssertionError("Expected exactly one honeypot per homepage form")
     if ua.count('href="privacy/"') < 1 or ru.count('href="privacy/"') < 1:
         raise AssertionError("Privacy link must remain in both form-consent blocks")
-    for locale, page in (("UA", ua), ("RU", ru)):
-        if 'data-site-footer="canonical"' not in page or 'href="./privacy/"' not in page:
-            raise AssertionError(f"{locale} canonical footer privacy route missing")
     if 'formEndpoint: "https://formspree.io/f/mvzezana"' not in config:
         raise AssertionError("Approved Formspree endpoint must remain explicit")
     if 'turnstileSiteKey: "0x4AAAAAAD2wlldaSXK8Bp9f"' not in config:
