@@ -1,0 +1,46 @@
+name: Apply global chrome V1
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'scripts/apply-global-chrome-v1.py'
+      - '.github/workflows/apply-global-chrome-v1.yml'
+      - 'assets/js/site.global-chrome.v1.js'
+      - 'assets/js/site.chrome.v3.js'
+      - 'assets/css/site.global-chrome.v1.css'
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+      - name: Apply canonical global chrome migration
+        run: python3 scripts/apply-global-chrome-v1.py
+      - name: Validate resulting production architecture
+        run: python3 scripts/validate-global-chrome-v1.py
+      - name: Check JavaScript syntax
+        run: |
+          node --check assets/js/site.global-chrome.v1.js
+          node --check assets/js/site.chrome.v3.js
+          node --check assets/js/site.v2.js
+          node --check assets/js/site.navigation.v1.js
+      - name: Remove one-time migration machinery
+        run: |
+          rm scripts/apply-global-chrome-v1.py
+          rm .github/workflows/apply-global-chrome-v1.yml
+      - name: Commit generated global chrome
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -m "Build canonical global site chrome"
+          git push origin HEAD:${{ github.event.pull_request.head.ref }}
