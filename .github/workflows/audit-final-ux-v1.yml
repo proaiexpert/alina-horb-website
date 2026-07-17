@@ -1,0 +1,70 @@
+name: Audit final UX V1
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  audit:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref || github.ref_name }}
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install browser audit runtime
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Serve the static site
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/alina-final-ux-server.log 2>&1 &
+          echo $! > /tmp/alina-final-ux-server.pid
+          for attempt in {1..20}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/alina-final-ux-server.log
+          exit 1
+
+      - name: Run full responsive audit and capture review images
+        env:
+          AUDIT_BASE_URL: http://127.0.0.1:4173
+          AUDIT_SCREENSHOTS: '1'
+          AUDIT_STRICT: '0'
+        run: node scripts/audit-final-ux-v1.mjs
+
+      - name: Commit audit report and screenshots
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add qa/final-ux
+          if git diff --cached --quiet; then
+            echo "No audit artifact changes"
+            exit 0
+          fi
+          git commit -m "Record final UX audit baseline"
+          git push origin HEAD:${{ github.event.pull_request.head.ref || github.ref_name }}
+
+      - name: Upload audit artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: final-ux-audit-v1
+          path: qa/final-ux
+          retention-days: 14
