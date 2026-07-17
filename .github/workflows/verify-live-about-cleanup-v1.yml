@@ -1,0 +1,55 @@
+name: Verify live About cleanup
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+
+jobs:
+  verify-live:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 0
+
+      - name: Wait for production cleanup
+        run: |
+          set -euo pipefail
+          verified=0
+          for attempt in $(seq 1 30); do
+            curl -fsSL --max-time 20 "https://alinahorb.com/about/?v=about-cleanup-${attempt}" -o /tmp/about-ua.html || true
+            curl -fsSL --max-time 20 "https://alinahorb.com/ru/about/?v=about-cleanup-${attempt}" -o /tmp/about-ru.html || true
+            curl -fsSL --max-time 20 "https://alinahorb.com/consultations/?v=about-cleanup-${attempt}" -o /tmp/consult-ua.html || true
+            curl -fsSL --max-time 20 "https://alinahorb.com/ru/consultations/?v=about-cleanup-${attempt}" -o /tmp/consult-ru.html || true
+            if grep -Fq 'Чітка мета, дбайливий темп і помітні зміни' /tmp/about-ua.html \
+              && grep -Fq 'Ясная цель, бережный темп и заметные изменения' /tmp/about-ru.html \
+              && ! grep -Fq 'profile-position section-block' /tmp/about-ua.html \
+              && ! grep -Fq 'profile-position section-block' /tmp/about-ru.html \
+              && grep -Fq 'Чи потрібно заздалегідь формулювати точний запит?' /tmp/consult-ua.html \
+              && grep -Fq 'Нужно ли заранее формулировать точный запрос?' /tmp/consult-ru.html; then
+              verified=1
+              echo "Live bilingual cleanup verified on attempt ${attempt}."
+              break
+            fi
+            echo "Attempt ${attempt}: production update not visible yet"
+            sleep 15
+          done
+          test "$verified" -eq 1
+
+      - name: Remove temporary verifier
+        run: |
+          set -euo pipefail
+          rm -f .github/workflows/verify-live-about-cleanup-v1.yml
+          rm -f .tmp/verify-live-about-cleanup-v1.txt
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Confirm live About cleanup'
+          git push origin HEAD:main
