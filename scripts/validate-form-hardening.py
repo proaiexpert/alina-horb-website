@@ -17,8 +17,11 @@ required = [
     'error?.name === "AbortError"',
     'statusCode >= 500',
     'mailtoFallback(payload)',
-    'setState("success", text.sent)',
-    'source: window.location.href',
+    'providerPayloadFrom(payload)',
+    'showSuccessConfirmation();',
+    'form.hidden = true;',
+    'successPanel.hidden = false;',
+    'subject: text.subject',
     'const turnstileSiteKey = String(config.turnstileSiteKey || "").trim();',
     'https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit',
     '"cf-turnstile-response": turnstileToken',
@@ -31,6 +34,10 @@ missing = [needle for needle in required if needle not in js]
 if missing:
     raise SystemExit("Missing form hardening contracts:\n- " + "\n- ".join(missing))
 
+for forbidden in ('source: window.location.href', 'data.get("language")', 'data.get("format")', 'locale, subject'):
+    if forbidden in js:
+        raise SystemExit(f"Noisy form payload remains: {forbidden}")
+
 if js.count('form.addEventListener("submit"') != 1:
     raise SystemExit("Expected exactly one form submit handler")
 if 'formEndpoint: "https://formspree.io/f/mvzezana"' not in config:
@@ -40,9 +47,18 @@ if 'formMode: "formspree"' not in config:
 if 'turnstileSiteKey: "0x4AAAAAAD2wlldaSXK8Bp9f"' not in config:
     raise SystemExit("Approved public Turnstile site key is not configured")
 
+for relative in ("index.html", "ru/index.html", "consultations/index.html", "ru/consultations/index.html"):
+    html = (ROOT / relative).read_text(encoding="utf-8")
+    if 'data-form-success' not in html:
+        raise SystemExit(f"{relative}: visible success confirmation missing")
+    if 'name="language"' in html:
+        raise SystemExit(f"{relative}: redundant language field remains")
+    if html.count('field-required') < 3 or html.count('field-optional') < 4:
+        raise SystemExit(f"{relative}: required/optional field labels are incomplete")
+
 for relative in ("index.html", "ru/index.html"):
     html = (ROOT / relative).read_text(encoding="utf-8")
     if robots_meta not in html or "noindex" in html.lower():
         raise SystemExit(f"{relative}: public indexing directive is not active")
 
-print("Production Formspree and Cloudflare Turnstile integration: OK; indexing enabled")
+print("Production Formspree, compact email payload, confirmation UX and Turnstile integration: OK")

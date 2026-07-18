@@ -31,9 +31,9 @@ replace_once(
     "Turnstile state",
 )
 replace_once(
-    '        consent: data.get("consent") === "on", locale, subject: text.subject, source: window.location.href\n',
-    '        consent: data.get("consent") === "on", locale, subject: text.subject, source: window.location.href,\n        "cf-turnstile-response": turnstileToken\n',
-    "Turnstile payload",
+    '      return provider;\n    };',
+    '      return { ...provider, "cf-turnstile-response": turnstileToken };\n    };',
+    "Turnstile provider payload",
 )
 replace_once(
     '    const markInteraction = () => { interacted = true; };',
@@ -89,8 +89,8 @@ replace_once(
     "Turnstile submit gate",
 )
 replace_once(
-    '        if (startedAtField) startedAtField.value = String(openedAt);\n        setState("success", text.sent);',
-    '        if (startedAtField) startedAtField.value = String(openedAt);\n        resetTurnstile();\n        setState("success", text.sent);',
+    '        if (startedAtField) startedAtField.value = String(openedAt);\n        showSuccessConfirmation();',
+    '        if (startedAtField) startedAtField.value = String(openedAt);\n        resetTurnstile();\n        showSuccessConfirmation();',
     "Turnstile reset after success",
 )
 replace_once(
