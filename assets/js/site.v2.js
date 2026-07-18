@@ -13,6 +13,7 @@
       error: "Не вдалося надіслати звернення. Перевірте дані або напишіть на email.",
       invalid: "Перевірте, будь ласка, обов’язкові поля.",
       blocked: "Не вдалося надіслати форму. Зачекайте кілька секунд і спробуйте ще раз.",
+      verification: "Підтвердьте, будь ласка, що ви не робот.",
       submit: "Надіслати звернення",
       fields: { name: "Ім’я", reply: "Контакт", channel: "Спосіб зв’язку", language: "Мова", format: "Формат", service: "Тип консультації", timezone: "Країна або часовий пояс", availability: "Зручний час", message: "Повідомлення" }
     },
@@ -25,6 +26,7 @@
       error: "Не удалось отправить обращение. Проверьте данные или напишите на email.",
       invalid: "Проверьте, пожалуйста, обязательные поля.",
       blocked: "Не удалось отправить форму. Подождите несколько секунд и попробуйте ещё раз.",
+      verification: "Подтвердите, пожалуйста, что вы не робот.",
       submit: "Отправить обращение",
       fields: { name: "Имя", reply: "Контакт", channel: "Способ связи", language: "Язык", format: "Формат", service: "Тип консультации", timezone: "Страна или часовой пояс", availability: "Удобное время", message: "Сообщение" }
     }
@@ -64,6 +66,9 @@
     const honeypot = form.querySelector("[name='website']");
     const startedAtField = form.querySelector("[name='startedAt']");
     const endpoint = String(config.formEndpoint || "").trim();
+    const turnstileSiteKey = String(config.turnstileSiteKey || "").trim();
+    let turnstileWidgetId = null;
+    let turnstileToken = "";
     let openedAt = Date.now();
     let interacted = false;
     let submitting = false;
@@ -83,7 +88,8 @@
         format: String(data.get("format") || "").trim(), service: String(data.get("service") || "").trim(),
         timezone: String(data.get("timezone") || "").trim(), availability: String(data.get("availability") || "").trim(),
         message: String(data.get("message") || "").trim(),
-        consent: data.get("consent") === "on", locale, subject: text.subject, source: window.location.href
+        consent: data.get("consent") === "on", locale, subject: text.subject, source: window.location.href,
+        "cf-turnstile-response": turnstileToken
       };
     };
 
@@ -102,6 +108,49 @@
       window.location.href = `mailto:${email}?subject=${encodeURIComponent(text.subject)}&body=${encodeURIComponent(body)}`;
     };
 
+    const resetTurnstile = () => {
+      turnstileToken = "";
+      if (window.turnstile && turnstileWidgetId !== null) window.turnstile.reset(turnstileWidgetId);
+    };
+
+    const initTurnstile = () => {
+      if (!turnstileSiteKey || config.formMode !== "formspree") return;
+      const actions = form.querySelector(".form-actions");
+      if (!actions || form.querySelector("[data-turnstile-container]")) return;
+      const container = document.createElement("div");
+      container.dataset.turnstileContainer = "";
+      container.className = "form-turnstile";
+      container.style.cssText = "min-height:65px;margin:4px 0 18px;";
+      container.setAttribute("aria-label", locale === "ru" ? "Проверка безопасности" : "Перевірка безпеки");
+      actions.before(container);
+
+      const render = () => {
+        if (!window.turnstile || turnstileWidgetId !== null) return;
+        turnstileWidgetId = window.turnstile.render(container, {
+          sitekey: turnstileSiteKey,
+          theme: "light",
+          size: "flexible",
+          callback: (token) => { turnstileToken = String(token || ""); if (status?.dataset.state === "error") setState("idle", ""); },
+          "expired-callback": () => { turnstileToken = ""; },
+          "error-callback": () => { turnstileToken = ""; setState("error", text.verification); }
+        });
+      };
+
+      let script = document.querySelector("script[data-alina-turnstile]");
+      if (window.turnstile) { render(); return; }
+      if (!script) {
+        script = document.createElement("script");
+        script.src = "https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit";
+        script.defer = true;
+        script.dataset.alinaTurnstile = "";
+        document.head.appendChild(script);
+      }
+      script.addEventListener("load", render, { once: true });
+      script.addEventListener("error", () => setState("error", text.verification), { once: true });
+    };
+
+    initTurnstile();
+
     const markInteraction = () => { interacted = true; };
     form.addEventListener("pointerdown", markInteraction, { passive: true });
     form.addEventListener("keydown", markInteraction);
@@ -117,6 +166,7 @@
       const meaningful = payload.name.length > 0 && payload.reply.length > 2 && payload.message.length > 2 && payload.consent;
       if (trapped || elapsed < 1500 || !interacted) { setState("error", text.blocked); return; }
       if (!meaningful) { setState("error", text.invalid); return; }
+      if (config.formMode === "formspree" && turnstileSiteKey && !turnstileToken) { setState("error", text.verification); return; }
       submitting = true;
       setState("loading", text.loading);
       if (!endpoint || config.formMode === "mailto") {
@@ -134,13 +184,14 @@
         if (!response.ok) { const requestError = new Error(`HTTP ${response.status}`); requestError.status = response.status; throw requestError; }
         form.reset(); openedAt = Date.now(); interacted = false;
         if (startedAtField) startedAtField.value = String(openedAt);
+        resetTurnstile();
         setState("success", text.sent);
       } catch (error) {
         console.error("Contact form submission failed", error);
         const statusCode = Number(error?.status || 0);
         const recoverable = error?.name === "AbortError" || statusCode === 0 || statusCode >= 500;
         if (recoverable) { setState("error", text.fallback); window.setTimeout(() => mailtoFallback(payload), reducedMotion ? 0 : 360); }
-        else setState("error", text.error);
+        else { resetTurnstile(); setState("error", text.error); }
       } finally { window.clearTimeout(timeoutId); submitting = false; }
     });
   };
