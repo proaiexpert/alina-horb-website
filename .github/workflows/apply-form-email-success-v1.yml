@@ -1,0 +1,56 @@
+name: Apply compact form email and success UX V1
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'scripts/apply-form-email-success-v1.py'
+      - '.github/workflows/apply-form-email-success-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    if: github.head_ref == 'feature/form-email-success-v1'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/form-email-success-v1
+          fetch-depth: 0
+
+      - name: Apply compact form patch
+        run: python3 scripts/apply-form-email-success-v1.py
+
+      - name: Validate source and production runtime
+        run: |
+          python3 scripts/validate-consultations-pages-v1.py
+          cp assets/js/site.v2.js /tmp/site.v2.source.js
+          python3 scripts/apply-turnstile-v3-2.py
+          node --check assets/js/site.v2.js
+          grep -Fq 'providerPayloadFrom(payload)' assets/js/site.v2.js
+          grep -Fq '"cf-turnstile-response": turnstileToken' assets/js/site.v2.js
+          grep -Fq 'showSuccessConfirmation();' assets/js/site.v2.js
+          mv /tmp/site.v2.source.js assets/js/site.v2.js
+          python3 -m py_compile scripts/apply-turnstile-v3-2.py scripts/validate-form-hardening.py scripts/validate-consultations-pages-v1.py scripts/validate-privacy-intake.py
+          ! grep -R -n --include='index.html' 'name="language"' index.html ru/index.html consultations/index.html ru/consultations/index.html
+          grep -Fq 'data-form-success' index.html
+          grep -Fq 'data-form-success' ru/index.html
+          grep -Fq 'data-form-success' consultations/index.html
+          grep -Fq 'data-form-success' ru/consultations/index.html
+
+      - name: Commit form improvements
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No form changes to commit'
+            exit 0
+          fi
+          git commit -m 'Simplify intake email and add visible success confirmation'
+          git push origin HEAD:feature/form-email-success-v1
