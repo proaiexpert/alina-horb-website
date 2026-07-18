@@ -1,0 +1,50 @@
+name: Apply SEO launch indexing V1
+
+on:
+  push:
+    branches:
+      - feature/seo-launch-indexing-v1
+    paths:
+      - 'scripts/apply-seo-launch-indexing-v1.py'
+      - '.github/workflows/apply-seo-launch-indexing-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout SEO feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: feature/seo-launch-indexing-v1
+          fetch-depth: 0
+
+      - name: Apply SEO launch patch
+        run: python3 scripts/apply-seo-launch-indexing-v1.py
+
+      - name: Validate patched source
+        run: |
+          python3 -m py_compile scripts/apply-indexing-launch-v3-2.py scripts/audit-seo-launch-v1.py scripts/validate-release-readiness.py scripts/validate-privacy-intake.py scripts/audit-post-refactor-tails-v1.py scripts/audit-launch-readiness-v1.py
+          grep -Fq 'noindex, follow' privacy/index.html
+          grep -Fq 'noindex, follow' ru/privacy/index.html
+          ! grep -Fq 'https://alinahorb.com/privacy/' sitemap.xml
+          ! grep -Fq 'https://alinahorb.com/ru/privacy/' sitemap.xml
+          ! grep -R -n --include='index.html' '<meta property="og:image:type" content="image/jpeg">' notes/*/index.html ru/notes/*/index.html
+          grep -Fq 'Как начать разговор, когда трудно сформулировать запрос' ru/notes/index.html
+          grep -Fq 'CollectionPage' notes/index.html
+          grep -Fq 'CollectionPage' ru/notes/index.html
+
+      - name: Commit SEO changes
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          if git diff --cached --quiet; then
+            echo 'No SEO changes to commit'
+            exit 0
+          fi
+          git commit -m 'Apply SEO launch indexing improvements'
+          git push origin HEAD:feature/seo-launch-indexing-v1
