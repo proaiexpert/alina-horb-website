@@ -1,0 +1,66 @@
+name: Audit SEO launch and indexing V1
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**/*.html'
+      - 'robots.txt'
+      - 'sitemap.xml'
+      - 'scripts/apply-indexing-launch-v3-2.py'
+      - 'scripts/audit-seo-launch-v1.py'
+      - 'scripts/validate-release-readiness.py'
+      - 'scripts/validate-privacy-intake.py'
+      - '.github/workflows/audit-seo-launch-indexing-v1.yml'
+      - '.github/workflows/deploy-pages.yml'
+  push:
+    branches:
+      - main
+    paths:
+      - '**/*.html'
+      - 'robots.txt'
+      - 'sitemap.xml'
+      - 'scripts/apply-indexing-launch-v3-2.py'
+      - 'scripts/audit-seo-launch-v1.py'
+      - 'scripts/validate-release-readiness.py'
+      - 'scripts/validate-privacy-intake.py'
+      - '.github/workflows/audit-seo-launch-indexing-v1.yml'
+      - '.github/workflows/deploy-pages.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  seo-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout tested commit
+        uses: actions/checkout@v4
+
+      - name: Simulate production transforms
+        run: |
+          python3 scripts/apply-notes-images-v3-1.py
+          python3 scripts/patch-notes-validator-expectations-v3-1.py
+          python3 scripts/apply-turnstile-v3-2.py
+          python3 scripts/apply-indexing-launch-v3-2.py
+          python3 scripts/apply-social-favicon-v3-3.py
+
+      - name: Run SEO launch contract
+        env:
+          AUDIT_STRICT: '1'
+        run: |
+          python3 scripts/audit-seo-launch-v1.py
+          python3 scripts/validate-release-readiness.py
+          python3 scripts/validate-privacy-intake.py
+
+      - name: Upload SEO report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: seo-launch-indexing-v1
+          path: qa/seo-launch-v1
+          retention-days: 14
+          if-no-files-found: warn
