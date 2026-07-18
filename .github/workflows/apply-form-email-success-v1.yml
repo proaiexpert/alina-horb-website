@@ -32,6 +32,11 @@ jobs:
           path = Path('scripts/apply-form-email-success-v1.py')
           text = path.read_text(encoding='utf-8')
           text = text.replace("new_contact = '''  const initContactForm", "new_contact = r'''  const initContactForm", 1)
+          text = text.replace(
+              "js, count = re.subn(r'  const initContactForm = \\(\\) => \\{.*?\\n  \\};\\n\\n  const initMobileBookingCta', new_contact + \"\\n  const initMobileBookingCta\", js, count=1, flags=re.S)",
+              "js, count = re.subn(r'  const initContactForm = \\(\\) => \\{.*?\\n  \\};\\n\\n  const initMobileBookingCta', lambda _: new_contact + \"\\n  const initMobileBookingCta\", js, count=1, flags=re.S)",
+              1,
+          )
           text = text.replace("turnstile = '''#!/usr/bin/env python3", 'turnstile = r"""#!/usr/bin/env python3', 1)
           text = text.replace("print(\"Cloudflare Turnstile runtime applied\")\n'''\nwrite(\"scripts/apply-turnstile-v3-2.py\", turnstile)", "print(\"Cloudflare Turnstile runtime applied\")\n\"\"\"\nwrite(\"scripts/apply-turnstile-v3-2.py\", turnstile)", 1)
           text = text.replace("validate_form = '''#!/usr/bin/env python3", "validate_form = r'''#!/usr/bin/env python3", 1)
