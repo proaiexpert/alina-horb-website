@@ -1,0 +1,55 @@
+name: QA localized form success V1
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - 'index.html'
+      - 'ru/index.html'
+      - 'consultations/index.html'
+      - 'ru/consultations/index.html'
+      - 'assets/js/site.v2.js'
+      - 'assets/css/site.intake.v3-2.css'
+      - 'scripts/apply-turnstile-v3-2.py'
+      - 'scripts/test-form-success-v1.mjs'
+      - '.github/workflows/qa-form-success-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  form-success:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout tested commit
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install browser runtime
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Serve static site
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/alina-form-test-server.log 2>&1 &
+          for attempt in {1..20}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/alina-form-test-server.log
+          exit 1
+
+      - name: Test compact payload and localized confirmation
+        env:
+          FORM_TEST_BASE_URL: http://127.0.0.1:4173
+        run: node scripts/test-form-success-v1.mjs
