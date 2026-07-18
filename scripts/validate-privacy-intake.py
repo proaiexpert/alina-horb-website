@@ -9,6 +9,7 @@ OLD_EMAIL = "alinahorb1991@gmail.com"
 FORM_ENDPOINT = "https://formspree.io/f/mvzezana"
 TURNSTILE_SITE_KEY = "0x4AAAAAAD2wlldaSXK8Bp9f"
 PUBLIC_ROBOTS = '<meta name="robots" content="index, follow, max-image-preview:large">'
+# The public privacy pages must identify every external processor used by the production form and typography stack.
 
 
 def require(path: Path, *needles: str) -> str:
@@ -58,6 +59,9 @@ def main() -> None:
         'href="https://alinahorb.com/privacy/"',
         'hreflang="ru" href="https://alinahorb.com/ru/privacy/"',
         "Неекстрений характер сайту",
+        "Formspree",
+        "Cloudflare Turnstile",
+        "Google Fonts",
         PUBLIC_ROBOTS,
         'data-site-footer="canonical"',
         'href="../">alinahorb.com</a>',
@@ -68,6 +72,9 @@ def main() -> None:
         'href="https://alinahorb.com/ru/privacy/"',
         'hreflang="uk" href="https://alinahorb.com/privacy/"',
         "Неэкстренный характер сайта",
+        "Formspree",
+        "Cloudflare Turnstile",
+        "Google Fonts",
         PUBLIC_ROBOTS,
         'data-site-footer="canonical"',
         'href="../">alinahorb.com</a>',
