@@ -31,8 +31,11 @@ jobs:
           from pathlib import Path
           path = Path('scripts/apply-form-email-success-v1.py')
           text = path.read_text(encoding='utf-8')
+          text = text.replace("new_contact = '''  const initContactForm", "new_contact = r'''  const initContactForm", 1)
           text = text.replace("turnstile = '''#!/usr/bin/env python3", 'turnstile = r"""#!/usr/bin/env python3', 1)
           text = text.replace("print(\"Cloudflare Turnstile runtime applied\")\n'''\nwrite(\"scripts/apply-turnstile-v3-2.py\", turnstile)", "print(\"Cloudflare Turnstile runtime applied\")\n\"\"\"\nwrite(\"scripts/apply-turnstile-v3-2.py\", turnstile)", 1)
+          text = text.replace("validate_form = '''#!/usr/bin/env python3", "validate_form = r'''#!/usr/bin/env python3", 1)
+          text = text.replace("consult_validator = '''#!/usr/bin/env python3", "consult_validator = r'''#!/usr/bin/env python3", 1)
           path.write_text(text, encoding='utf-8')
           PY
           python3 scripts/apply-form-email-success-v1.py 2>&1 | tee form-migration.log
