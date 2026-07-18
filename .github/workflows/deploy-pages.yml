@@ -61,6 +61,7 @@ jobs:
           python3 scripts/validate-article-relocation.py
           python3 scripts/validate-notes-hub-v32.py
           python3 scripts/validate-release-readiness.py
+          python3 scripts/audit-seo-launch-v1.py
 
       - name: Prepare public site artifact
         shell: bash
@@ -122,6 +123,10 @@ jobs:
           grep -q 'content="index, follow, max-image-preview:large"' _site/ru/about/index.html
           grep -q 'content="index, follow, max-image-preview:large"' _site/consultations/index.html
           grep -q 'content="index, follow, max-image-preview:large"' _site/ru/consultations/index.html
+          grep -q 'content="noindex, follow"' _site/privacy/index.html
+          grep -q 'content="noindex, follow"' _site/ru/privacy/index.html
+          ! grep -q 'https://alinahorb.com/privacy/' _site/sitemap.xml
+          ! grep -q 'https://alinahorb.com/ru/privacy/' _site/sitemap.xml
           grep -q 'alina-horb-og-ua-v2.jpg' _site/index.html
           grep -q 'alina-horb-og-ru-v2.jpg' _site/ru/index.html
           grep -q 'href="/favicon.ico"' _site/index.html

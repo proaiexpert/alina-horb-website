@@ -5,7 +5,8 @@ import xml.etree.ElementTree as ET
 
 ROOT = Path(__file__).resolve().parents[1]
 BASE = "https://alinahorb.com"
-ROBOTS_META = "index, follow, max-image-preview:large"
+PUBLIC_ROBOTS = "index, follow, max-image-preview:large"
+PRIVATE_ROBOTS = "noindex, follow"
 VERSION = "20260717-ux1"
 
 ROUTES = [
@@ -30,6 +31,8 @@ ROUTES = [
 ]
 
 ARTICLE_PATHS = {path for path, *_ in ROUTES if "notes/" in path and path not in {"notes/index.html", "ru/notes/index.html"}}
+PRIVACY_PATHS = {"privacy/index.html", "ru/privacy/index.html"}
+INDEXABLE_PATHS = {path for path, *_ in ROUTES} - PRIVACY_PATHS
 errors = []
 
 
@@ -53,8 +56,10 @@ for relative, canonical, ua_url, ru_url in ROUTES:
 
     require(count(r"<title>.*?</title>", text) == 1, f"{relative}: expected one title")
     require(count(r'<meta\s+name="description"\s+content="[^"]+"\s*/?>', text) == 1, f"{relative}: expected one meta description")
-    require(text.count(f'<meta name="robots" content="{ROBOTS_META}">') == 1, f"{relative}: public indexing directive missing")
-    require("noindex" not in text.lower(), f"{relative}: noindex remains after launch")
+    expected_robots = PRIVATE_ROBOTS if relative in PRIVACY_PATHS else PUBLIC_ROBOTS
+    require(text.count(f'<meta name="robots" content="{expected_robots}">') == 1, f"{relative}: indexing directive mismatch")
+    if relative in INDEXABLE_PATHS:
+        require("noindex" not in text.lower(), f"{relative}: noindex remains after launch")
     require(text.count(f'<link rel="canonical" href="{canonical}">') == 1, f"{relative}: canonical mismatch")
     require(text.count(f'<link rel="alternate" hreflang="uk" href="{ua_url}">') == 1, f"{relative}: UA hreflang mismatch")
     require(text.count(f'<link rel="alternate" hreflang="ru" href="{ru_url}">') == 1, f"{relative}: RU hreflang mismatch")
@@ -84,6 +89,7 @@ for relative, canonical, ua_url, ru_url in ROUTES:
         require(count(r'<meta\s+property="og:image"\s+content="https://alinahorb\.com/[^"]+"\s*/?>', text) == 1, f"{relative}: OG image missing")
         require(count(r'<meta\s+property="og:image:width"\s+content="\d+"\s*/?>', text) == 1, f"{relative}: OG image width missing")
         require(count(r'<meta\s+property="og:image:height"\s+content="\d+"\s*/?>', text) == 1, f"{relative}: OG image height missing")
+        require('<meta property="og:image:type" content="image/webp">' in text, f"{relative}: OG image MIME mismatch")
         require('has-editorial-rail' in text and 'editorial-rail-placeholder' in text, f"{relative}: stable article rail geometry missing")
 
 for home in (ROOT / "index.html", ROOT / "ru/index.html"):
@@ -117,7 +123,7 @@ if sitemap_path.is_file():
     root = ET.parse(sitemap_path).getroot()
     namespace = {"sm": "http://www.sitemaps.org/schemas/sitemap/0.9"}
     locations = [node.text for node in root.findall("sm:url/sm:loc", namespace)]
-    expected = [canonical for _, canonical, _, _ in ROUTES]
+    expected = [canonical for path, canonical, _, _ in ROUTES if path in INDEXABLE_PATHS]
     require(locations == expected, f"sitemap route/order mismatch: {locations}")
     require(len(locations) == len(set(locations)) == len(expected), "sitemap duplicates or missing URLs")
 
@@ -143,4 +149,4 @@ if errors:
         print(f"- {error}")
     raise SystemExit(1)
 
-print(f"Release readiness validation passed for {len(ROUTES)} publicly indexable routes")
+print(f"Release readiness validation passed for {len(INDEXABLE_PATHS)} indexable routes and {len(PRIVACY_PATHS)} noindex privacy routes")
