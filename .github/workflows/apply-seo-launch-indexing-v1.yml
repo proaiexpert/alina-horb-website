@@ -25,7 +25,10 @@ jobs:
           fetch-depth: 0
 
       - name: Apply SEO launch patch
-        run: python3 scripts/apply-seo-launch-indexing-v1.py
+        run: |
+          python3 scripts/apply-seo-launch-indexing-v1.py
+          # A workflow file is committed separately through the GitHub API.
+          git restore .github/workflows/deploy-pages.yml
 
       - name: Validate patched source
         run: |
