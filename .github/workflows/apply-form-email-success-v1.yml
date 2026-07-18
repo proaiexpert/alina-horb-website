@@ -38,28 +38,34 @@ jobs:
           python3 scripts/apply-form-email-success-v1.py 2>&1 | tee form-migration.log
 
       - name: Validate source and production runtime
+        shell: bash
         run: |
-          python3 scripts/validate-consultations-pages-v1.py
-          cp assets/js/site.v2.js /tmp/site.v2.source.js
-          python3 scripts/apply-turnstile-v3-2.py
-          node --check assets/js/site.v2.js
-          grep -Fq 'providerPayloadFrom(payload)' assets/js/site.v2.js
-          grep -Fq '"cf-turnstile-response": turnstileToken' assets/js/site.v2.js
-          grep -Fq 'showSuccessConfirmation();' assets/js/site.v2.js
-          mv /tmp/site.v2.source.js assets/js/site.v2.js
-          python3 -m py_compile scripts/apply-turnstile-v3-2.py scripts/validate-form-hardening.py scripts/validate-consultations-pages-v1.py scripts/validate-privacy-intake.py
-          ! grep -R -n --include='index.html' 'name="language"' index.html ru/index.html consultations/index.html ru/consultations/index.html
-          grep -Fq 'data-form-success' index.html
-          grep -Fq 'data-form-success' ru/index.html
-          grep -Fq 'data-form-success' consultations/index.html
-          grep -Fq 'data-form-success' ru/consultations/index.html
+          set -o pipefail
+          {
+            python3 scripts/validate-consultations-pages-v1.py
+            cp assets/js/site.v2.js /tmp/site.v2.source.js
+            python3 scripts/apply-turnstile-v3-2.py
+            node --check assets/js/site.v2.js
+            grep -Fq 'providerPayloadFrom(payload)' assets/js/site.v2.js
+            grep -Fq '"cf-turnstile-response": turnstileToken' assets/js/site.v2.js
+            grep -Fq 'showSuccessConfirmation();' assets/js/site.v2.js
+            mv /tmp/site.v2.source.js assets/js/site.v2.js
+            python3 -m py_compile scripts/apply-turnstile-v3-2.py scripts/validate-form-hardening.py scripts/validate-consultations-pages-v1.py scripts/validate-privacy-intake.py
+            ! grep -R -n --include='index.html' 'name="language"' index.html ru/index.html consultations/index.html ru/consultations/index.html
+            grep -Fq 'data-form-success' index.html
+            grep -Fq 'data-form-success' ru/index.html
+            grep -Fq 'data-form-success' consultations/index.html
+            grep -Fq 'data-form-success' ru/consultations/index.html
+          } 2>&1 | tee form-validation.log
 
       - name: Upload migration diagnostics
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: form-migration-diagnostics
-          path: form-migration.log
+          path: |
+            form-migration.log
+            form-validation.log
           retention-days: 3
           if-no-files-found: warn
 
@@ -69,7 +75,7 @@ jobs:
           git config user.name 'github-actions[bot]'
           git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
           git add -A
-          git reset form-migration.log || true
+          git reset form-migration.log form-validation.log || true
           if git diff --cached --quiet; then
             echo 'No form changes to commit'
             exit 0
