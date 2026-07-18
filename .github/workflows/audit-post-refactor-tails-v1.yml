@@ -1,3 +1,4 @@
+# Permanent repository, live-site and responsive regression gate after the static refactor.
 name: Audit post-refactor tails V1
 
 on:
