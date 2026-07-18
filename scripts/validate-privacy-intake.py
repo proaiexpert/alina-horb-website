@@ -38,6 +38,8 @@ def main() -> None:
         'href="assets/css/site.intake.v3-2.css"',
         'href="./privacy/">Конфіденційність</a>',
         'site.navigation.v1.js?v=20260717-ux1',
+        'data-form-success',
+        'field-optional',
     )
     ru = require(
         ROOT / "ru/index.html",
@@ -53,6 +55,8 @@ def main() -> None:
         'href="../assets/css/site.intake.v3-2.css"',
         'href="./privacy/">Конфиденциальность</a>',
         'site.navigation.v1.js?v=20260717-ux1',
+        'data-form-success',
+        'field-optional',
     )
     require(
         ROOT / "privacy/index.html",
@@ -95,7 +99,7 @@ def main() -> None:
         TURNSTILE_SITE_KEY,
         'formMode: "formspree"',
     )
-    require(ROOT / "assets/css/site.intake.v3-2.css", ".form-honeypot", ".form-guidance", ".form-consent a")
+    require(ROOT / "assets/css/site.intake.v3-2.css", ".form-honeypot", ".form-guidance", ".form-consent a", ".form-success-panel", ".field-optional")
     require(ROOT / "assets/css/site.privacy.v3-2.css", ".privacy-main", ".privacy-content")
 
     production_files = [
@@ -120,6 +124,13 @@ def main() -> None:
         text = path.read_text(encoding="utf-8")
         if PRIVATE_ROBOTS not in text:
             raise AssertionError(f"Privacy indexing policy mismatch in {path.relative_to(ROOT)}")
+
+    for path in (ROOT / "index.html", ROOT / "ru/index.html"):
+        text = path.read_text(encoding="utf-8")
+        if 'name="language"' in text:
+            raise AssertionError(f"Redundant language field remains in {path.relative_to(ROOT)}")
+        if text.count('field-required') < 3 or text.count('field-optional') < 4:
+            raise AssertionError(f"Required/optional form labels missing in {path.relative_to(ROOT)}")
 
     if ua.count('name="website"') != 1 or ru.count('name="website"') != 1:
         raise AssertionError("Expected exactly one honeypot per homepage form")

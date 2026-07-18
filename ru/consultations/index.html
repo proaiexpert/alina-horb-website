@@ -249,23 +249,26 @@
         </div>
         <div class="contact-form-wrap" data-reveal>
           <h3>Короткое обращение</h3>
-          <p class="form-guidance"><strong>Нескольких предложений достаточно.</strong> Укажите удобный контакт, язык, часовой пояс и интересующий формат.</p>
+          <p class="form-guidance"><strong>Заполните имя, контакт и короткое сообщение.</strong> Остальные организационные поля — необязательные.</p>
           <form class="contact-form" data-contact-form data-locale="ru" novalidate>
             <div class="form-honeypot" aria-hidden="true"><label for="consult-website">Не заполняйте это поле</label><input id="consult-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
             <input name="startedAt" type="hidden" value="">
-            <div class="form-field"><label for="consult-name">Имя</label><input id="consult-name" name="name" type="text" autocomplete="name" required maxlength="100"></div>
-            <div class="form-field"><label for="consult-reply">Ваш контакт</label><input id="consult-reply" name="reply" type="text" autocomplete="off" required maxlength="160" placeholder="@username или email"></div>
-            <div class="form-field"><label for="consult-channel">Как удобно ответить</label><select id="consult-channel" name="channel" required><option value="" selected disabled>Выберите способ</option><option value="Telegram">Telegram</option><option value="Instagram">Instagram</option><option value="Email">Email</option></select></div>
-            <div class="form-field"><label for="consult-language">Удобный язык</label><select id="consult-language" name="language" required><option value="" selected disabled>Выберите язык</option><option value="Украинский">Украинский</option><option value="Русский">Русский</option></select></div>
-            <div class="form-field form-field-full"><label for="consult-service">Какой формат вас интересует</label><select id="consult-service" name="service" required><option value="" selected disabled>Выберите формат</option><option value="Индивидуальная онлайн-консультация">Индивидуальная онлайн-консультация</option><option value="Парная или семейная консультация">Парная или семейная консультация</option><option value="Очная консультация по согласованию">Очная консультация по согласованию</option><option value="Нужна помощь с выбором формата">Нужна помощь с выбором формата</option></select></div>
-            <div class="form-field"><label for="consult-timezone">Страна или часовой пояс</label><input id="consult-timezone" name="timezone" type="text" autocomplete="country-name" required maxlength="100" placeholder="Например, Германия / CET"></div>
-            <div class="form-field"><label for="consult-availability">Удобное время для связи</label><input id="consult-availability" name="availability" type="text" autocomplete="off" maxlength="160" placeholder="Дни или примерное время"></div>
-            <input name="format" type="hidden" value="Консультация со страницы условий">
-            <div class="form-field form-field-full"><label for="consult-message">Коротко о запросе или вопросе</label><textarea id="consult-message" name="message" required minlength="3" maxlength="600" aria-describedby="consult-message-help"></textarea><p id="consult-message-help" class="form-privacy-note">Не нужно подробно описывать травматический опыт или отправлять документы. Достаточно нескольких предложений.</p></div>
+            <div class="form-field"><label for="consult-name">Имя<span class="field-flag field-required">обязательно</span></label><input id="consult-name" name="name" type="text" autocomplete="name" required maxlength="100"></div>
+            <div class="form-field"><label for="consult-reply">Ваш контакт<span class="field-flag field-required">обязательно</span></label><input id="consult-reply" name="reply" type="text" autocomplete="off" required maxlength="160" placeholder="@username, телефон или email"></div>
+            <div class="form-field"><label for="consult-channel">Как удобнее ответить<span class="field-flag field-optional">необязательно</span></label><select id="consult-channel" name="channel"><option value="" selected>Можно не выбирать</option><option value="Telegram">Telegram</option><option value="Instagram">Instagram</option><option value="Email">Email</option><option value="Телефон">Телефон</option></select></div>
+            <div class="form-field form-field-full"><label for="consult-service">Формат консультации<span class="field-flag field-optional">необязательно</span></label><select id="consult-service" name="service"><option value="" selected>Можно не выбирать</option><option value="Индивидуальная онлайн-консультация">Индивидуальная онлайн-консультация</option><option value="Парная или семейная консультация">Парная или семейная консультация</option><option value="Очная консультация по согласованию">Очная консультация по согласованию</option><option value="Нужна помощь с выбором формата">Нужна помощь с выбором формата</option></select></div>
+            <div class="form-field"><label for="consult-timezone">Страна или часовой пояс<span class="field-flag field-optional">необязательно</span></label><input id="consult-timezone" name="timezone" type="text" autocomplete="country-name" maxlength="100" placeholder="Например, Германия / CET"></div>
+            <div class="form-field"><label for="consult-availability">Удобное время для связи<span class="field-flag field-optional">необязательно</span></label><input id="consult-availability" name="availability" type="text" autocomplete="off" maxlength="160" placeholder="Дни или примерное время"></div>
+            <div class="form-field form-field-full"><label for="consult-message">Коротко о запросе или вопросе<span class="field-flag field-required">обязательно</span></label><textarea id="consult-message" name="message" required minlength="3" maxlength="600" aria-describedby="consult-message-help"></textarea><p id="consult-message-help" class="form-privacy-note">Достаточно нескольких предложений. Не отправляйте документы, платёжные данные или подробное описание кризисной ситуации.</p></div>
             <label class="form-consent" for="consult-consent"><input id="consult-consent" name="consent" type="checkbox" required><span>Я соглашаюсь на отправку обращения и обработку указанных контактных данных для ответа в соответствии с <a href="../privacy/">Политикой конфиденциальности</a>.</span></label>
             <div class="form-actions"><button class="button button-filled" type="submit">Отправить обращение</button></div>
             <p class="form-status" data-form-status data-state="idle" aria-live="polite"></p>
           </form>
+          <div class="form-success-panel" data-form-success hidden tabindex="-1" role="status" aria-live="polite">
+            <p class="section-kicker">Обращение отправлено</p>
+            <h3>Спасибо. Сообщение получено.</h3>
+            <p>Алина ответит по указанному контакту и предложит доступное время или уточнит организационные детали.</p>
+          </div>
         </div>
       </div>
     </section>

@@ -267,7 +267,7 @@
         <div class="contact-copy" data-reveal>
           <p class="section-kicker">Перший крок</p>
           <h2 id="contact-title">Контакти і запис</h2>
-          <p>Одна коротка форма допоможе узгодити зручний спосіб зв’язку, мову та формат консультації.</p>
+          <p>Одна коротка форма допоможе залишити контакт і, за бажанням, вказати зручний час та формат консультації.</p>
           <ul class="contact-list">
             <li><strong>Telegram</strong><a class="contact-link" data-telegram-link href="https://t.me/alina_horb1991" target="_blank" rel="noopener noreferrer">@alina_horb1991</a></li>
             <li><strong>Instagram</strong><a class="contact-link" href="https://instagram.com/ng_alina_dp" target="_blank" rel="noopener noreferrer">@ng_alina_dp</a></li>
@@ -278,20 +278,26 @@
         </div>
         <div class="contact-form-wrap" data-reveal>
           <h3>Коротке звернення</h3>
-          <p class="form-guidance"><strong>Для першого контакту достатньо кількох речень.</strong> Не надсилайте медичні документи, діагнози, копії посвідчень, платіжні дані або докладний опис кризової ситуації.</p>
+          <p class="form-guidance"><strong>Заповніть ім’я, контакт і коротке повідомлення.</strong> Решта організаційних полів — необов’язкові.</p>
           <form class="contact-form" data-contact-form data-locale="uk" novalidate>
             <div class="form-honeypot" aria-hidden="true"><label for="contact-website">Не заповнюйте це поле</label><input id="contact-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
             <input name="startedAt" type="hidden" value="">
-            <div class="form-field"><label for="contact-name">Ім’я</label><input id="contact-name" name="name" type="text" autocomplete="name" required maxlength="100"></div>
-            <div class="form-field"><label for="contact-reply">Ваш контакт</label><input id="contact-reply" name="reply" type="text" autocomplete="off" required maxlength="160" placeholder="@username або email"></div>
-            <div class="form-field"><label for="contact-channel">Як зручно відповісти</label><select id="contact-channel" name="channel" required><option value="" selected disabled>Оберіть спосіб</option><option value="Telegram">Telegram</option><option value="Instagram">Instagram</option><option value="Email">Email</option></select></div>
-            <div class="form-field"><label for="contact-language">Зручна мова</label><select id="contact-language" name="language" required><option value="" selected disabled>Оберіть мову</option><option value="Українська">Українська</option><option value="Російська">Російська</option></select></div>
-            <div class="form-field form-field-full"><label for="contact-format">Бажаний формат</label><select id="contact-format" name="format" required><option value="" selected disabled>Оберіть формат</option><option value="Онлайн">Онлайн</option><option value="Очно за попереднім погодженням">Очно за попереднім погодженням</option></select></div>
-            <div class="form-field form-field-full"><label for="contact-message">Коротко про запит або запитання</label><textarea id="contact-message" name="message" required minlength="3" maxlength="600" aria-describedby="contact-message-help"></textarea><p id="contact-message-help" class="form-privacy-note">Коротко опишіть організаційне запитання або те, з чим хотіли б звернутися. Екстрені звернення через форму не обробляються.</p></div>
+            <div class="form-field"><label for="contact-name">Ім’я<span class="field-flag field-required">обов’язково</span></label><input id="contact-name" name="name" type="text" autocomplete="name" required maxlength="100"></div>
+            <div class="form-field"><label for="contact-reply">Ваш контакт<span class="field-flag field-required">обов’язково</span></label><input id="contact-reply" name="reply" type="text" autocomplete="off" required maxlength="160" placeholder="@username, телефон або email"></div>
+            <div class="form-field"><label for="contact-channel">Як зручніше відповісти<span class="field-flag field-optional">необов’язково</span></label><select id="contact-channel" name="channel"><option value="" selected>Можна не обирати</option><option value="Telegram">Telegram</option><option value="Instagram">Instagram</option><option value="Email">Email</option><option value="Телефон">Телефон</option></select></div>
+            <div class="form-field form-field-full"><label for="contact-service">Формат консультації<span class="field-flag field-optional">необов’язково</span></label><select id="contact-service" name="service"><option value="" selected>Можна не обирати</option><option value="Онлайн">Онлайн</option><option value="Очно за попереднім погодженням">Очно за попереднім погодженням</option><option value="Потрібна допомога з вибором формату">Потрібна допомога з вибором формату</option></select></div>
+            <div class="form-field"><label for="contact-timezone">Країна або часовий пояс<span class="field-flag field-optional">необов’язково</span></label><input id="contact-timezone" name="timezone" type="text" autocomplete="country-name" maxlength="100" placeholder="Наприклад, Німеччина / CET"></div>
+            <div class="form-field"><label for="contact-availability">Зручний час для зв’язку<span class="field-flag field-optional">необов’язково</span></label><input id="contact-availability" name="availability" type="text" autocomplete="off" maxlength="160" placeholder="Дні або приблизний час"></div>
+            <div class="form-field form-field-full"><label for="contact-message">Коротко про запит або запитання<span class="field-flag field-required">обов’язково</span></label><textarea id="contact-message" name="message" required minlength="3" maxlength="600" aria-describedby="contact-message-help"></textarea><p id="contact-message-help" class="form-privacy-note">Достатньо кількох речень. Не надсилайте документи, платіжні дані або докладний опис кризової ситуації.</p></div>
             <label class="form-consent" for="contact-consent"><input id="contact-consent" name="consent" type="checkbox" required><span>Я погоджуюся на надсилання звернення та обробку вказаних контактних даних для відповіді відповідно до <a href="privacy/">Політики конфіденційності</a>.</span></label>
             <div class="form-actions"><button class="button button-filled" type="submit">Надіслати звернення</button></div>
             <p class="form-status" data-form-status data-state="idle" aria-live="polite"></p>
           </form>
+          <div class="form-success-panel" data-form-success hidden tabindex="-1" role="status" aria-live="polite">
+            <p class="section-kicker">Звернення надіслано</p>
+            <h3>Дякуємо. Повідомлення отримано.</h3>
+            <p>Аліна відповість за вказаним контактом і запропонує доступний час або уточнить організаційні деталі.</p>
+          </div>
         </div>
       </div>
     </section>

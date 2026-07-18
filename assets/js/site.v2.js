@@ -6,27 +6,27 @@
   const copy = {
     uk: {
       subject: "Звернення через сайт Аліни Горб",
-      loading: "Готуємо звернення…",
+      loading: "Надсилаємо звернення…",
       success: "Звернення підготовлено. Відкриваємо поштову програму.",
-      sent: "Звернення надіслано. Аліна відповість через обраний канал зв’язку.",
+      sent: "Звернення надіслано.",
       fallback: "Сервіс форми тимчасово недоступний. Відкриваємо поштову програму, щоб звернення не втратилося.",
       error: "Не вдалося надіслати звернення. Перевірте дані або напишіть на email.",
       invalid: "Перевірте, будь ласка, обов’язкові поля.",
       blocked: "Не вдалося надіслати форму. Зачекайте кілька секунд і спробуйте ще раз.",
       submit: "Надіслати звернення",
-      fields: { name: "Ім’я", reply: "Контакт", channel: "Спосіб зв’язку", language: "Мова", format: "Формат", service: "Тип консультації", timezone: "Країна або часовий пояс", availability: "Зручний час", message: "Повідомлення" }
+      fields: { name: "Ім’я", reply: "Контакт", channel: "Як відповісти", service: "Формат консультації", timezone: "Країна або часовий пояс", availability: "Зручний час", message: "Повідомлення" }
     },
     ru: {
       subject: "Обращение через сайт Алины Горб",
-      loading: "Готовим обращение…",
+      loading: "Отправляем обращение…",
       success: "Обращение подготовлено. Открываем почтовую программу.",
-      sent: "Обращение отправлено. Алина ответит через выбранный канал связи.",
+      sent: "Обращение отправлено.",
       fallback: "Сервис формы временно недоступен. Открываем почтовую программу, чтобы обращение не потерялось.",
       error: "Не удалось отправить обращение. Проверьте данные или напишите на email.",
       invalid: "Проверьте, пожалуйста, обязательные поля.",
       blocked: "Не удалось отправить форму. Подождите несколько секунд и попробуйте ещё раз.",
       submit: "Отправить обращение",
-      fields: { name: "Имя", reply: "Контакт", channel: "Способ связи", language: "Язык", format: "Формат", service: "Тип консультации", timezone: "Страна или часовой пояс", availability: "Удобное время", message: "Сообщение" }
+      fields: { name: "Имя", reply: "Контакт", channel: "Как ответить", service: "Формат консультации", timezone: "Страна или часовой пояс", availability: "Удобное время", message: "Сообщение" }
     }
   };
 
@@ -60,6 +60,7 @@
     const locale = form.dataset.locale === "ru" ? "ru" : "uk";
     const text = copy[locale];
     const status = form.querySelector("[data-form-status]");
+    const successPanel = form.parentElement?.querySelector("[data-form-success]");
     const button = form.querySelector("button[type='submit']");
     const honeypot = form.querySelector("[name='website']");
     const startedAtField = form.querySelector("[name='startedAt']");
@@ -78,20 +79,38 @@
     const payloadFromForm = () => {
       const data = new FormData(form);
       return {
-        name: String(data.get("name") || "").trim(), reply: String(data.get("reply") || "").trim(),
-        channel: String(data.get("channel") || "").trim(), language: String(data.get("language") || "").trim(),
-        format: String(data.get("format") || "").trim(), service: String(data.get("service") || "").trim(),
-        timezone: String(data.get("timezone") || "").trim(), availability: String(data.get("availability") || "").trim(),
+        name: String(data.get("name") || "").trim(),
+        reply: String(data.get("reply") || "").trim(),
+        channel: String(data.get("channel") || "").trim(),
+        service: String(data.get("service") || "").trim(),
+        timezone: String(data.get("timezone") || "").trim(),
+        availability: String(data.get("availability") || "").trim(),
         message: String(data.get("message") || "").trim(),
-        consent: data.get("consent") === "on", locale, subject: text.subject, source: window.location.href
+        consent: data.get("consent") === "on"
       };
+    };
+
+    const providerPayloadFrom = (payload) => {
+      const fields = text.fields;
+      const provider = {
+        subject: text.subject,
+        [fields.name]: payload.name,
+        [fields.reply]: payload.reply,
+        [fields.message]: payload.message
+      };
+      if (payload.channel) provider[fields.channel] = payload.channel;
+      if (payload.service) provider[fields.service] = payload.service;
+      if (payload.timezone) provider[fields.timezone] = payload.timezone;
+      if (payload.availability) provider[fields.availability] = payload.availability;
+      return provider;
     };
 
     const mailtoFallback = (payload) => {
       const fields = text.fields;
       const body = [
-        `${fields.name}: ${payload.name}`, `${fields.reply}: ${payload.reply}`, `${fields.channel}: ${payload.channel}`,
-        `${fields.language}: ${payload.language}`, `${fields.format}: ${payload.format}`,
+        `${fields.name}: ${payload.name}`,
+        `${fields.reply}: ${payload.reply}`,
+        payload.channel ? `${fields.channel}: ${payload.channel}` : null,
         payload.service ? `${fields.service}: ${payload.service}` : null,
         payload.timezone ? `${fields.timezone}: ${payload.timezone}` : null,
         payload.availability ? `${fields.availability}: ${payload.availability}` : null,
@@ -100,6 +119,17 @@
       const email = String(config.email || "hello@alinahorb.com").trim();
       setState("success", text.success);
       window.location.href = `mailto:${email}?subject=${encodeURIComponent(text.subject)}&body=${encodeURIComponent(body)}`;
+    };
+
+    const showSuccessConfirmation = () => {
+      setState("success", text.sent);
+      form.hidden = true;
+      if (!successPanel) return;
+      successPanel.hidden = false;
+      window.requestAnimationFrame(() => {
+        successPanel.focus({ preventScroll: true });
+        successPanel.scrollIntoView({ behavior: reducedMotion ? "auto" : "smooth", block: "center" });
+      });
     };
 
     const markInteraction = () => { interacted = true; };
@@ -129,12 +159,12 @@
         const response = await fetch(endpoint, {
           method: "POST",
           headers: { "Content-Type": "application/json", "Accept": "application/json" },
-          body: JSON.stringify(payload), signal: controller.signal
+          body: JSON.stringify(providerPayloadFrom(payload)), signal: controller.signal
         });
         if (!response.ok) { const requestError = new Error(`HTTP ${response.status}`); requestError.status = response.status; throw requestError; }
         form.reset(); openedAt = Date.now(); interacted = false;
         if (startedAtField) startedAtField.value = String(openedAt);
-        setState("success", text.sent);
+        showSuccessConfirmation();
       } catch (error) {
         console.error("Contact form submission failed", error);
         const statusCode = Number(error?.status || 0);

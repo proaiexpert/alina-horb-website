@@ -249,23 +249,26 @@
         </div>
         <div class="contact-form-wrap" data-reveal>
           <h3>Коротке звернення</h3>
-          <p class="form-guidance"><strong>Кількох речень достатньо.</strong> Вкажіть зручний контакт, мову, часовий пояс і формат, який вас цікавить.</p>
+          <p class="form-guidance"><strong>Заповніть ім’я, контакт і коротке повідомлення.</strong> Решта організаційних полів — необов’язкові.</p>
           <form class="contact-form" data-contact-form data-locale="uk" novalidate>
             <div class="form-honeypot" aria-hidden="true"><label for="consult-website">Не заповнюйте це поле</label><input id="consult-website" name="website" type="text" tabindex="-1" autocomplete="off"></div>
             <input name="startedAt" type="hidden" value="">
-            <div class="form-field"><label for="consult-name">Ім’я</label><input id="consult-name" name="name" type="text" autocomplete="name" required maxlength="100"></div>
-            <div class="form-field"><label for="consult-reply">Ваш контакт</label><input id="consult-reply" name="reply" type="text" autocomplete="off" required maxlength="160" placeholder="@username або email"></div>
-            <div class="form-field"><label for="consult-channel">Як зручно відповісти</label><select id="consult-channel" name="channel" required><option value="" selected disabled>Оберіть спосіб</option><option value="Telegram">Telegram</option><option value="Instagram">Instagram</option><option value="Email">Email</option></select></div>
-            <div class="form-field"><label for="consult-language">Зручна мова</label><select id="consult-language" name="language" required><option value="" selected disabled>Оберіть мову</option><option value="Українська">Українська</option><option value="Російська">Російська</option></select></div>
-            <div class="form-field form-field-full"><label for="consult-service">Який формат вас цікавить</label><select id="consult-service" name="service" required><option value="" selected disabled>Оберіть формат</option><option value="Індивідуальна онлайн-консультація">Індивідуальна онлайн-консультація</option><option value="Парна або сімейна консультація">Парна або сімейна консультація</option><option value="Очна консультація за погодженням">Очна консультація за погодженням</option><option value="Потрібна допомога з вибором формату">Потрібна допомога з вибором формату</option></select></div>
-            <div class="form-field"><label for="consult-timezone">Країна або часовий пояс</label><input id="consult-timezone" name="timezone" type="text" autocomplete="country-name" required maxlength="100" placeholder="Наприклад, Німеччина / CET"></div>
-            <div class="form-field"><label for="consult-availability">Зручний час для зв’язку</label><input id="consult-availability" name="availability" type="text" autocomplete="off" maxlength="160" placeholder="Дні або приблизний час"></div>
-            <input name="format" type="hidden" value="Консультація зі сторінки умов">
-            <div class="form-field form-field-full"><label for="consult-message">Коротко про запит або запитання</label><textarea id="consult-message" name="message" required minlength="3" maxlength="600" aria-describedby="consult-message-help"></textarea><p id="consult-message-help" class="form-privacy-note">Не потрібно докладно описувати травматичний досвід або надсилати документи. Достатньо кількох речень.</p></div>
+            <div class="form-field"><label for="consult-name">Ім’я<span class="field-flag field-required">обов’язково</span></label><input id="consult-name" name="name" type="text" autocomplete="name" required maxlength="100"></div>
+            <div class="form-field"><label for="consult-reply">Ваш контакт<span class="field-flag field-required">обов’язково</span></label><input id="consult-reply" name="reply" type="text" autocomplete="off" required maxlength="160" placeholder="@username, телефон або email"></div>
+            <div class="form-field"><label for="consult-channel">Як зручніше відповісти<span class="field-flag field-optional">необов’язково</span></label><select id="consult-channel" name="channel"><option value="" selected>Можна не обирати</option><option value="Telegram">Telegram</option><option value="Instagram">Instagram</option><option value="Email">Email</option><option value="Телефон">Телефон</option></select></div>
+            <div class="form-field form-field-full"><label for="consult-service">Формат консультації<span class="field-flag field-optional">необов’язково</span></label><select id="consult-service" name="service"><option value="" selected>Можна не обирати</option><option value="Індивідуальна онлайн-консультація">Індивідуальна онлайн-консультація</option><option value="Парна або сімейна консультація">Парна або сімейна консультація</option><option value="Очна консультація за погодженням">Очна консультація за погодженням</option><option value="Потрібна допомога з вибором формату">Потрібна допомога з вибором формату</option></select></div>
+            <div class="form-field"><label for="consult-timezone">Країна або часовий пояс<span class="field-flag field-optional">необов’язково</span></label><input id="consult-timezone" name="timezone" type="text" autocomplete="country-name" maxlength="100" placeholder="Наприклад, Німеччина / CET"></div>
+            <div class="form-field"><label for="consult-availability">Зручний час для зв’язку<span class="field-flag field-optional">необов’язково</span></label><input id="consult-availability" name="availability" type="text" autocomplete="off" maxlength="160" placeholder="Дні або приблизний час"></div>
+            <div class="form-field form-field-full"><label for="consult-message">Коротко про запит або запитання<span class="field-flag field-required">обов’язково</span></label><textarea id="consult-message" name="message" required minlength="3" maxlength="600" aria-describedby="consult-message-help"></textarea><p id="consult-message-help" class="form-privacy-note">Достатньо кількох речень. Не надсилайте документи, платіжні дані або докладний опис кризової ситуації.</p></div>
             <label class="form-consent" for="consult-consent"><input id="consult-consent" name="consent" type="checkbox" required><span>Я погоджуюся на надсилання звернення та обробку вказаних контактних даних для відповіді відповідно до <a href="../privacy/">Політики конфіденційності</a>.</span></label>
             <div class="form-actions"><button class="button button-filled" type="submit">Надіслати звернення</button></div>
             <p class="form-status" data-form-status data-state="idle" aria-live="polite"></p>
           </form>
+          <div class="form-success-panel" data-form-success hidden tabindex="-1" role="status" aria-live="polite">
+            <p class="section-kicker">Звернення надіслано</p>
+            <h3>Дякуємо. Повідомлення отримано.</h3>
+            <p>Аліна відповість за вказаним контактом і запропонує доступний час або уточнить організаційні деталі.</p>
+          </div>
         </div>
       </div>
     </section>
