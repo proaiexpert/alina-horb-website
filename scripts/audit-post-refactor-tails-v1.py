@@ -27,6 +27,7 @@ ROUTES = [
     "/notes/stress-relocation-and-lost-support/", "/ru/notes/stress-relocation-and-lost-support/",
     "/privacy/", "/ru/privacy/",
 ]
+NOINDEX_ROUTES = {"/privacy/", "/ru/privacy/"}
 
 STALE_ASSET_CANDIDATES = [
     "assets/js/site.global-chrome.v1.js",
@@ -397,8 +398,9 @@ def main() -> int:
         if parser.h1_count != 1:
             add_issue(critical, "live-semantics", f"Live page H1 count is {parser.h1_count}", route)
         robots = (parser.meta_robots or "").lower()
-        if "noindex" in robots or "index" not in robots:
-            add_issue(critical, "live-indexing", f"Live robots meta is {parser.meta_robots!r}", route)
+        expected_robots = "noindex, follow" if route in NOINDEX_ROUTES else "index, follow, max-image-preview:large"
+        if robots != expected_robots:
+            add_issue(critical, "live-indexing", f"Expected {expected_robots!r}, found {parser.meta_robots!r}", route)
         if parser.canonical != f"{LIVE_ORIGIN}{route}":
             add_issue(critical, "live-seo", f"Live canonical mismatch: {parser.canonical!r}", route)
         if parser.html_lang != ("ru" if route.startswith("/ru/") or route == "/ru/" else "uk"):

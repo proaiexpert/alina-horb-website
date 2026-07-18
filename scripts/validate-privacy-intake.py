@@ -9,6 +9,7 @@ OLD_EMAIL = "alinahorb1991@gmail.com"
 FORM_ENDPOINT = "https://formspree.io/f/mvzezana"
 TURNSTILE_SITE_KEY = "0x4AAAAAAD2wlldaSXK8Bp9f"
 PUBLIC_ROBOTS = '<meta name="robots" content="index, follow, max-image-preview:large">'
+PRIVATE_ROBOTS = '<meta name="robots" content="noindex, follow">'
 # The public privacy pages must identify every external processor used by the production form and typography stack.
 
 
@@ -62,7 +63,7 @@ def main() -> None:
         "Formspree",
         "Cloudflare Turnstile",
         "Google Fonts",
-        PUBLIC_ROBOTS,
+        PRIVATE_ROBOTS,
         'data-site-footer="canonical"',
         'href="../">alinahorb.com</a>',
     )
@@ -75,7 +76,7 @@ def main() -> None:
         "Formspree",
         "Cloudflare Turnstile",
         "Google Fonts",
-        PUBLIC_ROBOTS,
+        PRIVATE_ROBOTS,
         'data-site-footer="canonical"',
         'href="../">alinahorb.com</a>',
     )
@@ -111,10 +112,14 @@ def main() -> None:
         if OLD_EMAIL in text:
             raise AssertionError(f"Old public Gmail remains in {path.relative_to(ROOT)}")
 
-    for path in (ROOT / "index.html", ROOT / "ru/index.html", ROOT / "privacy/index.html", ROOT / "ru/privacy/index.html"):
+    for path in (ROOT / "index.html", ROOT / "ru/index.html"):
         text = path.read_text(encoding="utf-8")
         if "noindex" in text.lower():
             raise AssertionError(f"Indexing remains blocked in {path.relative_to(ROOT)}")
+    for path in (ROOT / "privacy/index.html", ROOT / "ru/privacy/index.html"):
+        text = path.read_text(encoding="utf-8")
+        if PRIVATE_ROBOTS not in text:
+            raise AssertionError(f"Privacy indexing policy mismatch in {path.relative_to(ROOT)}")
 
     if ua.count('name="website"') != 1 or ru.count('name="website"') != 1:
         raise AssertionError("Expected exactly one honeypot per homepage form")

@@ -19,6 +19,7 @@ PAGES_ORIGIN = "https://proaiexpert.github.io/alina-horb-website"
 APEX_ORIGIN = "https://alinahorb.com"
 WWW_ORIGIN = "https://www.alinahorb.com"
 PUBLIC_ROBOTS = "index, follow, max-image-preview:large"
+PRIVATE_ROBOTS = "noindex, follow"
 EXPECTED_APEX_IPS = {
     "185.199.108.153",
     "185.199.109.153",
@@ -34,6 +35,8 @@ ROUTES = [
     "/notes/stress-relocation-and-lost-support/", "/ru/notes/stress-relocation-and-lost-support/",
     "/privacy/", "/ru/privacy/",
 ]
+NOINDEX_ROUTES = {"/privacy/", "/ru/privacy/"}
+INDEXABLE_ROUTES = [route for route in ROUTES if route not in NOINDEX_ROUTES]
 
 
 def fetch_text(url: str, timeout: int = 25) -> tuple[dict, str]:
@@ -192,7 +195,7 @@ def main() -> int:
     report["live_sitemap"] = {
         **sitemap_meta,
         "locations": sitemap_locations,
-        "expected": [canonical_for(route) for route in ROUTES],
+        "expected": [canonical_for(route) for route in INDEXABLE_ROUTES],
     }
 
     report["tls"]["apex"] = tls_probe("alinahorb.com")
@@ -219,8 +222,9 @@ def main() -> int:
         if not apex.get("ok"):
             report["critical"].append(f"Live route failed: {route}")
             continue
-        if apex.get("robots") != PUBLIC_ROBOTS:
-            report["critical"].append(f"{route}: live robots meta is {apex.get('robots')!r}")
+        expected_robots = PRIVATE_ROBOTS if route in NOINDEX_ROUTES else PUBLIC_ROBOTS
+        if apex.get("robots") != expected_robots:
+            report["critical"].append(f"{route}: live robots meta is {apex.get('robots')!r}; expected {expected_robots!r}")
         if apex.get("canonical") != expected:
             report["critical"].append(f"{route}: canonical mismatch {apex.get('canonical')!r}")
         if apex.get("hreflang_uk") != uk_url or apex.get("hreflang_ru") != ru_url:
