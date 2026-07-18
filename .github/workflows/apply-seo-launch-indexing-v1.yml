@@ -1,5 +1,6 @@
 name: Apply SEO launch indexing V1
 
+# One-time migration workflow; remove after the SEO patch is committed.
 on:
   push:
     branches:
