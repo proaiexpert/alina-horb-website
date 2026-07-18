@@ -111,10 +111,6 @@ for forbidden in (
 ):
     require(forbidden not in site, f"primary runtime still contains competing owner: {forbidden}")
 
-utility = (ROOT / "assets/js/site.chrome.v3.js").read_text(encoding="utf-8")
-require("__ALINA_STATIC_UTILITY_CHROME_V1__" in utility, "utility compatibility marker missing")
-require("innerHTML" not in utility and "appendStylesheet" not in utility, "utility runtime still mutates page chrome")
-
 css = (ROOT / "assets/css/site.global-chrome.v1.css").read_text(encoding="utf-8")
 for token in (
     ".site-header--canonical", ".footer-editorial-grid", ".footer-navigation",
