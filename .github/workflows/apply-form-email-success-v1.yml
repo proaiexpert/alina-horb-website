@@ -31,7 +31,7 @@ jobs:
           from pathlib import Path
           path = Path('scripts/apply-form-email-success-v1.py')
           text = path.read_text(encoding='utf-8')
-          text = text.replace("turnstile = '''#!/usr/bin/env python3", 'turnstile = """#!/usr/bin/env python3', 1)
+          text = text.replace("turnstile = '''#!/usr/bin/env python3", 'turnstile = r"""#!/usr/bin/env python3', 1)
           text = text.replace("print(\"Cloudflare Turnstile runtime applied\")\n'''\nwrite(\"scripts/apply-turnstile-v3-2.py\", turnstile)", "print(\"Cloudflare Turnstile runtime applied\")\n\"\"\"\nwrite(\"scripts/apply-turnstile-v3-2.py\", turnstile)", 1)
           path.write_text(text, encoding='utf-8')
           PY
