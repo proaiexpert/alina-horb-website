@@ -7,6 +7,7 @@ on:
       - main
     paths:
       - 'scripts/apply-seo-launch-indexing-v1.py'
+      - 'scripts/apply-seo-title-polish-v1.py'
       - '.github/workflows/apply-seo-launch-indexing-v1.yml'
   workflow_dispatch:
 
@@ -24,9 +25,12 @@ jobs:
           ref: feature/seo-launch-indexing-v1
           fetch-depth: 0
 
-      - name: Apply SEO launch patch
+      - name: Apply remaining SEO changes
         run: |
-          python3 scripts/apply-seo-launch-indexing-v1.py
+          if grep -R -q --include='index.html' '<meta property="og:image:type" content="image/jpeg">' notes/*/index.html ru/notes/*/index.html; then
+            python3 scripts/apply-seo-launch-indexing-v1.py
+          fi
+          python3 scripts/apply-seo-title-polish-v1.py
           # A workflow file is committed separately through the GitHub API.
           git restore .github/workflows/deploy-pages.yml
 
@@ -39,6 +43,8 @@ jobs:
           ! grep -Fq 'https://alinahorb.com/ru/privacy/' sitemap.xml
           ! grep -R -n --include='index.html' '<meta property="og:image:type" content="image/jpeg">' notes/*/index.html ru/notes/*/index.html
           grep -Fq 'Как начать разговор, когда трудно сформулировать запрос' ru/notes/index.html
+          grep -Fq 'Первая консультация с психологом: как всё проходит — Алина Горб' ru/notes/first-consultation/index.html
+          grep -Fq 'Как начать разговор с психологом без готового запроса — Алина Горб' ru/notes/how-to-start-the-conversation/index.html
           grep -Fq 'CollectionPage' notes/index.html
           grep -Fq 'CollectionPage' ru/notes/index.html
 
@@ -51,5 +57,5 @@ jobs:
             echo 'No SEO changes to commit'
             exit 0
           fi
-          git commit -m 'Apply SEO launch indexing improvements'
+          git commit -m 'Polish Russian SEO titles'
           git push origin HEAD:feature/seo-launch-indexing-v1
