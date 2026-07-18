@@ -9,6 +9,7 @@ OLD_EMAIL = "alinahorb1991@gmail.com"
 FORM_ENDPOINT = "https://formspree.io/f/mvzezana"
 TURNSTILE_SITE_KEY = "0x4AAAAAAD2wlldaSXK8Bp9f"
 PUBLIC_ROBOTS = '<meta name="robots" content="index, follow, max-image-preview:large">'
+# The public privacy pages must identify every external processor used by the production form and typography stack.
 
 
 def require(path: Path, *needles: str) -> str:
