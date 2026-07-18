@@ -21,11 +21,9 @@ jobs:
       - name: Checkout tested commit
         uses: actions/checkout@v4
 
-      - name: Run external launch audit
+      - name: Run strict post-deployment launch audit
         env:
-          # A pull request is tested before its deployment, so the live domain still represents main.
-          # Manual runs remain strict and validate the current production state.
-          AUDIT_STRICT: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
+          AUDIT_STRICT: '1'
         run: python3 scripts/audit-launch-readiness-v1.py
 
       - name: Upload launch report
