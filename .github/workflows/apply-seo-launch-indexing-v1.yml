@@ -2,9 +2,9 @@ name: Apply SEO launch indexing V1
 
 # One-time migration workflow; remove after the SEO patch is committed.
 on:
-  push:
+  pull_request:
     branches:
-      - feature/seo-launch-indexing-v1
+      - main
     paths:
       - 'scripts/apply-seo-launch-indexing-v1.py'
       - '.github/workflows/apply-seo-launch-indexing-v1.yml'
@@ -15,6 +15,7 @@ permissions:
 
 jobs:
   apply:
+    if: github.head_ref == 'feature/seo-launch-indexing-v1'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout SEO feature branch
