@@ -11,7 +11,6 @@ on:
       - 'ru/consultations/**'
       - 'notes/**'
       - 'ru/notes/**'
-      - 'assets/js/site.chrome.v3.js'
       - 'assets/css/site.notes-hub.v3-2.css'
       - 'scripts/validate-interlinking-v1.py'
       - '.github/workflows/qa-interlinking-v1.yml'
@@ -27,7 +26,6 @@ on:
       - 'ru/consultations/**'
       - 'notes/**'
       - 'ru/notes/**'
-      - 'assets/js/site.chrome.v3.js'
       - 'assets/css/site.notes-hub.v3-2.css'
       - 'scripts/validate-interlinking-v1.py'
       - '.github/workflows/qa-interlinking-v1.yml'
@@ -43,9 +41,7 @@ jobs:
       - name: Validate bilingual routes and conversion paths
         run: python3 scripts/validate-interlinking-v1.py
       - name: Check shared JavaScript syntax
-        run: |
-          node --check assets/js/site.chrome.v3.js
-          node --check assets/js/site.navigation.v1.js
+        run: node --check assets/js/site.navigation.v1.js
       - name: Verify editorial conversion markers
         run: |
           grep -Fq 'notes-hub-conversion' notes/index.html

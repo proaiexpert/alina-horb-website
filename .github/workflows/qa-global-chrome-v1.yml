@@ -4,8 +4,6 @@ on:
   pull_request:
     paths:
       - '**/*.html'
-      - 'assets/js/site.global-chrome.v1.js'
-      - 'assets/js/site.chrome.v3.js'
       - 'assets/js/site.v2.js'
       - 'assets/js/site.navigation.v1.js'
       - 'assets/css/site.global-chrome.v1.css'
@@ -16,8 +14,6 @@ on:
       - main
     paths:
       - '**/*.html'
-      - 'assets/js/site.global-chrome.v1.js'
-      - 'assets/js/site.chrome.v3.js'
       - 'assets/js/site.v2.js'
       - 'assets/js/site.navigation.v1.js'
       - 'assets/css/site.global-chrome.v1.css'
@@ -36,8 +32,6 @@ jobs:
         run: python3 scripts/validate-global-chrome-v1.py
       - name: Check JavaScript syntax
         run: |
-          node --check assets/js/site.global-chrome.v1.js
-          node --check assets/js/site.chrome.v3.js
           node --check assets/js/site.v2.js
           node --check assets/js/site.navigation.v1.js
       - name: Reject legacy footer markup

@@ -23,7 +23,6 @@ jobs:
         run: |
           python3 scripts/apply-notes-images-v3-1.py
           python3 scripts/patch-notes-validator-expectations-v3-1.py
-          node --check assets/js/site.notes-images.v3-1.js
           python3 scripts/validate-notes-images-v3-1.py
           python3 scripts/apply-turnstile-v3-2.py
           node --check assets/js/site.v2.js

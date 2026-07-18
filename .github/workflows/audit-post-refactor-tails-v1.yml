@@ -1,0 +1,79 @@
+# Permanent repository, live-site and responsive regression gate after the static refactor.
+name: Audit post-refactor tails V1
+
+on:
+  pull_request:
+    branches:
+      - main
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  forensic-audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout tested commit
+        uses: actions/checkout@v4
+
+      - name: Run strict repository and live-site tail audit
+        env:
+          AUDIT_STRICT: '1'
+        run: python3 scripts/audit-post-refactor-tails-v1.py
+
+      - name: Upload forensic report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-refactor-tail-audit-v1
+          path: qa/post-refactor-tails
+          retention-days: 14
+          if-no-files-found: warn
+
+  browser-regression:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout tested commit
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install browser audit runtime
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+
+      - name: Serve the static site
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/alina-tail-audit-server.log 2>&1 &
+          for attempt in {1..20}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/alina-tail-audit-server.log
+          exit 1
+
+      - name: Re-run strict 18-route responsive audit
+        env:
+          AUDIT_BASE_URL: http://127.0.0.1:4173
+          AUDIT_SCREENSHOTS: '1'
+          AUDIT_STRICT: '1'
+          AUDIT_OUTPUT_DIR: qa/post-refactor-browser
+        run: node scripts/audit-final-ux-v1.mjs
+
+      - name: Upload browser regression report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-refactor-browser-audit-v1
+          path: qa/post-refactor-browser
+          retention-days: 14
+          if-no-files-found: warn

@@ -30,7 +30,6 @@ jobs:
         run: |
           python3 scripts/apply-notes-images-v3-1.py
           python3 scripts/patch-notes-validator-expectations-v3-1.py
-          node --check assets/js/site.notes-images.v3-1.js
           python3 scripts/validate-notes-images-v3-1.py
 
       - name: Build production form runtime
@@ -94,7 +93,6 @@ jobs:
           test -f _site/assets/css/site.about.v1.css
           test -f _site/assets/css/site.consultations.v1.css
           test -f _site/assets/css/site.notes-images.v3.css
-          test -f _site/assets/js/site.notes-images.v3-1.js
           test -f _site/assets/images/social/alina-horb-og-ua-v2.jpg
           test -f _site/assets/images/social/alina-horb-og-ru-v2.jpg
           test -f _site/assets/images/notes/alina-horb-note-first-consultation-v3.webp
