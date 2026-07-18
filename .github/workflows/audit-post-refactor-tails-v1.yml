@@ -18,9 +18,10 @@ jobs:
       - name: Checkout tested commit
         uses: actions/checkout@v4
 
-      - name: Run strict repository and live-site tail audit
+      - name: Run repository and live-site tail audit
         env:
-          AUDIT_STRICT: '1'
+          # On a PR, source changes are not live yet. Manual runs validate production strictly.
+          AUDIT_STRICT: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
         run: python3 scripts/audit-post-refactor-tails-v1.py
 
       - name: Upload forensic report
