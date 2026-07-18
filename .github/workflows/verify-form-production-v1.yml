@@ -1,0 +1,83 @@
+name: Verify production form UX V1
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '.github/workflows/verify-form-production-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-live-form:
+    runs-on: ubuntu-latest
+    timeout-minutes: 12
+    steps:
+      - name: Wait for deployment and verify live forms
+        shell: bash
+        run: |
+          python3 - <<'PY'
+          import time
+          import urllib.request
+
+          pages = {
+              "https://alinahorb.com/": ("data-form-success", "Дякуємо. Повідомлення отримано."),
+              "https://alinahorb.com/ru/": ("data-form-success", "Спасибо. Сообщение получено."),
+              "https://alinahorb.com/consultations/": ("field-optional", "Дякуємо. Повідомлення отримано."),
+              "https://alinahorb.com/ru/consultations/": ("field-optional", "Спасибо. Сообщение получено."),
+          }
+          js_url = "https://alinahorb.com/assets/js/site.v2.js"
+
+          def fetch(url):
+              request = urllib.request.Request(url, headers={"User-Agent": "AlinaHorbProductionFormVerifier/1.0"})
+              with urllib.request.urlopen(request, timeout=25) as response:
+                  return response.status, response.read().decode("utf-8", errors="replace")
+
+          last_errors = []
+          for attempt in range(24):
+              errors = []
+              try:
+                  for url, required in pages.items():
+                      status, body = fetch(url)
+                      if status != 200:
+                          errors.append(f"{url}: HTTP {status}")
+                          continue
+                      for needle in required:
+                          if needle not in body:
+                              errors.append(f"{url}: missing {needle!r}")
+                      if 'name="language"' in body:
+                          errors.append(f"{url}: redundant language field remains")
+                  status, js = fetch(js_url)
+                  if status != 200:
+                      errors.append(f"{js_url}: HTTP {status}")
+                  for needle in (
+                      "providerPayloadFrom(payload)",
+                      "showSuccessConfirmation();",
+                      '"cf-turnstile-response": turnstileToken',
+                      "window.turnstile.render",
+                  ):
+                      if needle not in js:
+                          errors.append(f"production JS missing {needle!r}")
+                  for forbidden in ('source: window.location.href', 'data.get("language")', 'data.get("format")'):
+                      if forbidden in js:
+                          errors.append(f"production JS still contains {forbidden!r}")
+              except Exception as error:
+                  errors.append(f"fetch error: {error}")
+
+              if not errors:
+                  print("Production form verification passed for four localized forms and transformed runtime")
+                  raise SystemExit(0)
+              last_errors = errors
+              print(f"Attempt {attempt + 1}/24: deployment not ready")
+              for error in errors:
+                  print(f"- {error}")
+              time.sleep(15)
+
+          print("Production form verification failed after deployment wait:")
+          for error in last_errors:
+              print(f"- {error}")
+          raise SystemExit(1)
+          PY
