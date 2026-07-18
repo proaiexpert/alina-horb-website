@@ -36,7 +36,9 @@ jobs:
           grep -Fq 'Google Fonts' ru/privacy/index.html
           grep -Fq 'https://alinahorb.com/privacy/</loc><lastmod>2026-07-17' sitemap.xml
           grep -Fq 'https://alinahorb.com/ru/privacy/</loc><lastmod>2026-07-17' sitemap.xml
-          test "$(git status --short | awk '{print $2}' | sort | tr '\n' ' ')" = "privacy/index.html ru/privacy/index.html scripts/validate-privacy-intake.py sitemap.xml "
+          actual="$(git status --short | awk '{print $2}' | sort | tr '\n' ' ')"
+          expected=".github/workflows/apply-privacy-processors-v2.yml privacy/index.html ru/privacy/index.html scripts/apply-privacy-processors-v2.py scripts/validate-privacy-intake.py sitemap.xml "
+          test "$actual" = "$expected"
 
       - name: Commit disclosure update
         run: |
