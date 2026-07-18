@@ -1,0 +1,47 @@
+name: Apply privacy processor disclosures V2
+
+on:
+  push:
+    branches:
+      - fix/privacy-processors-v2
+    paths:
+      - 'scripts/apply-privacy-processors-v2.py'
+      - '.github/workflows/apply-privacy-processors-v2.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  apply:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout clean feature branch
+        uses: actions/checkout@v4
+        with:
+          ref: fix/privacy-processors-v2
+          fetch-depth: 0
+
+      - name: Apply disclosures only
+        run: python3 scripts/apply-privacy-processors-v2.py
+
+      - name: Validate source changes without build-time mutation
+        run: |
+          python3 -m py_compile scripts/validate-privacy-intake.py
+          grep -Fq 'Formspree' privacy/index.html
+          grep -Fq 'Cloudflare Turnstile' privacy/index.html
+          grep -Fq 'Google Fonts' privacy/index.html
+          grep -Fq 'Formspree' ru/privacy/index.html
+          grep -Fq 'Cloudflare Turnstile' ru/privacy/index.html
+          grep -Fq 'Google Fonts' ru/privacy/index.html
+          grep -Fq 'https://alinahorb.com/privacy/</loc><lastmod>2026-07-17' sitemap.xml
+          grep -Fq 'https://alinahorb.com/ru/privacy/</loc><lastmod>2026-07-17' sitemap.xml
+          test "$(git status --short | awk '{print $2}' | sort | tr '\n' ' ')" = "privacy/index.html ru/privacy/index.html scripts/validate-privacy-intake.py sitemap.xml "
+
+      - name: Commit disclosure update
+        run: |
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A
+          git commit -m 'Disclose external form and font processors'
+          git push origin HEAD:fix/privacy-processors-v2
