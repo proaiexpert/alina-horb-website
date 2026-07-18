@@ -1,4 +1,5 @@
 name: Apply post-refactor tail cleanup V1
+# One-time branch cleanup; the script removes this workflow after success.
 
 on:
   push:
