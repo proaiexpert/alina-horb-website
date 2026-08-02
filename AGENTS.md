@@ -1,0 +1,62 @@
+# AGENTS.md
+
+## Required Read Order
+1. `AI_START_HERE.md`
+2. `AI_CURRENT_HANDOFF.md`
+3. `README.md` when present
+4. exact task-specific files and canonical documents named by the owner
+5. current branch/PR metadata when active work is referenced
+
+Do not begin broad repository exploration before completing this read order.
+
+## Default Execution Model
+- ChatGPT direct GitHub work is the default route for planning, code, content, SEO, documentation, branches, commits, pushes, and PR preparation.
+- Use one ChatGPT chat for small, scoped, reversible work.
+- Use separate ChatGPT Builder and Reviewer chats for production-facing, shared UI/JS, UA/RU parity, or medium-risk work.
+- Use Codex only when a local dev server, browser automation, screenshots, complex build/test pipelines, broad debugging, large refactoring, or prolonged terminal execution is materially required.
+- Gemini and other third-party or weak substitute models are not default workflow tools.
+
+## Chat Lifecycle
+- One Builder chat normally owns one task and one implementation branch.
+- One Reviewer chat normally owns one independent review pass.
+- Start a new chat for a new major phase, repository, architecture, or independent review.
+- Use the same Builder chat only for narrow corrections to the same branch and acceptance criteria.
+- Preserve continuity through `AI_CURRENT_HANDOFF.md`, branch, base SHA, head SHA, and exact canonical files.
+
+## Project Rules
+- Preserve the Ukrainian primary version and full Russian counterpart unless explicitly changing language architecture.
+- Preserve truthful psychologist positioning, calm editorial tone, privacy boundaries, localized URLs, canonical/hreflang relationships, and internal links.
+- Do not introduce clinical claims, invented credentials, rankings, leads, or performance claims.
+- Prefer minimal targeted changes; do not perform broad redesign or cleanup without explicit scope.
+- Read the current file before editing and do not invent paths, selectors, APIs, dependencies, or professional facts.
+
+## Independent Review
+For medium-risk or production-facing changes:
+
+- Builder works in a dedicated branch and reports base SHA, head SHA, exact files, checks, unverified items, and risks.
+- Reviewer starts in a fresh ChatGPT chat, initially read-only, and checks the actual GitHub diff.
+- Reviewer returns `ACCEPT`, `TARGETED CORRECTION`, or `REJECT`.
+
+## Git and Production Safety
+- Work in a dedicated branch.
+- Never modify `main`, merge, publish, roll back production, force-push, delete, or perform destructive operations without explicit owner authorization.
+- Commit and push only when explicitly authorized or clearly included in the task.
+- Before merge, verify base SHA, expected head SHA, changed files, mergeability, and scope.
+- Prefer squash merge when intermediate commits should not enter production history.
+
+## External Model Policy
+- Do not route ordinary work to Gemini, OpenCode, Telegram agents, or other third-party models.
+- An external model requires a concrete unique capability reason and explicit owner approval.
+
+## Handoff Maintenance
+After meaningful merged work, update `AI_CURRENT_HANDOFF.md` with current stable state, active priority, unresolved risks, canonical files, and next approved action.
+
+## Required Report
+- route used;
+- base SHA and head SHA;
+- files changed;
+- checks run;
+- verified and unverified behavior;
+- risks;
+- intentionally untouched areas;
+- next action.
