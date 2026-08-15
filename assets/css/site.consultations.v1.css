@@ -536,3 +536,42 @@ html.js .page-consultations [data-reveal].is-visible { opacity: 1; transform: tr
 @media (prefers-reduced-motion: reduce) {
   html.js .page-consultations [data-reveal] { transition: none; }
 }
+
+/* Pricing R1: primary EUR price, restrained UAH counterpart, and package detail. */
+.consult-hero-facts .consult-price-fact .price-alt {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: .015em;
+  text-transform: none;
+}
+.consult-format-grid small.consult-price-summary {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+}
+.consult-format-grid .package-price {
+  color: var(--terracotta);
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.45;
+  letter-spacing: .025em;
+}
+.condition-ledger .price-main {
+  display: block;
+}
+.condition-ledger strong .price-alt {
+  display: block;
+  margin-top: 6px;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 11px;
+  font-weight: 500;
+  line-height: 1.2;
+  letter-spacing: .015em;
+}
