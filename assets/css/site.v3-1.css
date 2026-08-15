@@ -265,6 +265,27 @@ h3 { line-height: 1.05; }
 }
 .trust-grid p:last-child { border-right: 1px solid var(--line); }
 
+.trust-grid p.trust-price {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+}
+.trust-price-primary {
+  display: block;
+  font-size: 19px;
+  line-height: 1;
+}
+.trust-price-secondary {
+  display: block;
+  color: var(--muted);
+  font-family: var(--sans);
+  font-size: 10px;
+  font-weight: 500;
+  line-height: 1.15;
+  letter-spacing: .01em;
+}
+
 .support-needs { background: var(--ivory-soft); }
 .section-heading-row {
   display: grid;
