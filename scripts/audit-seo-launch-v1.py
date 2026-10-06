@@ -15,6 +15,8 @@ from urllib.parse import urlparse
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / 'qa' / 'seo-launch-v1'
 BASE = 'https://alinahorb.com'
+PERSON_ID = f'{BASE}/#person'
+PERSON_URL = f'{BASE}/'
 PUBLIC_ROBOTS = 'index, follow, max-image-preview:large'
 PRIVATE_ROBOTS = 'noindex, follow'
 STRICT = os.environ.get('AUDIT_STRICT') == '1'
@@ -262,12 +264,32 @@ def main() -> int:
         elif route in NOTES_HUB_ROUTES:
             expected_types = {'CollectionPage', 'ItemList', 'BreadcrumbList'}
         elif route in ARTICLE_ROUTES:
-            expected_types = {'Article', 'BreadcrumbList'}
+            expected_types = {'Article', 'Person', 'BreadcrumbList'}
         else:
             expected_types = set()
         missing_types = expected_types - schema_types
         if missing_types:
             add(critical, 'structured-data', f'Missing schema types: {sorted(missing_types)}', relative)
+
+        person_nodes = [node for node in nodes if node.get('@type') == 'Person']
+        for person in person_nodes:
+            if person.get('@id') != PERSON_ID:
+                add(critical, 'entity-schema', f'Person @id must be {PERSON_ID}', relative)
+            if person.get('url') != PERSON_URL:
+                add(critical, 'entity-schema', f'Person URL must be {PERSON_URL}', relative)
+
+        if route in {'/', '/ru/'}:
+            website = next((node for node in nodes if node.get('@type') == 'WebSite'), None)
+            if not website or website.get('publisher') != {'@id': PERSON_ID}:
+                add(critical, 'entity-schema', 'WebSite publisher must reference canonical Person', relative)
+        elif route in {'/about/', '/ru/about/'}:
+            profile = next((node for node in nodes if node.get('@type') == 'ProfilePage'), None)
+            if not profile or profile.get('mainEntity') != {'@id': PERSON_ID}:
+                add(critical, 'entity-schema', 'ProfilePage mainEntity must reference canonical Person', relative)
+        elif route in {'/consultations/', '/ru/consultations/'}:
+            service = next((node for node in nodes if node.get('@type') == 'Service'), None)
+            if not service or service.get('provider') != {'@id': PERSON_ID}:
+                add(critical, 'entity-schema', 'Service provider must reference canonical Person', relative)
 
         if route in ARTICLE_ROUTES:
             article = next((node for node in nodes if node.get('@type') == 'Article'), None)
@@ -285,8 +307,11 @@ def main() -> int:
             if article.get('datePublished') > article.get('dateModified'):
                 add(critical, 'article-schema', 'datePublished must not be later than dateModified', relative)
             author = article.get('author')
-            if not isinstance(author, dict) or author.get('@type') != 'Person' or not author.get('name') or not author.get('url'):
-                add(critical, 'article-schema', 'Article author must be an identified Person with name and URL', relative)
+            if author != {'@id': PERSON_ID}:
+                add(critical, 'article-schema', 'Article author must reference canonical Person @id', relative)
+            person = next((node for node in nodes if node.get('@type') == 'Person' and node.get('@id') == PERSON_ID), None)
+            if not person or not person.get('name') or person.get('url') != PERSON_URL:
+                add(critical, 'article-schema', 'Article graph must define the canonical Person author', relative)
 
         if route in NOTES_HUB_ROUTES:
             item_list = next((node for node in nodes if node.get('@type') == 'ItemList'), None)

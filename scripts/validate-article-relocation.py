@@ -143,7 +143,7 @@ def validate_page(path: Path, expected: dict[str, str]) -> None:
     payload = json.loads(scripts[0])
     graph = payload.get("@graph", [])
     types = {item.get("@type") for item in graph if isinstance(item, dict)}
-    if not {"Article", "BreadcrumbList"}.issubset(types):
+    if not {"Article", "Person", "BreadcrumbList"}.issubset(types):
         fail(f"Structured data types missing in {rel}: {types}")
     article = next(item for item in graph if item.get("@type") == "Article")
     if article.get("datePublished") != "2026-07-14":
@@ -152,6 +152,11 @@ def validate_page(path: Path, expected: dict[str, str]) -> None:
         fail(f"Unexpected dateModified in {rel}")
     if article.get("inLanguage") != expected["lang"]:
         fail(f"Wrong structured-data language in {rel}")
+    if article.get("author") != {"@id": "https://alinahorb.com/#person"}:
+        fail(f"Article author identity mismatch in {rel}")
+    person = next(item for item in graph if item.get("@type") == "Person")
+    if person.get("@id") != "https://alinahorb.com/#person" or person.get("url") != "https://alinahorb.com/":
+        fail(f"Canonical Person identity mismatch in {rel}")
 
 
 def main() -> None:
