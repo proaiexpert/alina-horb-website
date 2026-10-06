@@ -52,7 +52,15 @@ def fetch_text(url: str, timeout: int = 25) -> tuple[dict, str]:
                 "bytes_read": len(body.encode("utf-8")),
             }, body)
     except urllib.error.HTTPError as error:
-        return ({"ok": False, "status": error.code, "final_url": error.geturl(), "error": str(error)}, "")
+        body = error.read(1_500_000).decode("utf-8", errors="replace")
+        return ({
+            "ok": False,
+            "status": error.code,
+            "final_url": error.geturl(),
+            "content_type": error.headers.get("content-type") if error.headers else None,
+            "bytes_read": len(body.encode("utf-8")),
+            "error": str(error),
+        }, body)
     except Exception as error:  # noqa: BLE001
         return ({"ok": False, "status": None, "final_url": None, "error": str(error)}, "")
 
@@ -144,6 +152,7 @@ def main() -> int:
         "live_assets": {},
         "live_robots": {},
         "live_sitemap": {},
+        "live_404": {},
         "tls": {},
         "critical": [],
         "warnings": [],
@@ -200,6 +209,14 @@ def main() -> int:
         "expected": [canonical_for(route) for route in INDEXABLE_ROUTES],
     }
 
+    missing_meta, missing_body = fetch_text(f"{APEX_ORIGIN}/__alina-horb-404-probe__/")
+    report["live_404"] = {
+        **missing_meta,
+        "custom_marker": 'data-custom-404="alinahorb"' in missing_body,
+        "noindex_follow": '<meta name="robots" content="noindex, follow">' in missing_body,
+        "canonical_present": '<link rel="canonical"' in missing_body,
+    }
+
     report["tls"]["apex"] = tls_probe("alinahorb.com")
     report["tls"]["www"] = tls_probe("www.alinahorb.com")
 
@@ -248,6 +265,10 @@ def main() -> int:
         report["critical"].append("Production Turnstile configuration/runtime is missing or stale")
     if not report["live_robots"].get("ok") or not report["live_robots"].get("allows_all") or not report["live_robots"].get("sitemap"):
         report["critical"].append("Live robots.txt is invalid")
+    custom_404 = report["live_404"]
+    if custom_404.get("status") != 404 or not custom_404.get("custom_marker") or not custom_404.get("noindex_follow") or custom_404.get("canonical_present"):
+        report["critical"].append(f"Custom 404 contract failed: {custom_404}")
+
     if report["live_sitemap"].get("locations") != report["live_sitemap"].get("expected"):
         report["critical"].append("Live sitemap route/order mismatch")
     if len(sitemap_lastmods) != len(INDEXABLE_ROUTES):
@@ -288,6 +309,7 @@ def main() -> int:
         f"GitHub Pages redirects: {sum(1 for item in report['http']['github_pages'].values() if item.get('final_url', '').startswith(APEX_ORIGIN))}/{len(ROUTES)}",
         f"Public indexing: {public_indexing_count}/{len(INDEXABLE_ROUTES)}",
         f"Privacy noindex: {privacy_noindex_count}/{len(NOINDEX_ROUTES)}",
+        f"Custom 404: {'ok' if report['live_404'].get('status') == 404 and report['live_404'].get('custom_marker') and report['live_404'].get('noindex_follow') and not report['live_404'].get('canonical_present') else 'invalid'}",
         f"Apex DNS: {'ok' if apex_answers == EXPECTED_APEX_IPS else 'mismatch'}",
         f"WWW DNS: {'ok' if 'proaiexpert.github.io' in www_cnames else 'mismatch'}",
         f"Apex TLS: {'ok' if report['tls']['apex'].get('ok') else 'unavailable'}",
