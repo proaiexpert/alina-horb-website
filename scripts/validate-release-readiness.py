@@ -95,15 +95,21 @@ for relative, canonical, ua_url, ru_url in ROUTES:
 for home in (ROOT / "index.html", ROOT / "ru/index.html"):
     if home.is_file():
         text = home.read_text(encoding="utf-8")
+        relative = home.relative_to(ROOT).as_posix()
         for css_name in (
             "site.v3-1.css", "site.v3-1-stability.css", "site.global-chrome.v1.css",
             "site.navigation.v1.css", "site.privacy.v3-2.css", "site.intake.v3-2.css",
             "site.notes-hub.v3-2.css", "site.notes-images.v3.css",
         ):
-            require(css_name in text, f"{home.relative_to(ROOT)}: explicit stylesheet missing: {css_name}")
-        require("site.footer.v3-2.css" not in text, f"{home.relative_to(ROOT)}: legacy footer stylesheet remains")
-        require('"@type": "WebSite"' in text, f"{home.relative_to(ROOT)}: WebSite schema missing")
-        require('"@type": "Person"' in text, f"{home.relative_to(ROOT)}: Person schema missing")
+            require(css_name in text, f"{relative}: explicit stylesheet missing: {css_name}")
+        require("site.footer.v3-2.css" not in text, f"{relative}: legacy footer stylesheet remains")
+        require('"@type": "Person"' in text, f"{relative}: Person schema missing")
+        if relative == "index.html":
+            require('"@type": "WebSite"' in text, "index.html: root WebSite schema missing")
+            require('"name": "Аліна Горб"' in text, "index.html: preferred site name missing")
+            require('"Алина Горб"' in text and '"alinahorb.com"' in text, "index.html: site-name alternates missing")
+        else:
+            require('"@type": "WebSite"' not in text, "ru/index.html: competing subdirectory WebSite schema remains")
 
 for css_relative in ("assets/css/site.v2.css", "assets/css/site.v3-1.css"):
     css = (ROOT / css_relative).read_text(encoding="utf-8")
