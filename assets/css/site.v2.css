@@ -4,11 +4,11 @@
   --stone: #e8ded3;
   --stone-deep: #d8c9bc;
   --sage: #929d88;
-  --sage-deep: #6f7967;
+  --sage-deep: #66705f;
   --terracotta: #a64133;
   --terracotta-dark: #7f3127;
   --graphite: #2f302d;
-  --muted: #60615b;
+  --muted: #5c5d57;
   --line: rgba(47, 48, 45, 0.18);
   --line-strong: rgba(47, 48, 45, 0.34);
   --serif: "Cormorant Garamond", Georgia, serif;
@@ -337,7 +337,7 @@ h3 { line-height: 1.05; }
 
 .principles-section { background: var(--sage-deep); color: var(--ivory-soft); }
 .principles-layout { display: grid; grid-template-columns: .82fr 1.18fr; gap: 78px; }
-.principles-layout .section-kicker { color: var(--ivory-soft); opacity: .95; }
+.principles-layout .section-kicker { color: var(--ivory-soft); opacity: .96; }
 .principles-intro p { max-width: 430px; color: rgba(255,255,255,.92); }
 .principles-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid rgba(255,255,255,.36); }
 .principles-list li { display: grid; grid-template-columns: 190px 1fr; gap: 28px; padding: 17px 0; border-bottom: 1px solid rgba(255,255,255,.28); }
