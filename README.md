@@ -31,8 +31,11 @@ The production domain is live with HTTPS. The 16 public UA/RU routes are indexab
 - clear consultation, process, FAQ, professional-boundary, and contact sections;
 - bilingual Notes hubs and localized article routes;
 - structured first-contact pathways and direct contact options;
+- production Formspree intake with Turnstile anti-spam and bilingual privacy pages;
 - approved portrait, logo, diploma, and editorial asset system;
 - keyboard support, visible focus states, reduced-motion handling, and no-JavaScript fallbacks;
+- automated SEO/indexing, browser regression, performance-readiness, and accessibility release gates;
+- strict post-deploy checks against the real production domain;
 - custom-domain GitHub Pages deployment with apex and `www` routing.
 
 ## Language and search architecture
@@ -94,7 +97,7 @@ Major changes should preserve:
 
 This repository is the canonical production source for `alinahorb.com`.
 
-The live website, bilingual structure, responsive homepage, Notes routes, custom domain, production form, public asset system, and technical search-indexing baseline are implemented. Google Search Console coverage and actual search-engine indexing remain external verification tasks; planned work must not be described as already implemented.
+The live website, bilingual structure, responsive homepage, Notes/article system, custom domain, production form, privacy layer, public asset system, technical search-indexing baseline, performance checks, and automated accessibility gate are implemented. Google Search Console coverage remains the main external search-verification task and requires account access. Client/professional policy details must not be invented when they have not been explicitly confirmed.
 
 Detailed governance and implementation records remain under `docs/`, including:
 

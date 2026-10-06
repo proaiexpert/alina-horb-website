@@ -10,7 +10,7 @@ Primary bilingual website for psychologist Alina Horb.
 - The website and the ProAI Expert portfolio case are separate repositories and should not be confused.
 
 ## Current Priority
-Current owner-directed priority: search-indexing verification and SEO hardening. Public routes must remain indexable at source and in the deployed artifact; Google Search Console coverage is a separate external verification task.
+The non-Google technical hardening pass is complete: public indexing controls, sitemap/robots/canonical/hreflang, structured data, SERP-title cleanup, live post-deploy SEO checks, performance-readiness checks, and automated accessibility checks are implemented. Google Search Console coverage remains a separate external verification task that requires account access.
 
 ## Canonical Entry Files
 1. `AGENTS.md`
@@ -34,7 +34,7 @@ Current owner-directed priority: search-indexing verification and SEO hardening.
 - merge/publication, rollback, force-push, deletion, or destructive operations.
 
 ## Next Approved Action
-Install the strict post-deploy live-production SEO guard so every successful main deployment verifies the real `alinahorb.com` routes, robots directives, canonicals, hreflang, sitemap, DNS/TLS, and production form assets. After that, inspect Google Search Console coverage when access is available.
+Do not start another broad redesign or speculative SEO rewrite by default. When Google Search Console access is restored, inspect sitemap processing, Google-selected canonicals, and per-URL indexing for the 16 public routes. Separately, any changes to jurisdiction, minors/couples policy, confidentiality/records practice, or acute-risk procedures require confirmed client/professional input before publication.
 
 ## Mechanical State Rule
 Always fetch current refs and SHAs. Do not assume an old chat or handoff contains current mechanical Git state.
