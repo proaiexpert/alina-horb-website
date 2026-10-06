@@ -337,7 +337,7 @@ h3 { line-height: 1.05; }
 
 .principles-section { background: var(--sage-deep); color: var(--ivory-soft); }
 .principles-layout { display: grid; grid-template-columns: .82fr 1.18fr; gap: 78px; }
-.principles-layout .section-kicker { color: var(--ivory-soft); opacity: .96; }
+.principles-layout .section-kicker { color: var(--ivory-soft); opacity: 1; }
 .principles-intro p { max-width: 430px; color: rgba(255,255,255,.92); }
 .principles-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid rgba(255,255,255,.36); }
 .principles-list li { display: grid; grid-template-columns: 190px 1fr; gap: 28px; padding: 17px 0; border-bottom: 1px solid rgba(255,255,255,.28); }
@@ -725,7 +725,7 @@ button.contact-link { border: 0; padding: 0; background: transparent; }
   border: 1px solid rgba(198, 83, 63, .32);
   padding: 22px 24px;
   background: rgba(198, 83, 63, .055);
-  color: var(--muted);
+  color: var(--graphite);
   font-size: 14px;
   line-height: 1.75;
 }
