@@ -304,7 +304,7 @@ html.js .page-about-profile [data-reveal].is-visible {
   margin-bottom: clamp(46px, 6vw, 76px);
 }
 
-.profile-position .section-kicker { color: #f0b3a8; }
+.profile-position .section-kicker { color: #faf0ed; }
 
 .position-principles {
   position: relative;
@@ -322,7 +322,7 @@ html.js .page-about-profile [data-reveal].is-visible {
 
 .position-principles article:first-child { padding-left: 0; }
 .position-principles article:last-child { border-right: 0; padding-right: 0; }
-.position-principles span { color: #f0b3a8; font-family: var(--serif); font-size: 24px; }
+.position-principles span { color: #faf0ed; font-family: var(--serif); font-size: 24px; }
 
 .position-principles h3 {
   margin: 36px 0 15px;
@@ -333,7 +333,7 @@ html.js .page-about-profile [data-reveal].is-visible {
 
 .position-principles p {
   margin: 0;
-  color: rgba(250,247,241,.78);
+  color: rgba(250,247,241,.92);
   font-size: 14px;
   line-height: 1.76;
 }
