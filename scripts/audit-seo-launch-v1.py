@@ -205,8 +205,9 @@ def main() -> int:
             add(critical, 'title', 'Document title is missing', relative)
         else:
             titles.append(title)
-            if len(title) < 25 or len(title) > 75:
-                add(warnings, 'title-length', f'Title length is {len(title)} characters', relative)
+            max_title_length = 60 if indexable else 75
+            if len(title) < 25 or len(title) > max_title_length:
+                add(warnings, 'title-length', f'Title length is {len(title)} characters; target max is {max_title_length}', relative)
         if not description:
             add(critical, 'description', 'Meta description is missing', relative)
         else:
