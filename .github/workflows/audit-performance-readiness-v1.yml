@@ -1,0 +1,30 @@
+name: Audit performance readiness V1
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**/*.html'
+      - 'assets/css/**'
+      - 'assets/js/**'
+      - 'assets/images/**'
+      - 'scripts/audit-performance-readiness-v1.py'
+      - '.github/workflows/audit-performance-readiness-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Checkout tested commit
+        uses: actions/checkout@v4
+
+      - name: Run strict performance readiness audit
+        env:
+          AUDIT_STRICT: '1'
+        run: python3 scripts/audit-performance-readiness-v1.py
