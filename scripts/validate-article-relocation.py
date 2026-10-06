@@ -146,6 +146,8 @@ def validate_page(path: Path, expected: dict[str, str]) -> None:
     if not {"Article", "BreadcrumbList"}.issubset(types):
         fail(f"Structured data types missing in {rel}: {types}")
     article = next(item for item in graph if item.get("@type") == "Article")
+    if article.get("datePublished") != "2026-07-14":
+        fail(f"Unexpected datePublished in {rel}")
     if article.get("dateModified") != "2026-07-15":
         fail(f"Unexpected dateModified in {rel}")
     if article.get("inLanguage") != expected["lang"]:
