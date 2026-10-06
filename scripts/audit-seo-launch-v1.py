@@ -255,8 +255,10 @@ def main() -> int:
                 add(critical, 'structured-data', 'Indexable page has no JSON-LD', relative)
 
         expected_types: set[str]
-        if route in {'/', '/ru/'}:
+        if route == '/':
             expected_types = {'WebSite', 'Person'}
+        elif route == '/ru/':
+            expected_types = {'Person'}
         elif route in {'/about/', '/ru/about/'}:
             expected_types = {'ProfilePage', 'Person', 'BreadcrumbList'}
         elif route in {'/consultations/', '/ru/consultations/'}:
@@ -278,10 +280,18 @@ def main() -> int:
             if person.get('url') != PERSON_URL:
                 add(critical, 'entity-schema', f'Person URL must be {PERSON_URL}', relative)
 
-        if route in {'/', '/ru/'}:
+        if route == '/':
             website = next((node for node in nodes if node.get('@type') == 'WebSite'), None)
             if not website or website.get('publisher') != {'@id': PERSON_ID}:
                 add(critical, 'entity-schema', 'WebSite publisher must reference canonical Person', relative)
+            if not website or website.get('url') != BASE + '/' or website.get('name') != 'Аліна Горб':
+                add(critical, 'site-name', 'Root WebSite must use canonical URL and preferred site name', relative)
+            alternate_names = website.get('alternateName', []) if website else []
+            if not isinstance(alternate_names, list) or 'Алина Горб' not in alternate_names or 'alinahorb.com' not in alternate_names:
+                add(critical, 'site-name', 'Root WebSite alternateName must include RU name and domain fallback', relative)
+        elif route == '/ru/':
+            if any(node.get('@type') == 'WebSite' for node in nodes):
+                add(critical, 'site-name', 'Subdirectory homepage must not define a competing WebSite site-name node', relative)
         elif route in {'/about/', '/ru/about/'}:
             profile = next((node for node in nodes if node.get('@type') == 'ProfilePage'), None)
             if not profile or profile.get('mainEntity') != {'@id': PERSON_ID}:
