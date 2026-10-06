@@ -40,7 +40,7 @@ INDEXABLE_ROUTES = [route for route in ROUTES if route not in NOINDEX_ROUTES]
 
 
 def fetch_text(url: str, timeout: int = 25) -> tuple[dict, str]:
-    request = urllib.request.Request(url, headers={"User-Agent": "AlinaHorbLaunchAudit/1.1"})
+    request = urllib.request.Request(url, headers={"User-Agent": "AlinaHorbLaunchAudit/1.2"})
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:
             body = response.read(1_500_000).decode("utf-8", errors="replace")
@@ -192,9 +192,11 @@ def main() -> int:
 
     sitemap_meta, sitemap_body = fetch_text(f"{APEX_ORIGIN}/sitemap.xml")
     sitemap_locations = re.findall(r"<loc>([^<]+)</loc>", sitemap_body)
+    sitemap_lastmods = re.findall(r"<lastmod>([^<]+)</lastmod>", sitemap_body)
     report["live_sitemap"] = {
         **sitemap_meta,
         "locations": sitemap_locations,
+        "lastmods": sitemap_lastmods,
         "expected": [canonical_for(route) for route in INDEXABLE_ROUTES],
     }
 
@@ -248,6 +250,14 @@ def main() -> int:
         report["critical"].append("Live robots.txt is invalid")
     if report["live_sitemap"].get("locations") != report["live_sitemap"].get("expected"):
         report["critical"].append("Live sitemap route/order mismatch")
+    if len(sitemap_lastmods) != len(INDEXABLE_ROUTES):
+        report["critical"].append(f"Live sitemap lastmod coverage mismatch: {len(sitemap_lastmods)}/{len(INDEXABLE_ROUTES)}")
+    else:
+        for value in sitemap_lastmods:
+            try:
+                datetime.strptime(value, "%Y-%m-%d")
+            except ValueError:
+                report["critical"].append(f"Live sitemap has invalid lastmod date: {value!r}")
 
     for hostname in ("apex", "www"):
         tls = report["tls"][hostname]
@@ -263,12 +273,21 @@ def main() -> int:
     (OUTPUT / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
     turnstile_ok = config.get("turnstile_site_key") and runtime.get("turnstile")
+    public_indexing_count = sum(
+        1 for route in INDEXABLE_ROUTES
+        if report["http"]["apex"].get(route, {}).get("robots") == PUBLIC_ROBOTS
+    )
+    privacy_noindex_count = sum(
+        1 for route in NOINDEX_ROUTES
+        if report["http"]["apex"].get(route, {}).get("robots") == PRIVATE_ROBOTS
+    )
     lines = [
         "Alina Horb launch readiness V1",
         f"Generated: {report['generated_at']}",
         f"Live routes: {sum(1 for item in report['http']['apex'].values() if item.get('ok'))}/{len(ROUTES)} reachable",
         f"GitHub Pages redirects: {sum(1 for item in report['http']['github_pages'].values() if item.get('final_url', '').startswith(APEX_ORIGIN))}/{len(ROUTES)}",
-        f"Public indexing: {sum(1 for item in report['http']['apex'].values() if item.get('robots') == PUBLIC_ROBOTS)}/{len(ROUTES)}",
+        f"Public indexing: {public_indexing_count}/{len(INDEXABLE_ROUTES)}",
+        f"Privacy noindex: {privacy_noindex_count}/{len(NOINDEX_ROUTES)}",
         f"Apex DNS: {'ok' if apex_answers == EXPECTED_APEX_IPS else 'mismatch'}",
         f"WWW DNS: {'ok' if 'proaiexpert.github.io' in www_cnames else 'mismatch'}",
         f"Apex TLS: {'ok' if report['tls']['apex'].get('ok') else 'unavailable'}",
