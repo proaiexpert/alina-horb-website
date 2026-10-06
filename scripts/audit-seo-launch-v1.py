@@ -286,6 +286,13 @@ def main() -> int:
             profile = next((node for node in nodes if node.get('@type') == 'ProfilePage'), None)
             if not profile or profile.get('mainEntity') != {'@id': PERSON_ID}:
                 add(critical, 'entity-schema', 'ProfilePage mainEntity must reference canonical Person', relative)
+            if not profile or not valid_iso_date(profile.get('dateCreated')) or not valid_iso_date(profile.get('dateModified')):
+                add(critical, 'profile-schema', 'ProfilePage must define valid dateCreated and dateModified', relative)
+            elif profile.get('dateCreated') > profile.get('dateModified'):
+                add(critical, 'profile-schema', 'ProfilePage dateCreated must not be later than dateModified', relative)
+            person = next((node for node in nodes if node.get('@type') == 'Person' and node.get('@id') == PERSON_ID), None)
+            if not person or person.get('mainEntityOfPage') != canonical or not person.get('description') or not person.get('image') or not person.get('sameAs'):
+                add(critical, 'profile-schema', 'Profile Person must include page link, description, image and sameAs', relative)
         elif route in {'/consultations/', '/ru/consultations/'}:
             service = next((node for node in nodes if node.get('@type') == 'Service'), None)
             if not service or service.get('provider') != {'@id': PERSON_ID}:
