@@ -32,7 +32,7 @@ Do not add titles such as psychotherapist, clinical psychologist, medical psycho
 - No city, address, Germany, Khust, phone, WhatsApp, map, or office hours may be published at this stage.
 - Audience wording: people of different ages, couples, and families; work with minors is agreed separately.
 - Session duration: 50 minutes.
-- Standard individual consultation: 50 minutes — 35 EUR (1,600 UAH). Package of 10 individual consultations: 270 EUR (12,320 UAH).
+- Standard individual consultation: 50 minutes — 35 EUR (1,600 UAH). Package of 10 individual consultations: 240 EUR (12,320 UAH).
 
 ## Confirmed focus areas
 
