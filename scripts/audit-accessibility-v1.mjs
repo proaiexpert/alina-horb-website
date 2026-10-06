@@ -26,7 +26,8 @@ const routes = [
   "/notes/stress-relocation-and-lost-support/",
   "/ru/notes/stress-relocation-and-lost-support/",
   "/privacy/",
-  "/ru/privacy/"
+  "/ru/privacy/",
+  "/404.html"
 ];
 
 const viewports = [
