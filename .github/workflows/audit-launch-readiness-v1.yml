@@ -8,6 +8,11 @@ on:
       - 'scripts/audit-launch-readiness-v1.py'
       - '.github/workflows/audit-launch-readiness-v1.yml'
       - 'CNAME'
+  workflow_run:
+    workflows:
+      - 'Deploy Alina Horb website'
+    types:
+      - completed
   workflow_dispatch:
 
 permissions:
@@ -15,17 +20,29 @@ permissions:
 
 jobs:
   audit:
+    if: ${{ github.event_name != 'workflow_run' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.head_branch == 'main') }}
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
       - name: Checkout tested commit
+        if: ${{ github.event_name != 'workflow_run' }}
         uses: actions/checkout@v4
+
+      - name: Checkout deployed commit
+        if: ${{ github.event_name == 'workflow_run' }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Allow production edge to settle
+        if: ${{ github.event_name == 'workflow_run' }}
+        run: sleep 20
 
       - name: Run external launch audit
         env:
-          # A pull request is tested before its deployment, so the live domain still represents main.
-          # Manual runs remain strict and validate the current production state.
-          AUDIT_STRICT: ${{ github.event_name == 'workflow_dispatch' && '1' || '0' }}
+          # Pull requests are advisory because live production still represents main.
+          # Manual runs and post-deploy workflow_run checks are strict against the live domain.
+          AUDIT_STRICT: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_run') && '1' || '0' }}
         run: python3 scripts/audit-launch-readiness-v1.py
 
       - name: Upload launch report

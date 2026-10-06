@@ -34,7 +34,7 @@ Current owner-directed priority: search-indexing verification and SEO hardening.
 - merge/publication, rollback, force-push, deletion, or destructive operations.
 
 ## Next Approved Action
-Continue the owner-directed indexing/SEO hardening sequence: verify source/deployment parity, sitemap freshness, and then inspect Google Search Console coverage when access is available.
+Install the strict post-deploy live-production SEO guard so every successful main deployment verifies the real `alinahorb.com` routes, robots directives, canonicals, hreflang, sitemap, DNS/TLS, and production form assets. After that, inspect Google Search Console coverage when access is available.
 
 ## Mechanical State Rule
 Always fetch current refs and SHAs. Do not assume an old chat or handoff contains current mechanical Git state.
