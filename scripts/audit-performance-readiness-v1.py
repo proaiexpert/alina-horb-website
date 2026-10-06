@@ -72,12 +72,17 @@ for relative in PUBLIC_PAGES:
     parser.feed(text)
 
     # Rendering stability and eager-resource sanity.
+    seen_eager_images: set[Path] = set()
     for image in parser.images:
         src = image.get("src", "")
         if not image.get("width") or not image.get("height"):
             critical.append(f"{relative}: image lacks explicit width/height: {src}")
         target = local_path(src, path)
         if target and target.is_file() and image.get("loading", "").lower() != "lazy":
+            resolved = target.resolve()
+            if resolved in seen_eager_images:
+                continue
+            seen_eager_images.add(resolved)
             size = target.stat().st_size
             if size > 500_000:
                 critical.append(f"{relative}: eager image exceeds 500 KB: {src} ({size} bytes)")
