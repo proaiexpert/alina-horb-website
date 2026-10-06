@@ -56,7 +56,7 @@ for relative, expected in PAGES.items():
     require('name="channel" required' not in text and 'name="service" required' not in text and 'name="timezone" required' not in text and 'name="availability" required' not in text, f"{relative}: optional field is still required")
     require('site-config.v2.js' in text and 'site.v2.js' in text, f"{relative}: form runtime missing")
     require('site.consultations.v1.css' in text, f"{relative}: page stylesheet missing")
-    require('50' in text and '35 €' in text and '1 600 грн' in text and '12 320 грн' in text and '270 €' in text, f"{relative}: confirmed duration/price missing")
+    require('50' in text and '35 €' in text and '1 600 грн' in text and '12 320 грн' in text and '240 €' in text, f"{relative}: confirmed duration/price missing")
     require(all(token not in text for token in ('20 €', '1 000 грн', '770 грн', '7 700 грн', '"price": "20"', '"price": "600"')), f"{relative}: legacy price remains")
     require(not re.search(r'(?<!\\d[ \\u00A0])\\b600 грн\\b', text), f"{relative}: standalone legacy 600 грн remains")
     require('financialstreamllc@gmail.com' not in text and 'alinahorb1991@gmail.com' not in text, f"{relative}: legacy email found")
