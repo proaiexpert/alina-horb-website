@@ -1,6 +1,6 @@
 # Alina Horb Website — Roadmap
 
-Last updated: 2026-07-14
+Last updated: 2026-10-06
 
 This roadmap separates completed foundations, active work, release gates, and post-launch improvements. It is not a marketing promise or release-date commitment.
 
@@ -133,157 +133,158 @@ The raw research pack is supporting material. The synthesis document is the adop
 
 ---
 
+
 ## Phase 7 — Privacy, legal, and production form
 
-**Status: Active — production privacy/form controls deployed; professional-policy confirmations remain**
+**Status: Active — technical implementation complete; client/professional confirmations remain**
 
-Required work:
+Delivered:
 
-- Ukrainian privacy-policy page;
-- Russian privacy-policy page;
-- review of service-information or terms content where appropriate;
-- confirmation of jurisdiction and client-location limits;
-- review of minors, couples, confidentiality, records, and acute-risk procedures;
-- replace temporary `mailto:` form with a privacy-reviewed endpoint;
-- minimal data collection;
-- server-side validation;
-- anti-spam protection;
-- clear success and error states;
+- Ukrainian and Russian privacy-policy pages;
+- production Formspree endpoint;
+- minimal intake fields, client-side validation, honeypot/timing protections and request timeout;
+- Cloudflare Turnstile anti-spam protection;
+- localized success/error/fallback states;
 - provider and retention disclosure;
-- warning not to submit medical, crisis, or emergency information.
+- warnings not to submit medical documents, payment data or detailed crisis information;
+- automated form/runtime QA.
 
-Telegram remains the primary direct channel.
+Remaining external confirmations:
 
-The remaining professional-policy confirmations do not change the current technical indexing state: public routes are indexable; privacy-policy routes remain noindex.
+- jurisdiction and client-location limits;
+- detailed minors and couples policy;
+- confidentiality exceptions and records/notes practice;
+- acute-risk and emergency escalation procedures;
+- final confirmation of production mailbox delivery where account-level verification is required.
 
+Telegram remains a direct contact channel. Public search routes remain indexable; privacy-policy routes remain intentionally `noindex, follow`.
 ---
+
 
 ## Phase 8 — Notes index V3.2
 
-**Status: Planned**
+**Status: Complete**
 
-Required work:
+Delivered:
 
-- editorial Notes hero and short positioning copy;
+- bilingual editorial Notes hubs;
 - one featured article plus three supporting cards;
-- unique optimized image for each article;
-- category and reading time;
-- strong hover/focus states;
-- consistent UA/RU layouts;
-- responsive behavior without horizontal carousel;
-- homepage header/footer parity;
-- internal links to consultation process, FAQ, support areas, and contact;
-- accessibility and reduced-motion QA.
-
+- unique optimized imagery for all four topics;
+- category and reading-time metadata;
+- responsive editorial layouts without a horizontal carousel;
+- global header/footer parity;
+- contextual links to consultations and related content;
+- keyboard/focus and reduced-motion support;
+- Notes image QA and performance/LCP prioritization.
 ---
+
 
 ## Phase 9 — Shared article template V3.2
 
-**Status: Planned**
+**Status: Complete**
 
-Implement one shared article system for all four UA and four RU routes.
+Delivered across all four UA and four RU article routes:
 
-Required:
-
-- category, reading time, and strong deck;
-- direct answer in the first 80–120 words;
+- category, reading time, deck and clear H1;
+- direct-answer opening;
 - unique editorial hero image;
-- 680–740 px comfortable reading measure on desktop;
-- structured H2/H3 hierarchy;
-- contents rail on desktop and static contents block on mobile where useful;
-- pull quote or explanatory block;
-- practical preparation/self-observation section where appropriate;
-- educational/diagnostic boundary;
-- author block with confirmed credential;
-- publication and meaningful update dates;
-- related articles;
-- contextual links to process, FAQ, support areas, Notes, and contact;
-- calm CTA;
-- article-specific safety notice only where relevant;
-- keyboard/focus accessibility and `prefers-reduced-motion` support.
+- controlled desktop reading measure;
+- structured H2/H3 hierarchy and contents navigation;
+- pull quotes/explanatory blocks and practical sections;
+- educational/diagnostic boundaries;
+- canonical Alina Horb author entity;
+- evidence-backed publication/update dates;
+- related articles and contextual links;
+- calm consultation CTA;
+- relevant safety language;
+- keyboard/focus and `prefers-reduced-motion` support.
 
-Existing routes should remain stable unless a redirect plan explicitly approves changes.
-
+Existing article routes remain stable.
 ---
+
 
 ## Phase 10 — Article editorial production
 
-**Status: Planned**
+**Status: Complete for the current four-article set**
 
-Recommended editing order:
+Published in Ukrainian and independently localized in Russian:
 
 1. What happens during the first consultation
 2. How to begin when the request is difficult to formulate
 3. When familiar coping strategies stop helping
 4. Stress, relocation, and loss of familiar support
 
-Required work:
-
-- Ukrainian as the primary canonical editorial version;
-- natural independent Russian localization;
-- remove generic AI phrasing and repetition;
-- verify terminology, evidence, and safety boundaries;
-- article-specific title, H1, H2/H3, meta description, and anchor text;
-- calm non-manipulative CTA;
-- source ledger for clinically sensitive claims;
-- final confirmation of factual statements about Alina's process and scope.
-
+The current set includes article-specific metadata, internal links, structured author/date data, safety boundaries, source governance and non-manipulative CTAs. Future article expansion should be driven by verified user/search demand rather than mass content production.
 ---
+
 
 ## Phase 11 — SEO and AI-search readiness
 
-**Status: Technical baseline implemented; ongoing SEO/AI-search optimization**
+**Status: Complete technical baseline; ongoing only when evidence justifies changes**
 
-Required work:
+Delivered:
 
-- unique title and meta description for every route;
-- canonical and reciprocal hreflang verification;
-- Open Graph and social-preview assets;
-- accurate `Article`/`BlogPosting`, `BreadcrumbList`, `Person`, and `WebSite` structured data;
-- visible author identity and meaningful dates;
-- contextual internal-link architecture;
-- representative image dimensions and alt text;
-- concise answer blocks written for humans first;
-- sitemap coverage;
-- robots review;
-- no keyword stuffing, fabricated expertise, diagnosis, or treatment promises.
+- unique titles and meta descriptions across public routes;
+- self-canonical and reciprocal UA/RU hreflang with Ukrainian x-default;
+- localized Open Graph/Twitter metadata and images;
+- accurate WebSite, Person, ProfilePage, Service, Article, FAQ and Breadcrumb structured data where appropriate;
+- one canonical Alina Horb Person entity across the site;
+- visible author identity and meaningful publication/update dates;
+- contextual internal linking;
+- explicit image dimensions and descriptive alt text;
+- sitemap and robots controls;
+- mobile-SERP title cleanup;
+- automated SEO/indexing validation and post-deploy live-domain checks.
 
-Do not use medical schema types that misrepresent Alina or the site.
-
+Do not use medical schema types, keyword stuffing, unsupported expertise, diagnosis claims or outcome promises.
 ---
+
 
 ## Phase 12 — Search launch
 
-**Status: Technical launch implemented; Google Search Console verification pending**
+**Status: Technical launch complete; Google Search Console verification pending**
 
-Current search-launch baseline:
+Completed technical launch:
 
-- finalize `robots.txt`;
-- finalize `sitemap.xml`;
-- keep all 16 public source routes and production routes indexable;
-- submit/verify the sitemap in Google Search Console (external status not yet independently confirmed);
-- verify Google-selected canonical and per-URL indexing in Search Console;
-- verify social previews;
-- run final mobile, tablet, laptop, desktop, Safari, Chromium, and WebKit QA;
-- confirm production form delivery and anti-spam behavior;
-- verify direct URLs for all versioned assets.
+- `robots.txt` and `sitemap.xml` finalized;
+- 16 public source and production routes are indexable;
+- two privacy-policy routes remain `noindex, follow`;
+- source-level indexability no longer depends solely on a deployment transform;
+- sitemap freshness and route inventory are validated;
+- canonical/hreflang and structured-data checks are enforced in CI;
+- strict live-production guard checks the real domain after successful deployment;
+- DNS, HTTPS/TLS, redirects and production-form assets are included in live checks;
+- responsive/browser regression, performance-readiness and accessibility release gates are in place.
 
+Remaining external verification when account access is available:
+
+- submit/verify the sitemap in Google Search Console;
+- inspect coverage for all 16 public URLs;
+- confirm Google-selected canonicals and any excluded/crawled-not-indexed reasons;
+- request re-indexing only where Search Console evidence shows it is useful.
 ---
 
 ## Phase 13 — Post-launch iteration
 
-**Status: Planned**
+**Status: Active maintenance baseline**
 
-Potential work after stable launch:
+Already implemented:
 
-- privacy-conscious analytics;
-- Search Console review;
-- article expansion based on real search questions;
-- conversion-path refinement;
-- accessibility follow-up;
-- performance-budget review;
-- authentic photography expansion;
-- appointment or CRM integration only after the contact workflow is stable.
+- strict post-deploy live-production SEO guard;
+- performance-readiness release gate and Notes LCP prioritization;
+- automated axe-core accessibility audit across all 18 UA/RU routes at mobile and desktop sizes;
+- WCAG contrast remediation with zero reported accessibility violations in the current audit;
+- broad responsive/browser regression QA.
+
+Future work should be evidence-led:
+
+- Google Search Console review once access is restored;
+- privacy-conscious analytics only if the owner wants measurement;
+- content expansion based on real search/user questions;
+- conversion-path refinements based on observed behavior;
+- authentic photography expansion when useful;
+- appointment/CRM integration only after the contact workflow and business need justify it.
+
 
 ## Non-goals
 
