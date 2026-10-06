@@ -5,10 +5,10 @@
   --stone-deep: #d8c9bc;
   --sage: #87927f;
   --sage-deep: #66705f;
-  --terracotta: #c6533f;
-  --terracotta-dark: #9f3f31;
+  --terracotta: #a64133;
+  --terracotta-dark: #7f3127;
   --graphite: #2f302d;
-  --muted: #686963;
+  --muted: #5c5d57;
   --line: rgba(47, 48, 45, 0.18);
   --line-strong: rgba(47, 48, 45, 0.34);
   --serif: "Cormorant Garamond", Georgia, serif;
@@ -373,14 +373,14 @@ h3 { line-height: 1.05; }
 .process-step h3 { margin: 8px 0 9px; font-family: var(--sans); font-size: 14px; font-weight: 600; }
 .process-step p { margin: 0; color: var(--muted); font-size: 13px; line-height: 1.55; }
 
-.principles-section { padding-block: 92px; background: var(--sage); color: var(--ivory-soft); }
+.principles-section { padding-block: 92px; background: var(--sage-deep); color: var(--ivory-soft); }
 .principles-layout { display: grid; grid-template-columns: .82fr 1.18fr; gap: 78px; }
-.principles-layout .section-kicker { color: var(--ivory-soft); opacity: .9; }
+.principles-layout .section-kicker { color: var(--ivory-soft); opacity: 1; }
 .principles-intro p { max-width: 430px; color: rgba(255,255,255,.9); }
 .principles-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid rgba(255,255,255,.36); }
 .principles-list li { display: grid; grid-template-columns: 190px 1fr; gap: 28px; padding: 17px 0; border-bottom: 1px solid rgba(255,255,255,.28); }
 .principles-list strong { font-weight: 600; }
-.principles-list span { color: rgba(255,255,255,.88); }
+.principles-list span { color: rgba(255,255,255,.92); }
 
 .faq-section { background: var(--ivory-soft); }
 .faq-layout { display: grid; grid-template-columns: .65fr 1.35fr; gap: 80px; }
@@ -699,7 +699,7 @@ button.contact-link { border: 0; padding: 0; background: transparent; }
   border: 1px solid rgba(198, 83, 63, .32);
   padding: 22px 24px;
   background: rgba(198, 83, 63, .055);
-  color: var(--muted);
+  color: var(--graphite);
   font-size: 14px;
   line-height: 1.75;
 }

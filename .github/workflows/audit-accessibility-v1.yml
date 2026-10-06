@@ -1,0 +1,61 @@
+name: Audit accessibility V1
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - '**/*.html'
+      - 'assets/css/**'
+      - 'assets/js/**'
+      - 'scripts/audit-accessibility-v1.mjs'
+      - '.github/workflows/audit-accessibility-v1.yml'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - name: Checkout tested commit
+        uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install accessibility audit runtime
+        run: |
+          npm install --no-save playwright @axe-core/playwright
+          npx playwright install --with-deps chromium
+
+      - name: Serve the static site
+        run: |
+          python3 -m http.server 4173 --bind 127.0.0.1 > /tmp/alina-accessibility-server.log 2>&1 &
+          for attempt in {1..20}; do
+            if curl -fsS http://127.0.0.1:4173/ >/dev/null; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat /tmp/alina-accessibility-server.log
+          exit 1
+
+      - name: Run strict WCAG audit
+        env:
+          AUDIT_BASE_URL: http://127.0.0.1:4173
+          AUDIT_STRICT: '1'
+        run: node scripts/audit-accessibility-v1.mjs
+
+      - name: Upload accessibility report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-audit-v1
+          path: qa/accessibility
+          retention-days: 14
+          if-no-files-found: warn

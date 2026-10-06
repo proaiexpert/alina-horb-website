@@ -522,9 +522,9 @@
 }
 
 .article-cta-copy { max-width: 760px; }
-.article-cta-copy .section-kicker { color: rgba(255,255,255,.72); }
+.article-cta-copy .section-kicker { color: var(--ivory-soft); }
 .article-cta-copy h2 { margin: 0 0 14px; font-size: 58px; }
-.article-cta-copy p { max-width: 620px; margin: 0; color: rgba(255,255,255,.78); }
+.article-cta-copy p { max-width: 620px; margin: 0; color: var(--ivory-soft); }
 .article-cta-band .button { flex: none; border-color: var(--ivory-soft); background: var(--ivory-soft); color: var(--sage-deep); }
 .article-cta-band .button:hover { background: transparent; color: white; }
 
