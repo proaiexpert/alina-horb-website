@@ -270,7 +270,7 @@ html.js .page-consultations [data-reveal].is-visible { opacity: 1; transform: tr
   gap: clamp(54px, 8vw, 122px);
   align-items: start;
 }
-.consult-first .section-kicker { color: #f0b3a8; }
+.consult-first .section-kicker { color: #faf0ed; }
 .consult-first-copy { max-width: 760px; }
 .consult-first-opening {
   margin-top: 0;
@@ -279,7 +279,7 @@ html.js .page-consultations [data-reveal].is-visible { opacity: 1; transform: tr
   font-size: clamp(31px, 3vw, 44px);
   line-height: 1.16;
 }
-.consult-first-copy > p:not(.consult-first-opening) { color: rgba(250,247,241,.75); font-size: 16px; line-height: 1.78; }
+.consult-first-copy > p:not(.consult-first-opening) { color: rgba(250,247,241,.92); font-size: 16px; line-height: 1.78; }
 .consult-first blockquote {
   margin: 34px 0 0;
   border-left: 1px solid rgba(240,179,168,.72);
