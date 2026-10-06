@@ -106,7 +106,7 @@ Delivered:
 - canonical and hreflang production-domain references;
 - favicon included in the Pages artifact.
 
-The site is publicly available but intentionally remains `noindex, nofollow` until the release gates below are complete.
+The site is publicly available and the 16 public UA/RU routes are technically indexable. The two privacy-policy routes remain intentionally `noindex, follow`.
 
 ---
 
@@ -135,7 +135,7 @@ The raw research pack is supporting material. The synthesis document is the adop
 
 ## Phase 7 — Privacy, legal, and production form
 
-**Status: Active release gate**
+**Status: Active — production privacy/form controls deployed; professional-policy confirmations remain**
 
 Required work:
 
@@ -154,7 +154,7 @@ Required work:
 
 Telegram remains the primary direct channel.
 
-`noindex, nofollow` must remain until this phase is approved.
+The remaining professional-policy confirmations do not change the current technical indexing state: public routes are indexable; privacy-policy routes remain noindex.
 
 ---
 
@@ -232,7 +232,7 @@ Required work:
 
 ## Phase 11 — SEO and AI-search readiness
 
-**Status: Planned release gate**
+**Status: Technical baseline implemented; ongoing SEO/AI-search optimization**
 
 Required work:
 
@@ -254,15 +254,15 @@ Do not use medical schema types that misrepresent Alina or the site.
 
 ## Phase 12 — Search launch
 
-**Status: Release gate**
+**Status: Technical launch implemented; Google Search Console verification pending**
 
-Only after privacy/form/editorial/SEO approval:
+Current search-launch baseline:
 
 - finalize `robots.txt`;
 - finalize `sitemap.xml`;
-- remove `noindex, nofollow` in a dedicated release commit;
-- submit sitemap to Google Search Console;
-- verify canonical selection and indexing;
+- keep all 16 public source routes and production routes indexable;
+- submit/verify the sitemap in Google Search Console (external status not yet independently confirmed);
+- verify Google-selected canonical and per-URL indexing in Search Console;
 - verify social previews;
 - run final mobile, tablet, laptop, desktop, Safari, Chromium, and WebKit QA;
 - confirm production form delivery and anti-spam behavior;
