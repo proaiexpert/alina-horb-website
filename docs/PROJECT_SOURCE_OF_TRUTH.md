@@ -83,12 +83,12 @@ The adopted article evidence and safety standard is:
 
 ## Contact form and privacy status
 
-- The current form opens a localized `mailto:` message.
-- The current form is temporary and does not store submissions.
-- Before search launch, the project requires UA/RU privacy pages and a privacy-reviewed form endpoint.
-- The production form must use minimal data collection, validation, anti-spam, clear success/error states, provider disclosure, and documented retention behavior.
-- The form must warn users not to submit sensitive medical, crisis, or emergency information.
-- `noindex, nofollow` remains until privacy, form, editorial, and SEO release gates are explicitly approved.
+- The production contact form submits through the configured Formspree endpoint in `assets/js/site-config.v2.js`.
+- Cloudflare Turnstile is used for anti-spam protection in the production form runtime.
+- Ukrainian and Russian privacy-policy pages are deployed and disclose the production form/provider handling.
+- The production form uses minimal data collection, validation, clear success/error states, provider disclosure, and retention/privacy language.
+- The form warns users not to submit sensitive medical, crisis, emergency, document, or payment information.
+- The 16 public UA/RU routes are indexable with `index, follow, max-image-preview:large`; the two privacy-policy routes remain `noindex, follow`.
 
 ## Portrait decisions for V3.1
 
@@ -122,7 +122,7 @@ The adopted article evidence and safety standard is:
 - The former GitHub Pages project URL redirects to `alinahorb.com`.
 - GitHub Pages DNS and HTTPS are active.
 - GitHub Pages deployment must use repository files directly and must not depend on Google Drive or ZIP files.
-- The project remains publicly accessible but intentionally excluded from search indexing until the release gate.
+- The project is publicly accessible and the 16 public search routes are technically indexable. Actual Google coverage, canonical selection, and indexing must be verified separately in Google Search Console.
 
 ## Editorial article system
 
@@ -149,7 +149,7 @@ Final articles require:
 
 ## Outstanding confirmation gates
 
-Before final article publication and search launch, confirm with Alina:
+For future scope, policy, and content expansion, confirm with Alina:
 
 - professional jurisdiction and permitted client locations;
 - exact first-session process;

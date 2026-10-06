@@ -12,7 +12,7 @@ A calm, human-first bilingual website for psychologist **Alina Horb**, designed 
 
 The project translates a personal psychology practice into a restrained editorial digital experience rather than a generic clinic template. The site helps visitors understand Alina’s approach, consultation format, areas of support, professional boundaries, educational materials, and available contact paths without using pressure-based conversion tactics.
 
-The production domain is live with HTTPS. Search indexing remains intentionally disabled in the current source through `noindex, nofollow` until a separate launch review confirms that the editorial, privacy, contact, and SEO gates are ready.
+The production domain is live with HTTPS. The 16 public UA/RU routes are indexable with `index, follow, max-image-preview:large`; the two privacy-policy routes remain intentionally `noindex, follow`.
 
 ## Business and user goals
 
@@ -48,7 +48,7 @@ The implementation includes:
 - reciprocal `hreflang` relationships;
 - `x-default` pointing to the Ukrainian experience;
 - localized Notes and article paths;
-- a controlled indexing gate that remains closed until launch approval.
+- public search routes are indexable at source and in the production artifact; privacy-policy routes remain intentionally noindex.
 
 ## Trust, privacy, and safety boundaries
 
@@ -94,7 +94,7 @@ Major changes should preserve:
 
 This repository is the canonical production source for `alinahorb.com`.
 
-The live website, bilingual structure, responsive homepage, Notes routes, custom domain, and public asset system are implemented. Indexing remains deliberately paused until a dedicated launch decision is made. Planned work must not be described as already implemented.
+The live website, bilingual structure, responsive homepage, Notes routes, custom domain, production form, public asset system, and technical search-indexing baseline are implemented. Google Search Console coverage and actual search-engine indexing remain external verification tasks; planned work must not be described as already implemented.
 
 Detailed governance and implementation records remain under `docs/`, including:
 

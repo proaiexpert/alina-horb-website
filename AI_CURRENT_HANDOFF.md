@@ -10,7 +10,7 @@ Primary bilingual website for psychologist Alina Horb.
 - The website and the ProAI Expert portfolio case are separate repositories and should not be confused.
 
 ## Current Priority
-No active implementation task is assumed in this repository. Default to read-only until the owner provides a specific website task.
+Current owner-directed priority: search-indexing verification and SEO hardening. Public routes must remain indexable at source and in the deployed artifact; Google Search Console coverage is a separate external verification task.
 
 ## Canonical Entry Files
 1. `AGENTS.md`
@@ -23,6 +23,7 @@ No active implementation task is assumed in this repository. Default to read-onl
 - No invented credentials, clinical claims, rankings, leads, or outcomes.
 - Preserve Ukrainian-primary and Russian-localized architecture.
 - Preserve canonical/hreflang/x-default and separate localized content.
+- Keep the 16 public UA/RU routes indexable; keep only the two privacy-policy routes `noindex, follow` unless the owner explicitly changes that policy.
 - Preserve privacy, boundaries, and natural professional language.
 
 ## Do Not Touch Without Explicit Scope
@@ -33,7 +34,7 @@ No active implementation task is assumed in this repository. Default to read-onl
 - merge/publication, rollback, force-push, deletion, or destructive operations.
 
 ## Next Approved Action
-Wait for a specific owner task. A fresh session should first report current main SHA, role, task interpretation, and exact proposed scope.
+Continue the owner-directed indexing/SEO hardening sequence: verify source/deployment parity, sitemap freshness, and then inspect Google Search Console coverage when access is available.
 
 ## Mechanical State Rule
 Always fetch current refs and SHAs. Do not assume an old chat or handoff contains current mechanical Git state.
