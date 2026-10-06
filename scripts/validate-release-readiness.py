@@ -92,6 +92,20 @@ for relative, canonical, ua_url, ru_url in ROUTES:
         require('<meta property="og:image:type" content="image/webp">' in text, f"{relative}: OG image MIME mismatch")
         require('has-editorial-rail' in text and 'editorial-rail-placeholder' in text, f"{relative}: stable article rail geometry missing")
 
+error_page = ROOT / "404.html"
+require(error_page.is_file(), "404.html missing")
+if error_page.is_file():
+    error_text = error_page.read_text(encoding="utf-8")
+    require(count(r"<title>.*?</title>", error_text) == 1, "404.html: expected one title")
+    require(error_text.count('<meta name="robots" content="noindex, follow">') == 1, "404.html: noindex, follow missing")
+    require('<link rel="canonical"' not in error_text, "404.html: canonical must be absent")
+    require(count(r"<h1\b", error_text) == 1, "404.html: expected one H1")
+    require('data-custom-404="alinahorb"' in error_text, "404.html: custom-page marker missing")
+    for href in ('href="/"', 'href="/ru/"', 'href="/consultations/"', 'href="/ru/consultations/"', 'href="/notes/"', 'href="/ru/notes/"'):
+        require(href in error_text, f"404.html: recovery link missing: {href}")
+    require("favicon-ag.svg" in error_text, "404.html: favicon missing")
+    require("assets/css/site.404.v1.css" in error_text, "404.html: dedicated stylesheet missing")
+
 for home in (ROOT / "index.html", ROOT / "ru/index.html"):
     if home.is_file():
         text = home.read_text(encoding="utf-8")
@@ -147,7 +161,9 @@ require("python3 scripts/apply-turnstile-v3-2.py" in workflow, "Turnstile runtim
 require("python3 scripts/apply-indexing-launch-v3-2.py" in workflow, "indexing launch step not wired")
 require("python3 scripts/validate-release-readiness.py" in workflow, "deployment validator not wired")
 require("cp sitemap.xml _site/" in workflow and "cp robots.txt _site/" in workflow, "deployment does not copy sitemap/robots")
+require("cp 404.html _site/" in workflow, "deployment does not copy custom 404")
 require("test -f _site/sitemap.xml" in workflow and "test -f _site/robots.txt" in workflow, "deployment does not assert sitemap/robots")
+require("test -f _site/404.html" in workflow, "deployment does not assert custom 404")
 
 if errors:
     print("Release readiness validation failed:")
