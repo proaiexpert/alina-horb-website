@@ -307,11 +307,12 @@ def main() -> int:
             if article.get('datePublished') > article.get('dateModified'):
                 add(critical, 'article-schema', 'datePublished must not be later than dateModified', relative)
             author = article.get('author')
-            if author != {'@id': PERSON_ID}:
-                add(critical, 'article-schema', 'Article author must reference canonical Person @id', relative)
+            expected_author_url = f'{BASE}/ru/about/' if language == 'ru' else f'{BASE}/about/'
+            if not isinstance(author, dict) or author.get('@type') != 'Person' or author.get('@id') != PERSON_ID or author.get('url') != expected_author_url:
+                add(critical, 'article-schema', 'Article author must reference canonical Person and localized ProfilePage URL', relative)
             person = next((node for node in nodes if node.get('@type') == 'Person' and node.get('@id') == PERSON_ID), None)
-            if not person or not person.get('name') or person.get('url') != PERSON_URL:
-                add(critical, 'article-schema', 'Article graph must define the canonical Person author', relative)
+            if not person or not person.get('name') or person.get('url') != PERSON_URL or person.get('mainEntityOfPage') != expected_author_url:
+                add(critical, 'article-schema', 'Article graph must define canonical Person plus localized profile page', relative)
 
         if route in NOTES_HUB_ROUTES:
             item_list = next((node for node in nodes if node.get('@type') == 'ItemList'), None)

@@ -152,8 +152,10 @@ def validate_page(path: Path, expected: dict[str, str]) -> None:
         fail(f"Unexpected dateModified in {rel}")
     if article.get("inLanguage") != expected["lang"]:
         fail(f"Wrong structured-data language in {rel}")
-    if article.get("author") != {"@id": "https://alinahorb.com/#person"}:
-        fail(f"Article author identity mismatch in {rel}")
+    author = article.get("author")
+    expected_author_url = "https://alinahorb.com/ru/about/" if expected["lang"] == "ru" else "https://alinahorb.com/about/"
+    if not isinstance(author, dict) or author.get("@type") != "Person" or author.get("@id") != "https://alinahorb.com/#person" or author.get("url") != expected_author_url:
+        fail(f"Article author identity/profile mismatch in {rel}")
     person = next(item for item in graph if item.get("@type") == "Person")
     if person.get("@id") != "https://alinahorb.com/#person" or person.get("url") != "https://alinahorb.com/":
         fail(f"Canonical Person identity mismatch in {rel}")
