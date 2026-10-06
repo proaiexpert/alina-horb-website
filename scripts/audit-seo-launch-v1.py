@@ -272,13 +272,17 @@ def main() -> int:
             article = next((node for node in nodes if node.get('@type') == 'Article'), None)
             if not article:
                 continue
-            for field in ('headline', 'description', 'mainEntityOfPage', 'image', 'author', 'dateModified'):
+            for field in ('headline', 'description', 'mainEntityOfPage', 'image', 'author', 'datePublished', 'dateModified'):
                 if not article.get(field):
                     add(critical, 'article-schema', f'Missing Article.{field}', relative)
             if article.get('mainEntityOfPage') != canonical:
                 add(critical, 'article-schema', 'mainEntityOfPage does not match canonical', relative)
+            if not valid_iso_date(article.get('datePublished')):
+                add(critical, 'article-schema', 'datePublished is not an ISO date', relative)
             if not valid_iso_date(article.get('dateModified')):
                 add(critical, 'article-schema', 'dateModified is not an ISO date', relative)
+            if article.get('datePublished') > article.get('dateModified'):
+                add(critical, 'article-schema', 'datePublished must not be later than dateModified', relative)
             author = article.get('author')
             if not isinstance(author, dict) or author.get('@type') != 'Person' or not author.get('name') or not author.get('url'):
                 add(critical, 'article-schema', 'Article author must be an identified Person with name and URL', relative)
