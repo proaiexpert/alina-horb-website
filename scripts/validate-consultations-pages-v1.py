@@ -32,6 +32,7 @@ def require(condition: bool, message: str) -> None:
 
 # HTMLParser handles case-insensitive HTML tag/attribute names and flexible quoting.
 PUBLIC_ROBOTS = "index, follow, max-image-preview:large"
+ROBOT_META_NAMES = {"robots", "googlebot", "googlebot-news"}
 
 
 class RobotsMetaParser(HTMLParser):
@@ -43,10 +44,13 @@ class RobotsMetaParser(HTMLParser):
         if tag != "meta":
             return
         names = [value for key, value in attrs if key == "name"]
-        if any((value or "").strip().casefold() == "robots" for value in names):
+        if any((value or "").strip().casefold() in ROBOT_META_NAMES for value in names):
             contents = [value for key, value in attrs if key == "content"]
             self.robots_tags.append(
-                (contents[0] or "").strip() if len(names) == 1 and len(contents) == 1 else None
+                (contents[0] or "").strip()
+                if len(names) == 1 and len(contents) == 1
+                and (names[0] or "").strip().casefold() == "robots"
+                else None
             )
 
 
@@ -74,6 +78,9 @@ approved = '<meta name="robots" content="index, follow, max-image-preview:large"
 for label, sample, expected_result in (
     ("approved", approved, True),
     ("approved alternate HTML spelling", "<META CONTENT='index, follow, max-image-preview:large' NAME='ROBOTS'>", True),
+    ("approved padded name whitespace", '<MeTa NAME = " robots " CONTENT = "index, follow, max-image-preview:large">', True),
+    ("unrelated description and viewport", '<meta name="description" content="Example"><meta name="viewport" content="width=device-width">' + approved, True),
+    ("unrelated alternate meta", approved + '<meta property="og:title" content="Test"><meta name="theme-color" content="#fff">', True),
     ("missing", '<meta name="description" content="example">', False),
     ("legacy noindex", '<meta name="robots" content="noindex, nofollow">', False),
     ("extra nofollow", approved + '<meta name="robots" content="nofollow">', False),
@@ -82,6 +89,23 @@ for label, sample, expected_result in (
     ("reordered conflict", approved + '<meta content="nofollow" name="robots">', False),
     ("single-quoted uppercase conflict", approved + "<META CONTENT='noindex, nofollow' NAME='ROBOTS'>", False),
     ("duplicate name attribute", '<meta name="robots" name="description" content="index, follow, max-image-preview:large">', False),
+    ("only nofollow", '<meta name="robots" content="nofollow">', False),
+    ("duplicate content attribute", '<meta name="robots" content="index, follow, max-image-preview:large" content="noindex">', False),
+    ("missing content", '<meta name="robots">', False),
+    ("googlebot none", approved + '<meta name="googlebot" content="none">', False),
+    ("googlebot noindex", approved + '<meta name="googlebot" content="noindex">', False),
+    ("googlebot nofollow", approved + '<meta name="googlebot" content="nofollow">', False),
+    ("googlebot-news noindex", approved + '<meta name="googlebot-news" content="noindex">', False),
+    ("googlebot-news none", approved + '<meta name="googlebot-news" content="none">', False),
+    ("googlebot harmless all", approved + '<meta name="googlebot" content="all">', False),
+    ("googlebot-news harmless all", approved + '<meta name="googlebot-news" content="all">', False),
+    ("uppercase crawler", approved + "<META CONTENT='none' NAME='GOOGLEBOT'>", False),
+    ("reordered crawler", approved + '<meta content="noindex" name="googlebot-news">', False),
+    ("padded crawler", approved + '<meta NAME = " googlebot-news " CONTENT = " all ">', False),
+    ("unquoted crawler attributes", approved + '<meta name=googlebot content=noindex>', False),
+    ("crawler in body", '<head>' + approved + '</head><body><meta name="googlebot" content="none"></body>', False),
+    ("duplicate crawler name", approved + '<meta name="googlebot" name="description" content="none">', False),
+    ("duplicate crawler content", approved + '<meta name="googlebot-news" content="all" content="none">', False),
 ):
     require(has_exact_public_robots(sample) == expected_result,
             f"Robots-meta regression: {label}")
@@ -97,6 +121,7 @@ for sample, expected_match in (
     ("1  600 грн", False),
     ("1\u202f600\u202fгрн", False),
     ("1 600 грн; 600 грн", True),
+    ("1\u00a0600\u202fгрн; 600\u202fгрн", True),
 ):
     require(has_standalone_600_uah(sample) == expected_match,
             f"Standalone legacy price matcher regression: {sample!r}")
