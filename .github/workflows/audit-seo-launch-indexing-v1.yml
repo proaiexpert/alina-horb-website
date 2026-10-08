@@ -12,6 +12,7 @@ on:
       - 'scripts/audit-seo-launch-v1.py'
       - 'scripts/validate-release-readiness.py'
       - 'scripts/validate-privacy-intake.py'
+      - 'scripts/validate-consultations-pages-v1.py'
       - '.github/workflows/audit-seo-launch-indexing-v1.yml'
       - '.github/workflows/deploy-pages.yml'
   push:
@@ -25,6 +26,7 @@ on:
       - 'scripts/audit-seo-launch-v1.py'
       - 'scripts/validate-release-readiness.py'
       - 'scripts/validate-privacy-intake.py'
+      - 'scripts/validate-consultations-pages-v1.py'
       - '.github/workflows/audit-seo-launch-indexing-v1.yml'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
@@ -55,6 +57,7 @@ jobs:
           python3 scripts/audit-seo-launch-v1.py
           python3 scripts/validate-release-readiness.py
           python3 scripts/validate-privacy-intake.py
+          python3 scripts/validate-consultations-pages-v1.py
 
       - name: Upload SEO report
         if: always()
