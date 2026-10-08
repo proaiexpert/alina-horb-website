@@ -12,6 +12,8 @@ from html.parser import HTMLParser
 from pathlib import Path
 from urllib.parse import urlparse
 
+from seo_robots_guard_v1 import check_html_robots
+
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / 'qa' / 'seo-launch-v1'
 BASE = 'https://alinahorb.com'
@@ -185,7 +187,7 @@ def main() -> int:
         title = parser.title
         description = parser.meta.get(('name', 'description'), '')
         robots = parser.meta.get(('name', 'robots'), '')
-        expected_robots = PUBLIC_ROBOTS if indexable else PRIVATE_ROBOTS
+        robots_issues = check_html_robots(text, indexable=indexable)
         ua_url, ru_url, x_default = expected_hreflang(route)
 
         route_report[route] = {
@@ -196,6 +198,7 @@ def main() -> int:
             'title_length': len(title),
             'description_length': len(description),
             'robots': robots,
+            'robots_issues': robots_issues,
             'canonical': link_value(parser, 'canonical'),
         }
 
@@ -216,8 +219,8 @@ def main() -> int:
             descriptions.append(description)
             if len(description) < 90 or len(description) > 180:
                 add(warnings, 'description-length', f'Description length is {len(description)} characters', relative)
-        if robots != expected_robots:
-            add(critical, 'indexing', f'Expected robots={expected_robots!r}, found {robots!r}', relative)
+        for issue in robots_issues:
+            add(critical, 'indexing', issue, relative)
         if link_value(parser, 'canonical') != canonical:
             add(critical, 'canonical', f'Canonical must be {canonical}', relative)
         if link_value(parser, 'alternate', 'uk') != ua_url:
