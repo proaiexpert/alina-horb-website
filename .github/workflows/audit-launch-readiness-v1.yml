@@ -6,6 +6,7 @@ on:
       - main
     paths:
       - 'scripts/audit-launch-readiness-v1.py'
+      - 'scripts/seo_robots_guard_v1.py'
       - '.github/workflows/audit-launch-readiness-v1.yml'
       - 'CNAME'
   workflow_run:
@@ -43,7 +44,9 @@ jobs:
           # Pull requests are advisory because live production still represents main.
           # Manual runs and post-deploy workflow_run checks are strict against the live domain.
           AUDIT_STRICT: ${{ (github.event_name == 'workflow_dispatch' || github.event_name == 'workflow_run') && '1' || '0' }}
-        run: python3 scripts/audit-launch-readiness-v1.py
+        run: |
+          python3 scripts/seo_robots_guard_v1.py --self-test
+          python3 scripts/audit-launch-readiness-v1.py
 
       - name: Upload launch report
         if: always()
