@@ -14,6 +14,8 @@ from collections import defaultdict, deque
 from html.parser import HTMLParser
 from pathlib import Path
 
+from seo_robots_guard_v1 import audit_robots, get_x_robots_tags
+
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "qa" / "post-refactor-tails"
 STRICT = os.environ.get("AUDIT_STRICT") == "1"
@@ -121,7 +123,6 @@ class PageParser(HTMLParser):
         self.inputs: list[dict[str, str]] = []
         self.labels_for: set[str] = set()
         self.anchors: list[dict[str, str]] = []
-        self.meta_robots: str | None = None
         self.canonical: str | None = None
         self.hreflangs: dict[str, str] = {}
         self.forms: list[dict[str, str]] = []
@@ -138,8 +139,6 @@ class PageParser(HTMLParser):
             self._in_title = True
         if values.get("id"):
             self.ids.append(values["id"])
-        if tag == "meta" and values.get("name", "").lower() == "robots":
-            self.meta_robots = values.get("content")
         if tag == "link" and values.get("rel", "").lower() == "canonical":
             self.canonical = values.get("href")
         if tag == "link" and values.get("rel", "").lower() == "alternate" and values.get("hreflang"):
@@ -195,14 +194,15 @@ def fetch(url: str, timeout: int = 30) -> tuple[dict, str]:
                     "status": response.status,
                     "final_url": response.geturl(),
                     "content_type": response.headers.get("content-type", ""),
+                    "x_robots_tags": get_x_robots_tags(response.headers),
                     "bytes": len(body),
                 }, text)
         except urllib.error.HTTPError as error:
-            last = ({"ok": False, "status": error.code, "final_url": error.geturl(), "error": str(error)}, "")
+            last = ({"ok": False, "status": error.code, "final_url": error.geturl(), "x_robots_tags": get_x_robots_tags(error.headers), "error": str(error)}, "")
             if error.code not in {429, 500, 502, 503, 504}:
                 return last
         except Exception as error:  # noqa: BLE001
-            last = ({"ok": False, "status": None, "final_url": None, "error": str(error)}, "")
+            last = ({"ok": False, "status": None, "final_url": None, "x_robots_tags": None, "error": str(error)}, "")
         if attempt < 2:
             time.sleep(1.5 * (attempt + 1))
     return last or ({"ok": False, "status": None, "final_url": None, "error": "unknown fetch failure"}, "")
@@ -260,6 +260,8 @@ def main() -> int:
             add_issue(critical, "seo", f"Incomplete hreflang set: {sorted(parser.hreflangs)}", relative)
 
         text = path.read_text(encoding="utf-8")
+        for issue in audit_robots(text, indexable=route not in NOINDEX_ROUTES):
+            add_issue(critical, "source-indexing", issue, relative)
         for name, pattern in FORBIDDEN_PRODUCTION_PATTERNS.items():
             if pattern.search(text):
                 add_issue(critical, "content-tail", f"Forbidden production marker found: {name}", relative)
@@ -397,10 +399,10 @@ def main() -> int:
         parser.feed(body)
         if parser.h1_count != 1:
             add_issue(critical, "live-semantics", f"Live page H1 count is {parser.h1_count}", route)
-        robots = (parser.meta_robots or "").lower()
-        expected_robots = "noindex, follow" if route in NOINDEX_ROUTES else "index, follow, max-image-preview:large"
-        if robots != expected_robots:
-            add_issue(critical, "live-indexing", f"Expected {expected_robots!r}, found {parser.meta_robots!r}", route)
+        robots_issues = audit_robots(body, indexable=route not in NOINDEX_ROUTES, headers=meta.get("x_robots_tags"))
+        meta["robots_issues"] = robots_issues
+        for issue in robots_issues:
+            add_issue(critical, "live-indexing", issue, route)
         if parser.canonical != f"{LIVE_ORIGIN}{route}":
             add_issue(critical, "live-seo", f"Live canonical mismatch: {parser.canonical!r}", route)
         if parser.html_lang != ("ru" if route.startswith("/ru/") or route == "/ru/" else "uk"):
