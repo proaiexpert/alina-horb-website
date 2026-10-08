@@ -29,6 +29,18 @@ def require(condition: bool, message: str) -> None:
         errors.append(message)
 
 
+# Regression cases: reject the standalone legacy price without matching valid 1 600 грн.
+LEGACY_600_UAH = re.compile(r'(?<!\d[ \u00A0])\b600 грн\b')
+for sample, expected_match in (
+    ("600 грн", True),
+    ("Ціна: 600 грн.", True),
+    ("1 600 грн", False),
+    ("1\u00a0600 грн", False),
+):
+    require(bool(LEGACY_600_UAH.search(sample)) == expected_match,
+            f"Standalone legacy price matcher regression: {sample!r}")
+
+
 for relative, expected in PAGES.items():
     path = ROOT / relative
     require(path.is_file(), f"Missing page: {relative}")
@@ -41,7 +53,7 @@ for relative, expected in PAGES.items():
     require(text.count(f'<link rel="canonical" href="{expected["canonical"]}">') == 1, f"{relative}: canonical mismatch")
     require(text.count(f'<link rel="alternate" hreflang="uk" href="{expected["ua"]}">') == 1, f"{relative}: UA hreflang mismatch")
     require(text.count(f'<link rel="alternate" hreflang="ru" href="{expected["ru"]}">') == 1, f"{relative}: RU hreflang mismatch")
-    require(text.count('<meta name="robots" content="noindex, nofollow">') + text.count('<meta name="robots" content="index, follow, max-image-preview:large">') == 1, f"{relative}: indexing directive mismatch")
+    require(text.count('<meta name="robots" content="index, follow, max-image-preview:large">') == 1, f"{relative}: public indexing directive mismatch")
     require('"@type": "Service"' in text, f"{relative}: Service schema missing")
     require('"@type": "Person"' in text, f"{relative}: Person schema missing")
     require('"provider": {' in text and '"@id": "https://alinahorb.com/#person"' in text, f"{relative}: Service provider identity mismatch")
@@ -58,7 +70,8 @@ for relative, expected in PAGES.items():
     require('site.consultations.v1.css' in text, f"{relative}: page stylesheet missing")
     require('50' in text and '35 €' in text and '1 600 грн' in text and '12 320 грн' in text and '240 €' in text, f"{relative}: confirmed duration/price missing")
     require(all(token not in text for token in ('20 €', '1 000 грн', '770 грн', '7 700 грн', '"price": "20"', '"price": "600"')), f"{relative}: legacy price remains")
-    require(not re.search(r'(?<!\\d[ \\u00A0])\\b600 грн\\b', text), f"{relative}: standalone legacy 600 грн remains")
+    require(not re.search(r'(?<!\d)270\s*€', text), f"{relative}: obsolete 270 € package remains")
+    require(not LEGACY_600_UAH.search(text), f"{relative}: standalone legacy 600 грн remains")
     require('financialstreamllc@gmail.com' not in text and 'alinahorb1991@gmail.com' not in text, f"{relative}: legacy email found")
     require(not re.search(r'\b(TODO|TBD)\b', text, re.I), f"{relative}: unfinished content token found")
     ids = re.findall(r'\bid="([^"]+)"', text)
