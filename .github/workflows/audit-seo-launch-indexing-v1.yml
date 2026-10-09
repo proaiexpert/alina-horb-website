@@ -25,6 +25,7 @@ on:
       - 'scripts/validate-release-readiness.py'
       - 'scripts/validate-privacy-intake.py'
       - 'scripts/validate-consultations-pages-v1.py'
+      - 'scripts/seo_robots_guard_v1.py'
       - '.github/workflows/audit-seo-launch-indexing-v1.yml'
       - '.github/workflows/deploy-pages.yml'
   push:
@@ -51,6 +52,7 @@ on:
       - 'scripts/validate-release-readiness.py'
       - 'scripts/validate-privacy-intake.py'
       - 'scripts/validate-consultations-pages-v1.py'
+      - 'scripts/seo_robots_guard_v1.py'
       - '.github/workflows/audit-seo-launch-indexing-v1.yml'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
@@ -78,6 +80,7 @@ jobs:
         env:
           AUDIT_STRICT: '1'
         run: |
+          python3 scripts/seo_robots_guard_v1.py --self-test
           python3 scripts/audit-seo-launch-v1.py
           python3 scripts/validate-release-readiness.py
           python3 scripts/validate-privacy-intake.py

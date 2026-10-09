@@ -9,6 +9,7 @@ import ssl
 import sys
 import urllib.error
 import urllib.request
+from seo_robots_guard_v1 import audit_robots, get_x_robots_tags, has_canonical_link, read_complete_response
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -43,26 +44,39 @@ def fetch_text(url: str, timeout: int = 25) -> tuple[dict, str]:
     request = urllib.request.Request(url, headers={"User-Agent": "AlinaHorbLaunchAudit/1.2"})
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:
-            body = response.read(1_500_000).decode("utf-8", errors="replace")
+            raw = read_complete_response(response, limit=1_500_000)
+            body = raw.decode("utf-8", errors="replace")
             return ({
                 "ok": 200 <= response.status < 400,
                 "status": response.status,
                 "final_url": response.geturl(),
                 "content_type": response.headers.get("content-type"),
-                "bytes_read": len(body.encode("utf-8")),
+                "x_robots_tags": get_x_robots_tags(response.headers),
+                "bytes_read": len(raw),
             }, body)
     except urllib.error.HTTPError as error:
-        body = error.read(1_500_000).decode("utf-8", errors="replace")
+        try:
+            raw = read_complete_response(error, limit=1_500_000)
+        except Exception as body_error:  # noqa: BLE001
+            return ({
+                "ok": False,
+                "status": error.code,
+                "final_url": error.geturl(),
+                "x_robots_tags": get_x_robots_tags(error.headers),
+                "error": f"{error}; incomplete/oversized error response: {body_error}",
+            }, "")
+        body = raw.decode("utf-8", errors="replace")
         return ({
             "ok": False,
             "status": error.code,
             "final_url": error.geturl(),
             "content_type": error.headers.get("content-type") if error.headers else None,
-            "bytes_read": len(body.encode("utf-8")),
+            "x_robots_tags": get_x_robots_tags(error.headers),
+            "bytes_read": len(raw),
             "error": str(error),
         }, body)
     except Exception as error:  # noqa: BLE001
-        return ({"ok": False, "status": None, "final_url": None, "error": str(error)}, "")
+        return ({"ok": False, "status": None, "final_url": None, "x_robots_tags": None, "error": str(error)}, "")
 
 
 def fetch_json(url: str, timeout: int = 20) -> dict:
@@ -89,9 +103,12 @@ def first_match(pattern: str, body: str) -> str | None:
     return match.group(1).strip() if match else None
 
 
-def html_probe(url: str) -> dict:
+def html_probe(url: str, *, indexable: bool = True) -> dict:
     meta, body = fetch_text(url)
+    issues = audit_robots(body, indexable=indexable, headers=meta.get("x_robots_tags"))
     meta.update({
+        "robots_issues": issues,
+        "robots_valid": bool(meta.get("ok")) and not issues,
         "has_expected_name": "Аліна Горб" in body or "Алина Горб" in body,
         "robots": first_match(r'<meta\s+name=["\']robots["\']\s+content=["\']([^"\']+)["\']', body),
         "canonical": first_match(r'<link\s+rel=["\']canonical["\']\s+href=["\']([^"\']+)["\']', body),
@@ -171,11 +188,11 @@ def main() -> int:
         report["rdap"] = {"registered": None, "error": str(error)}
 
     for route in ROUTES:
-        report["http"]["github_pages"][route] = html_probe(f"{PAGES_ORIGIN}{route}")
-        report["http"]["apex"][route] = html_probe(f"{APEX_ORIGIN}{route}")
+        report["http"]["github_pages"][route] = html_probe(f"{PAGES_ORIGIN}{route}", indexable=route not in NOINDEX_ROUTES)
+        report["http"]["apex"][route] = html_probe(f"{APEX_ORIGIN}{route}", indexable=route not in NOINDEX_ROUTES)
 
     for route in ("/", "/ru/", "/consultations/", "/notes/"):
-        report["http"]["www"][route] = html_probe(f"{WWW_ORIGIN}{route}")
+        report["http"]["www"][route] = html_probe(f"{WWW_ORIGIN}{route}", indexable=route not in NOINDEX_ROUTES)
 
     config_meta, config_body = fetch_text(f"{APEX_ORIGIN}/assets/js/site-config.v2.js")
     runtime_meta, runtime_body = fetch_text(f"{APEX_ORIGIN}/assets/js/site.v2.js")
@@ -214,7 +231,8 @@ def main() -> int:
         **missing_meta,
         "custom_marker": 'data-custom-404="alinahorb"' in missing_body,
         "noindex_follow": '<meta name="robots" content="noindex, follow">' in missing_body,
-        "canonical_present": '<link rel="canonical"' in missing_body,
+        "robots_issues": audit_robots(missing_body, indexable=False, headers=missing_meta.get("x_robots_tags")),
+        "canonical_present": has_canonical_link(missing_body),
     }
 
     report["tls"]["apex"] = tls_probe("alinahorb.com")
@@ -241,9 +259,8 @@ def main() -> int:
         if not apex.get("ok"):
             report["critical"].append(f"Live route failed: {route}")
             continue
-        expected_robots = PRIVATE_ROBOTS if route in NOINDEX_ROUTES else PUBLIC_ROBOTS
-        if apex.get("robots") != expected_robots:
-            report["critical"].append(f"{route}: live robots meta is {apex.get('robots')!r}; expected {expected_robots!r}")
+        for issue in apex.get("robots_issues", ["robots verification unavailable"]):
+            report["critical"].append(f"{route}: {issue}")
         if apex.get("canonical") != expected:
             report["critical"].append(f"{route}: canonical mismatch {apex.get('canonical')!r}")
         if apex.get("hreflang_uk") != uk_url or apex.get("hreflang_ru") != ru_url:
@@ -266,7 +283,7 @@ def main() -> int:
     if not report["live_robots"].get("ok") or not report["live_robots"].get("allows_all") or not report["live_robots"].get("sitemap"):
         report["critical"].append("Live robots.txt is invalid")
     custom_404 = report["live_404"]
-    if custom_404.get("status") != 404 or not custom_404.get("custom_marker") or not custom_404.get("noindex_follow") or custom_404.get("canonical_present"):
+    if custom_404.get("status") != 404 or not custom_404.get("custom_marker") or not custom_404.get("noindex_follow") or custom_404.get("canonical_present") or custom_404.get("robots_issues"):
         report["critical"].append(f"Custom 404 contract failed: {custom_404}")
 
     if report["live_sitemap"].get("locations") != report["live_sitemap"].get("expected"):
@@ -296,11 +313,11 @@ def main() -> int:
     turnstile_ok = config.get("turnstile_site_key") and runtime.get("turnstile")
     public_indexing_count = sum(
         1 for route in INDEXABLE_ROUTES
-        if report["http"]["apex"].get(route, {}).get("robots") == PUBLIC_ROBOTS
+        if report["http"]["apex"].get(route, {}).get("robots_valid")
     )
     privacy_noindex_count = sum(
         1 for route in NOINDEX_ROUTES
-        if report["http"]["apex"].get(route, {}).get("robots") == PRIVATE_ROBOTS
+        if report["http"]["apex"].get(route, {}).get("robots_valid")
     )
     lines = [
         "Alina Horb launch readiness V1",
