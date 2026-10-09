@@ -14,7 +14,7 @@ from collections import defaultdict, deque
 from html.parser import HTMLParser
 from pathlib import Path
 
-from seo_robots_guard_v1 import audit_robots, get_x_robots_tags
+from seo_robots_guard_v1 import audit_robots, get_x_robots_tags, read_complete_response
 
 ROOT = Path(__file__).resolve().parents[1]
 OUTPUT = ROOT / "qa" / "post-refactor-tails"
@@ -187,7 +187,7 @@ def fetch(url: str, timeout: int = 30) -> tuple[dict, str]:
         request = urllib.request.Request(url, headers={"User-Agent": "AlinaHorbTailAudit/1.1"})
         try:
             with urllib.request.urlopen(request, timeout=timeout) as response:
-                body = response.read(2_000_000)
+                body = read_complete_response(response, limit=2_000_000)
                 text = body.decode("utf-8", errors="replace")
                 return ({
                     "ok": 200 <= response.status < 400,
