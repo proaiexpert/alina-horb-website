@@ -9,6 +9,7 @@ from __future__ import annotations
 import re
 import sys
 from email.message import Message
+from io import BytesIO
 from html.parser import HTMLParser
 from typing import Sequence
 
@@ -18,6 +19,57 @@ ROBOT_NAMES = frozenset({"robots", "googlebot", "googlebot-news"})
 DIRECTIVE_PARAMETERS = frozenset({
     "max-image-preview", "max-snippet", "max-video-preview", "unavailable_after",
 })
+
+
+def normalized_policy(content: str) -> tuple[str, ...]:
+    """Normalize semantically equivalent approved directives, never extra rules."""
+    return tuple(
+        re.sub(r"\s*:\s*", ":", part.strip().casefold())
+        for part in content.split(",")
+    )
+
+
+def read_complete_response(response, *, limit: int) -> bytes:
+    """Read at most limit+1 bytes, refuse oversized/truncated HTTP bodies."""
+    if limit < 1:
+        raise ValueError("invalid HTTP body limit")
+    sizes = response.headers.get_all("Content-Length", [])
+    if len(sizes) > 1:
+        raise ValueError("duplicate Content-Length headers; complete body cannot be verified")
+    declared = None
+    if sizes:
+        raw_size = sizes[0].strip()
+        if not raw_size.isdecimal():
+            raise ValueError(f"invalid Content-Length: {raw_size!r}")
+        declared = int(raw_size)
+        if declared > limit:
+            raise ValueError(f"HTTP body exceeds {limit}-byte audit limit (Content-Length={declared})")
+    data = response.read(limit + 1)
+    if len(data) > limit:
+        raise ValueError(f"HTTP body exceeds {limit}-byte audit limit")
+    if declared is not None and len(data) != declared:
+        raise ValueError(f"incomplete HTTP body: read {len(data)} bytes of declared {declared}")
+    return data
+
+
+class CanonicalLinkParser(HTMLParser):
+    def __init__(self) -> None:
+        super().__init__(convert_charrefs=True)
+        self.found = False
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag == "link" and any(
+            "canonical" in (value or "").strip().casefold().split()
+            for key, value in attrs if key == "rel"
+        ):
+            self.found = True
+
+
+def has_canonical_link(html: str) -> bool:
+    parser = CanonicalLinkParser()
+    parser.feed(html)
+    parser.close()
+    return parser.found
 
 
 class RobotsMetaParser(HTMLParser):
@@ -45,14 +97,17 @@ def check_html_robots(html: str, *, indexable: bool) -> list[str]:
     violations: list[str] = []
     general = 0
     expected = PUBLIC_ROBOTS if indexable else PRIVATE_ROBOTS
+    required_directives = normalized_policy(expected)
     for names, contents in parser.entries:
         normalized = [(name or "").strip().casefold() for name in names]
         if len(names) != 1 or len(contents) != 1 or contents[0] is None:
             violations.append(f"robots meta has missing/duplicate name or content attributes: {normalized!r}")
         if "robots" in normalized:
             general += 1
-            if len(names) == 1 and len(contents) == 1 and (contents[0] or "").strip() != expected:
-                violations.append(f"robots meta policy mismatch: found {(contents[0] or '').strip()!r}, expected {expected!r}")
+            if len(names) == 1 and len(contents) == 1:
+                actual = normalized_policy(contents[0] or "")
+                if len(actual) != len(required_directives) or set(actual) != set(required_directives):
+                    violations.append(f"robots meta policy mismatch: found {(contents[0] or '').strip()!r}, expected {expected!r}")
         if any(name in {"googlebot", "googlebot-news"} for name in normalized):
             violations.append(f"unapproved crawler-specific robots meta: {normalized!r}")
     if general != 1:
@@ -117,6 +172,17 @@ def self_test() -> int:
         ("padded name", '<META NAME = " robots " CONTENT = "index, follow, max-image-preview:large">', True, [], True),
         ("privacy matching header", private, False, ["noindex", "follow"], True),
         ("public positive header", public, True, ["index, follow, max-image-preview:large"], True),
+        ("public uppercase", '<meta name="robots" content="INDEX, FOLLOW, MAX-IMAGE-PREVIEW:LARGE">', True, [], True),
+        ("public reordered", '<meta name="robots" content="follow, max-image-preview:large, index">', True, [], True),
+        ("public mixed case reordered", '<meta name="robots" content="FOLLOW, index, MAX-IMAGE-PREVIEW:LaRgE">', True, [], True),
+        ("privacy uppercase", '<meta name="robots" content="NOINDEX, FOLLOW">', False, [], True),
+        ("privacy reordered", '<meta name="robots" content="FOLLOW, NoIndex">', False, [], True),
+        ("colon padded", '<meta name="robots" content=" index , follow , max-image-preview : large ">', True, [], True),
+        ("uppercase spaced", '<meta name="robots" content=" MAX-IMAGE-PREVIEW : LARGE , INDEX , FOLLOW ">', True, [], True),
+        ("directive repeated", '<meta name="robots" content="index, follow, follow, max-image-preview:large">', True, [], False),
+        ("directive extra", '<meta name="robots" content="index, follow, max-image-preview:large, noindex">', True, [], False),
+        ("directive missing", '<meta name="robots" content="index, follow">', True, [], False),
+        ("empty directive", '<meta name="robots" content="index,, follow, max-image-preview:large">', True, [], False),
         ("missing", "<html><head></head></html>", True, [], False),
         ("public noindex", '<meta name="robots" content="noindex">', True, [], False),
         ("public nofollow", '<meta name="robots" content="nofollow">', True, [], False),
@@ -161,7 +227,49 @@ def self_test() -> int:
         passed += 1
     else:
         print("FAIL: repeated HTTPMessage headers")
-    total = len(samples) + 1
+    class FakeResponse(BytesIO):
+        def __init__(self, data: bytes, content_lengths: tuple[str, ...] = ()) -> None:
+            super().__init__(data)
+            self.headers = Message()
+            for length in content_lengths:
+                self.headers.add_header("Content-Length", length)
+
+    http_reads = [
+        ("complete with length", b"abcd", ("4",), 4, True),
+        ("complete without length", b"abcd", (), 4, True),
+        ("shorter than header", b"abc", ("4",), 4, False),
+        ("declared oversized", b"abcde", ("5",), 4, False),
+        ("undeclared oversized", b"abcde", (), 4, False),
+        ("bad length", b"abcd", ("abc",), 4, False),
+        ("negative length", b"abcd", ("-1",), 4, False),
+        ("duplicate lengths", b"abcd", ("4", "4"), 4, False),
+        ("exact declared under limit", b"abc", ("3",), 4, True),
+    ]
+    for name, data, lengths, limit, should_pass in http_reads:
+        try:
+            result = read_complete_response(FakeResponse(data, lengths), limit=limit)
+            actual_pass = result == data
+        except ValueError:
+            actual_pass = False
+        if actual_pass == should_pass:
+            passed += 1
+        else:
+            print(f"FAIL HTTP read: {name}: actual_pass={actual_pass}")
+
+    canonical_cases = [
+        ('<link rel="canonical" href="https://alinahorb.com/">', True),
+        ('<LINK HREF="https://alinahorb.com/" REL=canonical>', True),
+        ("<link rel='alternate canonical' href='https://alinahorb.com/'>", True),
+        ('<link rel="alternate" href="https://alinahorb.com/">', False),
+        ('<meta name="robots" content="noindex, follow">', False),
+    ]
+    for html, should_find in canonical_cases:
+        if has_canonical_link(html) == should_find:
+            passed += 1
+        else:
+            print(f"FAIL canonical parser: {html!r}")
+
+    total = len(samples) + 1 + len(http_reads) + len(canonical_cases)
     print(f"Robots guard self-test: {passed}/{total} PASS, {total-passed} FAIL")
     return 0 if passed == total else 1
 
