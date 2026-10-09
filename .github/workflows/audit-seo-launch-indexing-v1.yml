@@ -6,12 +6,26 @@ on:
       - main
     paths:
       - '**/*.html'
+      - 'assets/css/site.consultations.v1.css'
+      - 'assets/css/site.intake.v3-2.css'
+      - 'assets/css/site.privacy.v3-2.css'
+      - 'assets/css/site.v2.css'
+      - 'assets/css/site.v3-1.css'
+      - 'assets/js/site.v2.js'
+      - 'assets/js/site-config.v2.js'
+      - 'assets/js/site.navigation.v1.js'
       - 'robots.txt'
       - 'sitemap.xml'
+      - 'scripts/apply-notes-images-v3-1.py'
+      - 'scripts/patch-notes-validator-expectations-v3-1.py'
+      - 'scripts/apply-turnstile-v3-2.py'
+      - 'scripts/apply-social-favicon-v3-3.py'
       - 'scripts/apply-indexing-launch-v3-2.py'
       - 'scripts/audit-seo-launch-v1.py'
       - 'scripts/validate-release-readiness.py'
       - 'scripts/validate-privacy-intake.py'
+      - 'scripts/validate-consultations-pages-v1.py'
+      - 'scripts/seo_robots_guard_v1.py'
       - '.github/workflows/audit-seo-launch-indexing-v1.yml'
       - '.github/workflows/deploy-pages.yml'
   push:
@@ -19,12 +33,26 @@ on:
       - main
     paths:
       - '**/*.html'
+      - 'assets/css/site.consultations.v1.css'
+      - 'assets/css/site.intake.v3-2.css'
+      - 'assets/css/site.privacy.v3-2.css'
+      - 'assets/css/site.v2.css'
+      - 'assets/css/site.v3-1.css'
+      - 'assets/js/site.v2.js'
+      - 'assets/js/site-config.v2.js'
+      - 'assets/js/site.navigation.v1.js'
       - 'robots.txt'
       - 'sitemap.xml'
+      - 'scripts/apply-notes-images-v3-1.py'
+      - 'scripts/patch-notes-validator-expectations-v3-1.py'
+      - 'scripts/apply-turnstile-v3-2.py'
+      - 'scripts/apply-social-favicon-v3-3.py'
       - 'scripts/apply-indexing-launch-v3-2.py'
       - 'scripts/audit-seo-launch-v1.py'
       - 'scripts/validate-release-readiness.py'
       - 'scripts/validate-privacy-intake.py'
+      - 'scripts/validate-consultations-pages-v1.py'
+      - 'scripts/seo_robots_guard_v1.py'
       - '.github/workflows/audit-seo-launch-indexing-v1.yml'
       - '.github/workflows/deploy-pages.yml'
   workflow_dispatch:
@@ -52,9 +80,11 @@ jobs:
         env:
           AUDIT_STRICT: '1'
         run: |
+          python3 scripts/seo_robots_guard_v1.py --self-test
           python3 scripts/audit-seo-launch-v1.py
           python3 scripts/validate-release-readiness.py
           python3 scripts/validate-privacy-intake.py
+          python3 scripts/validate-consultations-pages-v1.py
 
       - name: Upload SEO report
         if: always()
