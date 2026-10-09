@@ -9,7 +9,7 @@ import ssl
 import sys
 import urllib.error
 import urllib.request
-from seo_robots_guard_v1 import audit_robots, get_x_robots_tags
+from seo_robots_guard_v1 import audit_robots, get_x_robots_tags, has_canonical_link, read_complete_response
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -44,24 +44,35 @@ def fetch_text(url: str, timeout: int = 25) -> tuple[dict, str]:
     request = urllib.request.Request(url, headers={"User-Agent": "AlinaHorbLaunchAudit/1.2"})
     try:
         with urllib.request.urlopen(request, timeout=timeout) as response:
-            body = response.read(1_500_000).decode("utf-8", errors="replace")
+            raw = read_complete_response(response, limit=1_500_000)
+            body = raw.decode("utf-8", errors="replace")
             return ({
                 "ok": 200 <= response.status < 400,
                 "status": response.status,
                 "final_url": response.geturl(),
                 "content_type": response.headers.get("content-type"),
                 "x_robots_tags": get_x_robots_tags(response.headers),
-                "bytes_read": len(body.encode("utf-8")),
+                "bytes_read": len(raw),
             }, body)
     except urllib.error.HTTPError as error:
-        body = error.read(1_500_000).decode("utf-8", errors="replace")
+        try:
+            raw = read_complete_response(error, limit=1_500_000)
+        except Exception as body_error:  # noqa: BLE001
+            return ({
+                "ok": False,
+                "status": error.code,
+                "final_url": error.geturl(),
+                "x_robots_tags": get_x_robots_tags(error.headers),
+                "error": f"{error}; incomplete/oversized error response: {body_error}",
+            }, "")
+        body = raw.decode("utf-8", errors="replace")
         return ({
             "ok": False,
             "status": error.code,
             "final_url": error.geturl(),
             "content_type": error.headers.get("content-type") if error.headers else None,
             "x_robots_tags": get_x_robots_tags(error.headers),
-            "bytes_read": len(body.encode("utf-8")),
+            "bytes_read": len(raw),
             "error": str(error),
         }, body)
     except Exception as error:  # noqa: BLE001
@@ -221,7 +232,7 @@ def main() -> int:
         "custom_marker": 'data-custom-404="alinahorb"' in missing_body,
         "noindex_follow": '<meta name="robots" content="noindex, follow">' in missing_body,
         "robots_issues": audit_robots(missing_body, indexable=False, headers=missing_meta.get("x_robots_tags")),
-        "canonical_present": '<link rel="canonical"' in missing_body,
+        "canonical_present": has_canonical_link(missing_body),
     }
 
     report["tls"]["apex"] = tls_probe("alinahorb.com")
