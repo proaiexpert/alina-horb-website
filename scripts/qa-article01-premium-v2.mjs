@@ -111,18 +111,16 @@ try {
   const headerEvents={initial};
   if(isMobile){
     // Trigger genuine scroll events inside article; header should hide without shifting the document.
-    await page.evaluate(()=>{
-      const el=document.querySelector(".article-body");
-      const y=Math.max(450,window.scrollY + el.getBoundingClientRect().top+190);
-      window.scrollTo({top:y,behavior:"instant"});
-    });
-    // A real reading gesture produces more than one scroll event.
-    // Full-page screenshots can reposition the browser between animation frames;
-    // complete the gesture with a second user-direction delta rather than
-    // treating a single programmatic jump as a touch scroll.
-    await page.waitForTimeout(75);
-    await page.evaluate(()=>window.scrollBy({top:160,behavior:"instant"}));
-    await page.waitForTimeout(430);
+    // Start at the top after the full-page screenshot: Chromium may otherwise
+    // leave its scroll offset between screenshot segments. Use real wheel gestures
+    // rather than one synthetic scrollTo jump, and wait for the rAF/transition.
+    await page.evaluate(()=>window.scrollTo({top:0,behavior:"instant"}));
+    await page.waitForTimeout(180);
+    for (let gesture=0;gesture<7;gesture++) {
+      await page.mouse.wheel(0,260);
+      await page.waitForTimeout(85);
+    }
+    await page.waitForTimeout(440);
     const down=await headerState(page);headerEvents.down=down;
     const after=await page.evaluate(()=>({y:window.scrollY,docWidth:document.documentElement.scrollWidth}));
     if(!down.hidden||!down.inert||down.ariaHidden!=="true"||down.pointerEvents!=="none")
