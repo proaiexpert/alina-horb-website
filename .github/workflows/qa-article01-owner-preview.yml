@@ -21,7 +21,7 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Test isolated Owner Preview at six widths
         env:
-          TASK027_PREVIEW_URL: https://alina-horb-article01-owner-preview-db6058pih.vercel.app
+          TASK027_PREVIEW_URL: https://alina-horb-article01-owner-preview-g029a3p1l.vercel.app
         run: node scripts/qa-article01-owner-preview.mjs
       - name: Upload actual Chromium screenshots and QA
         if: always()
