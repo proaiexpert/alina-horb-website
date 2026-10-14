@@ -24,14 +24,15 @@ try {
       const img=hero?.querySelector("img");
       const g=document.querySelector(".article-hero-grid");
       const grid=g?getComputedStyle(g).gridTemplateColumns:"";
+      const copyRect=document.querySelector(".article-hero-copy")?.getBoundingClientRect();
       const rect=hero?.getBoundingClientRect();
       const docs=document.documentElement;
       const cycle=document.querySelector(".conflict-cycle");
       const lis=cycle?[...cycle.querySelectorAll(":scope > li")]:[];
       const faqs=[...document.querySelectorAll("details.article-qa")];
       const missing=[...document.images].filter(x=>!x.complete||x.naturalWidth===0).map(x=>x.src);
-      return {title:document.title,lang:document.documentElement.lang,h1:[...document.querySelectorAll("h1")].map(x=>x.textContent.trim()),canonical:document.querySelector('link[rel="canonical"]')?.href,hreflang:[...document.querySelectorAll('link[rel="alternate"][hreflang]')].map(x=>x.hreflang),heroRatio:rect?rect.width/rect.height:null,heroImg:{complete:img?.complete,naturalWidth:img?.naturalWidth,naturalHeight:img?.naturalHeight,objectFit:img?getComputedStyle(img).objectFit:null},heroGrid:grid,cycleCount:lis.length,faqCount:faqs.length,docWidth:docs.scrollWidth,bodyWidth:document.body.scrollWidth,missingImages:missing,
-       noteLinks:[...document.querySelectorAll(".article-toc a")].every(x=>document.getElementById(x.hash.slice(1))),
+      return {title:document.title,lang:document.documentElement.lang,h1:[...document.querySelectorAll("h1")].map(x=>x.textContent.trim()),canonical:document.querySelector('link[rel="canonical"]')?.href,hreflang:[...document.querySelectorAll('link[rel="alternate"][hreflang]')].map(x=>x.hreflang),heroRatio:rect?rect.width/rect.height:null,heroImg:{complete:img?.complete,naturalWidth:img?.naturalWidth,naturalHeight:img?.naturalHeight,objectFit:img?getComputedStyle(img).objectFit:null},heroGrid:grid,copyRect:copyRect?{left:copyRect.left,right:copyRect.right,top:copyRect.top,bottom:copyRect.bottom,width:copyRect.width}:null,heroRect:rect?{left:rect.left,right:rect.right,top:rect.top,bottom:rect.bottom,width:rect.width}:null,cycleCount:lis.length,faqCount:faqs.length,docWidth:docs.scrollWidth,bodyWidth:document.body.scrollWidth,missingImages:missing,
+       noteLinks:[...document.querySelectorAll(".article-toc a")].every(x=>document.getElementById(decodeURIComponent(x.hash.slice(1)))),
        articleCTA:[...document.querySelectorAll('a[href*="consultations/"]')].length};
     });
     const rules=[
@@ -49,7 +50,7 @@ try {
       [r.articleCTA>0,"Missing article consultation link"],
       [r.missingImages.length===0,"Broken images: "+r.missingImages.join(" ")],
       [errors.length===0,"Browser errors: "+errors.join(" | ")],
-      [(width<=1100?r.heroGrid.split(" ").filter(Boolean).length===1:r.heroGrid.split(" ").filter(Boolean).length===2),"Hero column count "+r.heroGrid]
+      [(width<=1100 ? r.heroRect?.top >= r.copyRect?.bottom-5 : r.heroRect?.left >= r.copyRect?.right-5 && r.copyRect?.width>=275 && r.heroRect?.width>=275),"Hero geometry at "+width+"px: "+JSON.stringify({grid:r.heroGrid,hero:r.heroRect,copy:r.copyRect})]
     ];
     for (const [ok,why] of rules) if(!ok)issues.push(width+": "+why);
     const toggle=page.locator('[data-menu-toggle]');

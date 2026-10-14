@@ -25,3 +25,19 @@ body.article-template-v32[data-note="conflict"] .article-qa summary:focus-visibl
 body.article-template-v32[data-note="conflict"] .article-qa p {margin:15px 0 0}
 @media(max-width:1100px) {body.article-template-v32[data-note="conflict"] .article-hero-grid {grid-template-columns:minmax(0,1fr);gap:0}body.article-template-v32[data-note="conflict"] .article-hero-copy {order:0;padding-block:45px 25px}body.article-template-v32[data-note="conflict"] .article-hero-visual {order:1;align-self:stretch;aspect-ratio:4/3;min-height:0;height:auto;margin-bottom:28px}}
 @media(max-width:620px) {body.article-template-v32[data-note="conflict"] .article-hero--v32 h1 {font-size:clamp(40px,10vw,52px)}body.article-template-v32[data-note="conflict"] .article-hero-label {right:10px;bottom:10px;padding:9px 12px}body.article-template-v32[data-note="conflict"] .conflict-cycle li {grid-template-columns:49px minmax(0,1fr);gap:15px}body.article-template-v32[data-note="conflict"] .conflict-cycle-num {font-size:46px}body.article-template-v32[data-note="conflict"] .conflict-cycle li strong {font-size:25px}}
+
+/* Fix rail geometry at >=1181px: navigation is column one, article copy and image are columns two/three. */
+@media (min-width:1181px) {
+  body.article-template-v32[data-note="conflict"] .article-hero-grid.has-editorial-rail {
+    grid-template-columns: 184px minmax(0, 1.08fr) minmax(0, .92fr);
+    gap: clamp(28px, 3.1vw, 48px);
+  }
+}
+/* Article-only typographic author mark; no missing legacy portrait request. */
+body.article-template-v32[data-note="conflict"] .article-author-card { grid-template-columns: 76px minmax(0, 1fr); }
+body.article-template-v32[data-note="conflict"] .article-author-mark {
+  width: 76px; height: 90px; display: grid; place-items: center;
+  border: 1px solid var(--line-strong); background: var(--ivory);
+  color: var(--sage-deep); font-family: var(--serif);
+  font-size: 36px; line-height: 1; letter-spacing: -.035em;
+}
