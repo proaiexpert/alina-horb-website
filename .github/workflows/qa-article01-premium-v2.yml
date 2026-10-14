@@ -21,7 +21,7 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Run eight viewport browser and reading header audit
         env:
-          TASK028_PREVIEW_URL: https://alina-horb-article01-owner-preview-hga0rv1ln.vercel.app
+          TASK028_PREVIEW_URL: https://alina-horb-article01-owner-preview-m5ff3jhtz.vercel.app
         run: node scripts/qa-article01-premium-v2.mjs
       - name: Save screenshots and measurements
         if: always()
