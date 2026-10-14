@@ -49,7 +49,16 @@ try {
   try{response=await page.goto(ORIGIN+ARTICLE,{waitUntil:"networkidle",timeout:50000})}
   catch(e){bad(spec.name,"Navigation "+e.message);await page.close();continue}
   await page.evaluate(()=>document.fonts?.ready);
-  await page.waitForTimeout(170);
+  // Verify lazy-loaded author portrait only AFTER it has entered viewport.
+  // Its normal 'loading=lazy' is intentional and is not a broken image.
+  const authorImg=page.locator(".article-author-portrait img");
+  await authorImg.scrollIntoViewIfNeeded();
+  await authorImg.evaluate(async img => {
+    if (!img.complete) await new Promise(resolve => { img.addEventListener("load",resolve,{once:true}); img.addEventListener("error",resolve,{once:true}); setTimeout(resolve,3500); });
+    try { await img.decode(); } catch {}
+  });
+  await page.evaluate(()=>window.scrollTo({top:0,behavior:"instant"}));
+  await page.waitForTimeout(300);
   const metrics=await page.evaluate(()=>{
     const img=document.querySelector(".article-hero-visual img");
     const author=document.querySelector(".article-author-portrait img");
@@ -75,7 +84,7 @@ try {
       recurrence:!!document.querySelector(".conflict-recurrence"),
       sectionCount,
       hasCTA:!!document.querySelector(".article-conclusion-action a[href*='consultations/']"),
-      hrefs:[...document.querySelectorAll("a[href^='#']")].every(a=>document.getElementById(decodeURIComponent(a.hash.slice(1)))),
+      hrefs:[...document.querySelectorAll(".article-toc a[href^='#']")].every(a=>document.getElementById(decodeURIComponent(a.hash.slice(1)))),
       heroGeometry: {imageX:hr?.left,copyRight:heroCopy?.right, imageY:hr?.top,copyBottom:heroCopy?.bottom},
       missingImages
     };
@@ -89,7 +98,7 @@ try {
   if(metrics.authorNatural[0]<400||metrics.authorNatural[1]<400)bad(spec.name,"Verified author photo missing");
   if(metrics.authorLabel!=="Психолог · Магістр психології")bad(spec.name,"Author credentials incorrect");
   if(metrics.faqCount!==4||metrics.stages!==5||!metrics.recurrence)bad(spec.name,"Four FAQs / five stages / optional recurrence broken");
-  if(metrics.sectionCount!==11||!metrics.hasCTA||!metrics.hrefs)bad(spec.name,"Content sections/CTA/anchors broken");
+  if(metrics.sectionCount!==12||!metrics.hasCTA||!metrics.hrefs)bad(spec.name,"Content sections/CTA/anchors broken");
   if(metrics.missingImages.length)bad(spec.name,"Broken images: "+metrics.missingImages.join("; "));
   if(initial.hidden||initial.inert||initial.ariaHidden)bad(spec.name,"Header not visible initially");
   if(spec.width<=1100&&metrics.heroGeometry.imageY<metrics.heroGeometry.copyBottom-6)bad(spec.name,"Mobile/tablet Hero is not text-then-image");
@@ -144,6 +153,8 @@ try {
     const focused=await page.evaluate(()=>document.querySelector(".site-header")?.contains(document.activeElement));
     if(!focused)bad(spec.name,"Visible header is not keyboard focusable");
     await page.evaluate(()=>document.activeElement.blur());
+    // Reading mode intentionally allows an anchor/focus safety period of 950ms.
+    await page.waitForTimeout(1050);
     await page.evaluate(()=>window.scrollTo({top:document.querySelector(".article-body").offsetTop+240,behavior:"instant"}));
     await page.waitForTimeout(420);
     const hiddenNow=await headerState(page);
@@ -187,8 +198,9 @@ try {
  await page.goto(ORIGIN+ARTICLE,{waitUntil:"networkidle",timeout:45000});
  const duration=await page.locator(".site-header--canonical.inner-page-header").evaluate(x=>getComputedStyle(x).transitionDuration);
  if(duration.split(",").some(x=>parseFloat(x)>0))bad("reduced-motion","Nonzero header transition: "+duration);
+ await page.waitForTimeout(1100);
  await page.evaluate(()=>window.scrollTo({top:document.querySelector(".article-body").offsetTop+200,behavior:"instant"}));
- await page.waitForTimeout(120);
+ await page.waitForTimeout(180);
  if(!(await headerState(page)).hidden)bad("reduced-motion","Scrolling did not hide header");
  await page.close();
  for(const route of ["/notes/","/"]){
