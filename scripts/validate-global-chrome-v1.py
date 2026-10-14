@@ -26,7 +26,7 @@ def production_pages() -> list[Path]:
     articles = sorted((ROOT / "notes").glob("*/index.html")) + sorted((ROOT / "ru/notes").glob("*/index.html"))
     pages = fixed + articles
     require(all(path.is_file() for path in pages), "one or more production HTML files are missing")
-    require(len(pages) == 18, f"expected 18 production HTML files, found {len(pages)}")
+    require(len(pages) == 19, f"expected 19 staged HTML files (18 baseline + 1 approved UA), found {len(pages)}")
     return pages
 
 
@@ -73,7 +73,11 @@ for path in production_pages():
     require('site.notes-images.v3-1.js' not in text, f"{relative}: Notes image mutation runtime remains")
     require(f'{asset}images/logos/favicon-ag.svg' in text, f"{relative}: canonical SVG favicon missing")
     require(f'href="{locale_home}consultations/#contact"' in text, f"{relative}: canonical booking route missing")
-    require(f'href="{alternate}"' in text, f"{relative}: mirrored language route missing")
+    if relative == "notes/constant-arguments-with-partner/index.html":
+        require('href="../../ru/notes/"' in text, f"{relative}: missing safe language fallback to RU Notes")
+        require('href="../../ru/notes/constant-arguments-with-partner/"' not in text, f"{relative}: phantom RU article link")
+    else:
+        require(f'href="{alternate}"' in text, f"{relative}: mirrored language route missing")
 
     if is_ru:
         require('Об Алине' in text and 'Консультации' in text and 'Заметки' in text, f"{relative}: RU navigation labels missing")
@@ -121,6 +125,7 @@ for token in (
 
 ua_articles = {path.parent.name for path in (ROOT / "notes").glob("*/index.html")}
 ru_articles = {path.parent.name for path in (ROOT / "ru/notes").glob("*/index.html")}
-require(ua_articles == ru_articles and len(ua_articles) == 4, "UA/RU article pairs are not mirrored")
+require(ru_articles == ua_articles - {"constant-arguments-with-partner"} and len(ru_articles) == 4,
+        "Four approved bilingual pairs plus precisely one UA-only Article #1 are required")
 
 print("Static global chrome and direct navigation validation passed.")

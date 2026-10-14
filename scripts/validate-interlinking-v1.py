@@ -49,10 +49,11 @@ for token in (
 ua_articles = {path.parent.name: path for path in (ROOT / "notes").glob("*/index.html")}
 ru_articles = {path.parent.name: path for path in (ROOT / "ru/notes").glob("*/index.html")}
 require(ua_articles, "no UA articles found")
-require(ua_articles.keys() == ru_articles.keys(), "UA/RU article slug sets are not mirrored")
-require(len(ua_articles) == 4, f"expected 4 article pairs, found {len(ua_articles)}")
+require(set(ua_articles) - set(ru_articles) == {"constant-arguments-with-partner"}, "Exactly Article #1 may be UA-only")
+require(set(ru_articles) == set(ua_articles) - {"constant-arguments-with-partner"} and len(ru_articles) == 4,
+        "Existing four UA/RU article pairs must remain mirrored")
 
-for slug in sorted(ua_articles):
+for slug in sorted(ru_articles):
     for is_ru, path in ((False, ua_articles[slug]), (True, ru_articles[slug])):
         relative = path.relative_to(ROOT).as_posix()
         text = path.read_text(encoding="utf-8")
@@ -68,6 +69,11 @@ for slug in sorted(ua_articles):
         require("https://alinahorb.com/#about" not in text, f"{relative}: stale absolute About anchor remains")
         require("https://alinahorb.com/ru/#about" not in text, f"{relative}: stale RU absolute About anchor remains")
 
+ua_new_article = read("notes/constant-arguments-with-partner/index.html")
+require('href="../../ru/notes/"' in ua_new_article and 'href="../../ru/notes/constant-arguments-with-partner/"' not in ua_new_article,
+        "UA-only article must switch to RU Notes hub, not a phantom article")
+require('https://alinahorb.com/about/' in ua_new_article and 'https://alinahorb.com/consultations/' in ua_new_article,
+        "UA-only article must keep approved editorial internal links")
 require('href="../../consultations/#process"' in read("notes/first-consultation/index.html"), "UA first article process link missing")
 require('href="../../consultations/#process"' in read("ru/notes/first-consultation/index.html"), "RU first article process link missing")
 

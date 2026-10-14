@@ -26,6 +26,7 @@ ROUTES = [
     ("ru/notes/when-coping-stops-helping/index.html", f"{BASE}/ru/notes/when-coping-stops-helping/", f"{BASE}/notes/when-coping-stops-helping/", f"{BASE}/ru/notes/when-coping-stops-helping/"),
     ("notes/stress-relocation-and-lost-support/index.html", f"{BASE}/notes/stress-relocation-and-lost-support/", f"{BASE}/notes/stress-relocation-and-lost-support/", f"{BASE}/ru/notes/stress-relocation-and-lost-support/"),
     ("ru/notes/stress-relocation-and-lost-support/index.html", f"{BASE}/ru/notes/stress-relocation-and-lost-support/", f"{BASE}/notes/stress-relocation-and-lost-support/", f"{BASE}/ru/notes/stress-relocation-and-lost-support/"),
+    ("notes/constant-arguments-with-partner/index.html", f"{BASE}/notes/constant-arguments-with-partner/", None, None),
     ("privacy/index.html", f"{BASE}/privacy/", f"{BASE}/privacy/", f"{BASE}/ru/privacy/"),
     ("ru/privacy/index.html", f"{BASE}/ru/privacy/", f"{BASE}/privacy/", f"{BASE}/ru/privacy/"),
 ]
@@ -61,8 +62,13 @@ for relative, canonical, ua_url, ru_url in ROUTES:
     if relative in INDEXABLE_PATHS:
         require("noindex" not in text.lower(), f"{relative}: noindex remains after launch")
     require(text.count(f'<link rel="canonical" href="{canonical}">') == 1, f"{relative}: canonical mismatch")
-    require(text.count(f'<link rel="alternate" hreflang="uk" href="{ua_url}">') == 1, f"{relative}: UA hreflang mismatch")
-    require(text.count(f'<link rel="alternate" hreflang="ru" href="{ru_url}">') == 1, f"{relative}: RU hreflang mismatch")
+    if ua_url is None and ru_url is None:
+        # TASK027: approved UA-only editorial preview; no phantom Russian URL.
+        require('rel="alternate" hreflang=' not in text, f"{relative}: unpaired article advertises hreflang")
+        require('<a href="../../ru/notes/" lang="ru" hreflang="ru">RU</a>' in text, f"{relative}: language switch must lead to existing RU Notes hub")
+    else:
+        require(text.count(f'<link rel="alternate" hreflang="uk" href="{ua_url}">') == 1, f"{relative}: UA hreflang mismatch")
+        require(text.count(f'<link rel="alternate" hreflang="ru" href="{ru_url}">') == 1, f"{relative}: RU hreflang mismatch")
     require(count(r"<h1\b", text) == 1, f"{relative}: expected one H1")
 
     ids = re.findall(r'\bid="([^"]+)"', text)
@@ -89,7 +95,8 @@ for relative, canonical, ua_url, ru_url in ROUTES:
         require(count(r'<meta\s+property="og:image"\s+content="https://alinahorb\.com/[^"]+"\s*/?>', text) == 1, f"{relative}: OG image missing")
         require(count(r'<meta\s+property="og:image:width"\s+content="\d+"\s*/?>', text) == 1, f"{relative}: OG image width missing")
         require(count(r'<meta\s+property="og:image:height"\s+content="\d+"\s*/?>', text) == 1, f"{relative}: OG image height missing")
-        require('<meta property="og:image:type" content="image/webp">' in text, f"{relative}: OG image MIME mismatch")
+        expected_og_mime = "image/jpeg" if relative == "notes/constant-arguments-with-partner/index.html" else "image/webp"
+        require(f'<meta property="og:image:type" content="{expected_og_mime}">' in text, f"{relative}: OG image MIME mismatch")
         require('has-editorial-rail' in text and 'editorial-rail-placeholder' in text, f"{relative}: stable article rail geometry missing")
 
 error_page = ROOT / "404.html"
