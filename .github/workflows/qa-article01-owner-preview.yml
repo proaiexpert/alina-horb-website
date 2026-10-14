@@ -1,0 +1,33 @@
+name: QA Article 01 Owner Preview / Six Viewports
+on:
+  push:
+    branches:
+      - agent/alina-article01-bilingual-preview-r1
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  article01-browser:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install browser
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Test isolated Owner Preview at six widths
+        env:
+          TASK027_PREVIEW_URL: https://alina-horb-article01-owner-preview-db6058pih.vercel.app
+        run: node scripts/qa-article01-owner-preview.mjs
+      - name: Upload actual Chromium screenshots and QA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: task027-article01-owner-preview-six-viewports
+          path: qa/article01-browser
+          retention-days: 14
+          if-no-files-found: warn
