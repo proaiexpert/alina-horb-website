@@ -116,6 +116,12 @@ try {
       const y=Math.max(450,window.scrollY + el.getBoundingClientRect().top+190);
       window.scrollTo({top:y,behavior:"instant"});
     });
+    // A real reading gesture produces more than one scroll event.
+    // Full-page screenshots can reposition the browser between animation frames;
+    // complete the gesture with a second user-direction delta rather than
+    // treating a single programmatic jump as a touch scroll.
+    await page.waitForTimeout(75);
+    await page.evaluate(()=>window.scrollBy({top:160,behavior:"instant"}));
     await page.waitForTimeout(430);
     const down=await headerState(page);headerEvents.down=down;
     const after=await page.evaluate(()=>({y:window.scrollY,docWidth:document.documentElement.scrollWidth}));
