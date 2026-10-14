@@ -94,7 +94,15 @@
   if (toggle) observer.observe(toggle, { attributes: true, attributeFilter: ["aria-expanded"] });
   window.addEventListener("hashchange", showForNavigation);
   window.addEventListener("popstate", showForNavigation);
-  window.addEventListener("pageshow", showForNavigation);
+  window.addEventListener("pageshow", event => {
+    // Only a BFCache history restoration needs a temporary anchor/viewport hold.
+    // Ordinary first load must allow reading-mode hide on the first real downward scroll.
+    if (event.persisted) showForNavigation();
+    else {
+      previousY = Math.max(0, window.scrollY);
+      schedule();
+    }
+  });
   window.addEventListener("pagehide", () => { if (frame) cancelAnimationFrame(frame); setHidden(false); });
   // Reduced motion is implemented in CSS; no JS-driven animation is used.
   void reduced;
