@@ -1,0 +1,33 @@
+name: QA TASK 028 Premium Article V2
+on:
+  push:
+    branches:
+      - agent/alina-article01-bilingual-preview-r1
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  article01-premium-chromium:
+    runs-on: ubuntu-latest
+    timeout-minutes: 24
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Run eight viewport browser and reading header audit
+        env:
+          TASK028_PREVIEW_URL: https://alina-horb-article01-owner-preview-hga0rv1ln.vercel.app
+        run: node scripts/qa-article01-premium-v2.mjs
+      - name: Save screenshots and measurements
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TASK028-premium-article-v2-visual-qa
+          path: qa/article01-premium-v2
+          retention-days: 14
+          if-no-files-found: warn
