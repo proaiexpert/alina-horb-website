@@ -125,6 +125,11 @@ for(const [label,width,height] of viewports){
  const loc=await languageAnchor.getAttribute("href");
  if(new URL(loc,BASE+articleRoute(lang)).pathname!==switchHref)fail(id,"Switch destination invalid "+loc);
  if(width===390){
+  // The header is intentionally hidden while reading. Scroll up as a user would,
+  // then activate the actually visible language switch instead of clicking hidden UI.
+  await page.evaluate(()=>window.scrollTo({top:0,behavior:"instant"}));
+  await page.waitForTimeout(380);
+  if((await menuState(page)).hidden)fail(id,"Header unavailable at top before language switch");
   await languageAnchor.click();await page.waitForLoadState("domcontentloaded");
   if(!page.url().includes(switchHref)||await page.locator("html").getAttribute("lang")==lang)fail(id,"Real click language switch invalid");
  }
