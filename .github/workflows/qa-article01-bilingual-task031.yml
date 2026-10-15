@@ -21,7 +21,7 @@ jobs:
           npx playwright install --with-deps chromium
       - name: Real bilingual preview QA at eight viewports per language
         env:
-          TASK031_PREVIEW_URL: https://alina-horb-article01-owner-preview-khnf27kps.vercel.app
+          TASK031_PREVIEW_URL: https://alina-horb-article01-owner-preview-lxd2b0ko4.vercel.app
         run: node scripts/qa-article01-bilingual-task031.mjs
       - name: Save bilingual screenshots and QA evidence
         if: always()
