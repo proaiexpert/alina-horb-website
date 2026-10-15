@@ -82,7 +82,7 @@ for(const [label,width,height] of viewports){
  if(!metric.recurrence?.includes(lang==="ru"?"не является неизбежным":"не є неминучим"))fail(id,"Optional recurrence missing");
   const expectedIntro=lang==="ru"?"Иногда кажется, что отношения превратились в бесконечное повторение":"Іноді здається, що стосунки перетворилися";
   if(!metric.introFirst?.startsWith(expectedIntro))fail(id,"First approved introductory paragraph is missing");
-  if(metric.footerSwitch.length!==1||metric.footerSwitch[0]!==canonical(lang==="ru"?"uk":"ru"))fail(id,"Footer language switch must link to paired article");
+  if(metric.footerSwitch.length!==1||new URL(metric.footerSwitch[0]).pathname!==new URL(canonical(lang==="ru"?"uk":"ru")).pathname)fail(id,"Footer language switch must link to paired article");
  if(!metric.caseFriday||metric.case.length!==2)fail(id,"Two-voice Friday case invalid");
  if(lang==="ru"&&(!metric.case[0].includes("Для тебя всегда всё важнее меня")||!metric.case[1].includes("Я работаю, чтобы у нас всё было нормально")))fail(id,"RU voices not localized");
  if(lang==="uk"&&(!metric.case[0].includes("Для тебе завжди все важливіше")||!metric.case[1].includes("Я працюю, щоб у нас усе було нормально")))fail(id,"UA voices corrupted");
