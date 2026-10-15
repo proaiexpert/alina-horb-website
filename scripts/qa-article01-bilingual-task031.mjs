@@ -121,7 +121,7 @@ for(const [label,width,height] of viewports){
  }
  const uiSwitch=lang==="ru"?"UA":"RU";
  const switchHref=lang==="ru"?"/notes/constant-arguments-with-partner/":"/ru/notes/constant-arguments-with-partner/";
- const languageAnchor=page.locator(".language-switch a");
+ const languageAnchor=page.locator("header.site-header .language-switch a");
  const loc=await languageAnchor.getAttribute("href");
  if(new URL(loc,BASE+articleRoute(lang)).pathname!==switchHref)fail(id,"Switch destination invalid "+loc);
  if(width===390){
