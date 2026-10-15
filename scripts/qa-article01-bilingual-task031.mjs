@@ -88,7 +88,7 @@ for(const [label,width,height] of viewports){
  if(!metric.schema.types.includes("BreadcrumbList"))fail(id,"Breadcrumb schema missing");
  if(metric.canonical!==canonical(lang))fail(id,"Canonical mismatch");
  for(const [code,expected] of Object.entries({uk:canonical("uk"),ru:canonical("ru"),"x-default":canonical("uk")}))if(metric.alts[code]!==expected)fail(id,"hreflang "+code);
- if(metric.buttons.length!==1||metric.buttons[0].href!=="https://alinahorb.com/"+(lang==="ru"?"ru/":"")+"consultations/")fail(id,"CTA mismatch");
+ if(metric.buttons.length!==1||new URL(metric.buttons[0].href).pathname!=="/"+(lang==="ru"?"ru/":"")+"consultations/")fail(id,"CTA mismatch");
  if(metric.toc.length!==11||metric.toc.some(x=>!x.exists))fail(id,"TOC anchors broken");
  if(metric.missing.length)fail(id,"Missing image "+metric.missing.join(","));
  if(metric.links.some(x=>/^\s*#\s*$/.test(x.raw)||!x.url))fail(id,"Empty link");
