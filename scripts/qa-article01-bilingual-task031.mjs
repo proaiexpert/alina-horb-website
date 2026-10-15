@@ -3,7 +3,7 @@
 import { chromium } from "playwright";
 import fs from "node:fs/promises";
 import path from "node:path";
-const BASE=process.env.TASK031_PREVIEW_URL || "https://alina-horb-article01-owner-preview-6w09m5o7o.vercel.app";
+const BASE=process.env.TASK031_PREVIEW_URL || "https://alina-horb-article01-owner-preview-khnf27kps.vercel.app";
 const ROUTE="/notes/constant-arguments-with-partner/";
 const viewports=[
  ["iphone-small",375,812],["iphone",390,844],["phone-landscape",844,390],
@@ -46,6 +46,8 @@ for(const [label,width,height] of viewports){
    const faq=graph.find(x=>x["@type"]==="FAQPage");
    return {
     lang:document.documentElement.lang,title:document.title,description:q('meta[name="description"]')?.content,
+    introFirst:q('.article-essay-intro > p:first-of-type')?.textContent.trim(),
+    footerSwitch:qa('footer.site-footer .footer-utility .language-switch a').map(el=>el.href),
     canonical:q('link[rel="canonical"]')?.href,alts,h1:qa("h1").map(x=>x.textContent.trim()),
     width:document.documentElement.scrollWidth,
     hero:{ratio:hr?.width/hr?.height,copyRight:copy?.right,imageLeft:hr?.left,imageTop:hr?.top,copyBottom:copy?.bottom,
@@ -77,7 +79,10 @@ for(const [label,width,height] of viewports){
  if(metric.author.natural!==900||metric.author.credential!==(lang==="ru"?"Психолог · Магистр психологии":"Психолог · Магістр психології"))fail(id,"Author photo or credential");
  if(metric.cycle.length!==5||metric.stages.map(x=>x.label).join("|")!=="01|02|03|04|05")fail(id,"Five-stage order");
  if(metric.stages.some(x=>Math.abs(x.center-metric.stages[0].center)>3)||metric.spine==="rgba(0, 0, 0, 0)")fail(id,"Unconnected cycle spine");
- if(!metric.recurrence?.includes(lang==="ru"?"не неизбежно":"не є неминучим"))fail(id,"Optional recurrence missing");
+ if(!metric.recurrence?.includes(lang==="ru"?"не является неизбежным":"не є неминучим"))fail(id,"Optional recurrence missing");
+  const expectedIntro=lang==="ru"?"Иногда кажется, что отношения превратились в бесконечное повторение":"Іноді здається, що стосунки перетворилися";
+  if(!metric.introFirst?.startsWith(expectedIntro))fail(id,"First approved introductory paragraph is missing");
+  if(metric.footerSwitch.length!==1||metric.footerSwitch[0]!==canonical(lang==="ru"?"uk":"ru"))fail(id,"Footer language switch must link to paired article");
  if(!metric.caseFriday||metric.case.length!==2)fail(id,"Two-voice Friday case invalid");
  if(lang==="ru"&&(!metric.case[0].includes("Для тебя всегда всё важнее меня")||!metric.case[1].includes("Я работаю, чтобы у нас всё было нормально")))fail(id,"RU voices not localized");
  if(lang==="uk"&&(!metric.case[0].includes("Для тебе завжди все важливіше")||!metric.case[1].includes("Я працюю, щоб у нас усе було нормально")))fail(id,"UA voices corrupted");
@@ -143,6 +148,11 @@ for(const [label,width,height] of viewports){
    const r=await tab.goto(BASE+prefix+route,{waitUntil:"domcontentloaded",timeout:45000});
    const found=await tab.locator('a[href*="constant-arguments-with-partner/"]').count();
    if(r?.status()!==200||found<1)fail("teaser-"+language+route,"Hub/home card missing");
+  if(route==="/notes/"){
+    const navItems=await tab.locator(".notes-hub-index li a").count();
+    if(navItems!==5)fail("teaser-"+language,"Notes topic index must list all five items: "+navItems);
+    if(await tab.locator('.notes-hub-index a[href="#conflict-article"]').count()!==1)fail("teaser-"+language,"Conflict article missing from Notes index");
+  }
   }
   const published=await tab.goto(BASE+prefix+"/notes/first-consultation/",{waitUntil:"domcontentloaded",timeout:45000});
   if(published?.status()!==200||!await tab.locator("h1").count())fail("regression-"+language,"Existing article unavailable");
