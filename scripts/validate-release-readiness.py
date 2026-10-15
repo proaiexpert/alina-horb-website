@@ -26,7 +26,8 @@ ROUTES = [
     ("ru/notes/when-coping-stops-helping/index.html", f"{BASE}/ru/notes/when-coping-stops-helping/", f"{BASE}/notes/when-coping-stops-helping/", f"{BASE}/ru/notes/when-coping-stops-helping/"),
     ("notes/stress-relocation-and-lost-support/index.html", f"{BASE}/notes/stress-relocation-and-lost-support/", f"{BASE}/notes/stress-relocation-and-lost-support/", f"{BASE}/ru/notes/stress-relocation-and-lost-support/"),
     ("ru/notes/stress-relocation-and-lost-support/index.html", f"{BASE}/ru/notes/stress-relocation-and-lost-support/", f"{BASE}/notes/stress-relocation-and-lost-support/", f"{BASE}/ru/notes/stress-relocation-and-lost-support/"),
-    ("notes/constant-arguments-with-partner/index.html", f"{BASE}/notes/constant-arguments-with-partner/", None, None),
+    ("notes/constant-arguments-with-partner/index.html", f"{BASE}/notes/constant-arguments-with-partner/", f"{BASE}/notes/constant-arguments-with-partner/", f"{BASE}/ru/notes/constant-arguments-with-partner/"),
+    ("ru/notes/constant-arguments-with-partner/index.html", f"{BASE}/ru/notes/constant-arguments-with-partner/", f"{BASE}/notes/constant-arguments-with-partner/", f"{BASE}/ru/notes/constant-arguments-with-partner/"),
     ("privacy/index.html", f"{BASE}/privacy/", f"{BASE}/privacy/", f"{BASE}/ru/privacy/"),
     ("ru/privacy/index.html", f"{BASE}/ru/privacy/", f"{BASE}/privacy/", f"{BASE}/ru/privacy/"),
 ]
@@ -95,7 +96,7 @@ for relative, canonical, ua_url, ru_url in ROUTES:
         require(count(r'<meta\s+property="og:image"\s+content="https://alinahorb\.com/[^"]+"\s*/?>', text) == 1, f"{relative}: OG image missing")
         require(count(r'<meta\s+property="og:image:width"\s+content="\d+"\s*/?>', text) == 1, f"{relative}: OG image width missing")
         require(count(r'<meta\s+property="og:image:height"\s+content="\d+"\s*/?>', text) == 1, f"{relative}: OG image height missing")
-        expected_og_mime = "image/jpeg" if relative == "notes/constant-arguments-with-partner/index.html" else "image/webp"
+        expected_og_mime = "image/jpeg" if "constant-arguments-with-partner/" in relative else "image/webp"
         require(f'<meta property="og:image:type" content="{expected_og_mime}">' in text, f"{relative}: OG image MIME mismatch")
         require('has-editorial-rail' in text and 'editorial-rail-placeholder' in text, f"{relative}: stable article rail geometry missing")
 

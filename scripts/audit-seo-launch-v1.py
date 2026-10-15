@@ -41,6 +41,7 @@ ROUTES = [
     ('/notes/stress-relocation-and-lost-support/', 'notes/stress-relocation-and-lost-support/index.html', 'uk', True),
     ('/ru/notes/stress-relocation-and-lost-support/', 'ru/notes/stress-relocation-and-lost-support/index.html', 'ru', True),
     ('/notes/constant-arguments-with-partner/', 'notes/constant-arguments-with-partner/index.html', 'uk', True),
+    ('/ru/notes/constant-arguments-with-partner/', 'ru/notes/constant-arguments-with-partner/index.html', 'ru', True),
     ('/privacy/', 'privacy/index.html', 'uk', False),
     ('/ru/privacy/', 'ru/privacy/index.html', 'ru', False),
 ]
@@ -224,17 +225,12 @@ def main() -> int:
             add(critical, 'indexing', issue, relative)
         if link_value(parser, 'canonical') != canonical:
             add(critical, 'canonical', f'Canonical must be {canonical}', relative)
-        if route == '/notes/constant-arguments-with-partner/':
-            for language_tag in ('uk', 'ru', 'x-default'):
-                if link_value(parser, 'alternate', language_tag):
-                    add(critical, 'hreflang', 'UA-only preview must not advertise unpaired article alternates', relative)
-        else:
-            if link_value(parser, 'alternate', 'uk') != ua_url:
-                add(critical, 'hreflang', f'UK alternate must be {ua_url}', relative)
-            if link_value(parser, 'alternate', 'ru') != ru_url:
-                add(critical, 'hreflang', f'RU alternate must be {ru_url}', relative)
-            if link_value(parser, 'alternate', 'x-default') != x_default:
-                add(critical, 'hreflang', f'x-default alternate must be {x_default}', relative)
+        if link_value(parser, 'alternate', 'uk') != ua_url:
+            add(critical, 'hreflang', f'UK alternate must be {ua_url}', relative)
+        if link_value(parser, 'alternate', 'ru') != ru_url:
+            add(critical, 'hreflang', f'RU alternate must be {ru_url}', relative)
+        if link_value(parser, 'alternate', 'x-default') != x_default:
+            add(critical, 'hreflang', f'x-default alternate must be {x_default}', relative)
 
         if language == 'ru' and 'коли важко сформулювати запит' in text.lower():
             add(critical, 'localization', 'Ukrainian phrase leaked into Russian content', relative)
@@ -322,7 +318,7 @@ def main() -> int:
             if not article:
                 continue
             mandatory = ('headline', 'description', 'mainEntityOfPage', 'image', 'author', 'dateModified')
-            if route == '/notes/constant-arguments-with-partner/':
+            if route in {'/notes/constant-arguments-with-partner/', '/ru/notes/constant-arguments-with-partner/'}:
                 mandatory += ('dateCreated',)
             else:
                 mandatory += ('datePublished',)
@@ -331,14 +327,14 @@ def main() -> int:
                     add(critical, 'article-schema', f'Missing Article.{field}', relative)
             if article.get('mainEntityOfPage') != canonical:
                 add(critical, 'article-schema', 'mainEntityOfPage does not match canonical', relative)
-            date_field = 'dateCreated' if route == '/notes/constant-arguments-with-partner/' else 'datePublished'
+            date_field = 'dateCreated' if route in {'/notes/constant-arguments-with-partner/', '/ru/notes/constant-arguments-with-partner/'} else 'datePublished'
             if not valid_iso_date(article.get(date_field)):
                 add(critical, 'article-schema', f'{date_field} is not an ISO date', relative)
             if not valid_iso_date(article.get('dateModified')):
                 add(critical, 'article-schema', 'dateModified is not an ISO date', relative)
             if article.get(date_field) and article.get('dateModified') and article[date_field] > article['dateModified']:
                 add(critical, 'article-schema', f'{date_field} must not be later than dateModified', relative)
-            if route == '/notes/constant-arguments-with-partner/' and article.get('datePublished'):
+            if route in {'/notes/constant-arguments-with-partner/', '/ru/notes/constant-arguments-with-partner/'} and article.get('datePublished'):
                 add(critical, 'article-schema', 'Unapproved UA draft must not claim publication date', relative)
             author = article.get('author')
             expected_author_url = f'{BASE}/ru/about/' if language == 'ru' else f'{BASE}/about/'
@@ -350,7 +346,7 @@ def main() -> int:
 
         if route in NOTES_HUB_ROUTES:
             item_list = next((node for node in nodes if node.get('@type') == 'ItemList'), None)
-            expected_items = 5 if route == '/notes/' else 4
+            expected_items = 5  # Both language hubs carry the fifth genuine article route
             if not item_list or item_list.get('numberOfItems') != expected_items or len(item_list.get('itemListElement', [])) != expected_items:
                 add(critical, 'collection-schema', f'Notes ItemList must contain exactly {expected_items} articles', relative)
 
