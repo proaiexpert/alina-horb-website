@@ -246,7 +246,7 @@ try {
      const result=await prior.goto("https://alina-horb-article01-owner-preview-m5ff3jhtz.vercel.app"+ARTICLE,{waitUntil:"networkidle",timeout:50000});
      if(result?.status()!==200)bad("comparison","V2 baseline unavailable at "+w);
      else {
-       await prior.locator('.article-body--v32 > section[id]').nth(1).screenshot({path:path.join(OUTPUT,`${w}-before-v2-case-process.png`)});
+       await prior.locator('[id="як-виглядає-повторюваний-цикл-конфлікту"]').screenshot({path:path.join(OUTPUT,`${w}-before-v2-case-process.png`)});
        await prior.locator(".article-author-card").screenshot({path:path.join(OUTPUT,`${w}-before-v2-author-no-cta.png`)});
      }
    } catch(e) {bad("comparison",w+": "+e.message);}
