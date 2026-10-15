@@ -36,7 +36,7 @@ for(const [label,width,height] of viewports){
  await author.evaluate(async el=>{try{await el.decode()}catch{}}).catch(()=>{});
  await page.evaluate(()=>window.scrollTo({top:0,behavior:"instant"}));
  await page.waitForTimeout(200);
- const metric=await page.evaluate(()=>{
+ const metric=await page.evaluate((pageLang)=>{
    const q=s=>document.querySelector(s),qa=s=>[...document.querySelectorAll(s)];
    const h=q(".article-hero-visual"),hr=h?.getBoundingClientRect(),copy=q(".article-hero-copy")?.getBoundingClientRect();
    const caseItems=qa(".article-case-voice"),caseRects=caseItems.map(el=>{const r=el.getBoundingClientRect();return {x:r.x,y:r.y,w:r.width,h:r.height}});
@@ -56,7 +56,7 @@ for(const [label,width,height] of viewports){
        faq:faq?.mainEntity||[],crumb:graph.find(x=>x["@type"]==="BreadcrumbList")},
     toc:qa(".article-toc a").map(x=>({href:x.href,exists:!!document.getElementById(decodeURIComponent(x.hash.slice(1)))})),
     case:caseItems.map(x=>x.textContent.trim()),caseRects,
-    caseFriday:q(".article-case-context")?.textContent.includes(lang==="ru"?"вечер пятницы":"вечір п’ятниці"),
+    caseFriday:q(".article-case-context")?.textContent.includes(pageLang==="ru"?"вечер пятницы":"вечір п’ятниці"),
     cycle:qa(".conflict-cycle > li").map(x=>({number:x.querySelector(".conflict-cycle-num")?.textContent.trim(),title:x.querySelector("strong")?.textContent.trim(),desc:x.querySelector("p")?.textContent.trim()})),
     stages:spans,spine:getComputedStyle(q(".conflict-cycle"),"::before").backgroundColor,
     recurrence:q(".conflict-recurrence")?.textContent.trim(),
@@ -66,7 +66,7 @@ for(const [label,width,height] of viewports){
     links:qa("a[href]").map(x=>({raw:x.getAttribute("href"),url:x.href})),
     missing:qa("img").filter(x=>!x.complete||x.naturalWidth===0).map(x=>x.src)
    }
- });
+ },lang);
  if(status!==200)fail(id,"HTTP "+status);
  if(!header.includes("noindex")||!header.includes("nofollow"))fail(id,"preview indexing guard missing "+header);
  if(metric.lang!==lang)fail(id,"Wrong html lang");
