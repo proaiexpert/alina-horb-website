@@ -1,0 +1,33 @@
+name: QA TASK 031 Bilingual Preview
+on:
+  push:
+    branches:
+      - agent/alina-article01-bilingual-preview-r1
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  bilingual-article:
+    runs-on: ubuntu-latest
+    timeout-minutes: 28
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - name: Install Chromium
+        run: |
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+      - name: Real bilingual preview QA at eight viewports per language
+        env:
+          TASK031_PREVIEW_URL: https://alina-horb-article01-owner-preview-lxd2b0ko4.vercel.app
+        run: node scripts/qa-article01-bilingual-task031.mjs
+      - name: Save bilingual screenshots and QA evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: TASK031-bilingual-preview-browser-evidence
+          path: qa/task031-bilingual
+          retention-days: 14
+          if-no-files-found: warn

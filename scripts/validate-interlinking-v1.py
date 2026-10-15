@@ -49,10 +49,11 @@ for token in (
 ua_articles = {path.parent.name: path for path in (ROOT / "notes").glob("*/index.html")}
 ru_articles = {path.parent.name: path for path in (ROOT / "ru/notes").glob("*/index.html")}
 require(ua_articles, "no UA articles found")
-require(ua_articles.keys() == ru_articles.keys(), "UA/RU article slug sets are not mirrored")
-require(len(ua_articles) == 4, f"expected 4 article pairs, found {len(ua_articles)}")
+require(set(ua_articles) == set(ru_articles), "All article routes must have real UA/RU pairs")
+require(set(ru_articles) == set(ua_articles) and len(ru_articles) == 5,
+        "All five UA/RU article pairs must be mirrored")
 
-for slug in sorted(ua_articles):
+for slug in sorted(ru_articles):
     for is_ru, path in ((False, ua_articles[slug]), (True, ru_articles[slug])):
         relative = path.relative_to(ROOT).as_posix()
         text = path.read_text(encoding="utf-8")
@@ -60,7 +61,9 @@ for slug in sorted(ua_articles):
         absolute_about = "https://alinahorb.com/ru/about/" if is_ru else "https://alinahorb.com/about/"
 
         require(f'href="{prefix}about/"' in text, f"{relative}: author About link missing")
-        require(f'href="{prefix}consultations/#contact"' in text, f"{relative}: canonical article CTA missing")
+        require((f'href="{prefix}consultations/#contact"' in text or
+             (slug == "constant-arguments-with-partner" and f'href="{prefix}consultations/"' in text)),
+            f"{relative}: article consultation CTA missing")
         require(absolute_about in text, f"{relative}: structured author URL missing")
         require(f'href="{prefix}#about"' not in text, f"{relative}: stale About anchor remains")
         require(f'href="{prefix}#contact"' not in text, f"{relative}: stale Contact anchor remains")
@@ -68,6 +71,11 @@ for slug in sorted(ua_articles):
         require("https://alinahorb.com/#about" not in text, f"{relative}: stale absolute About anchor remains")
         require("https://alinahorb.com/ru/#about" not in text, f"{relative}: stale RU absolute About anchor remains")
 
+ua_new_article = read("notes/constant-arguments-with-partner/index.html")
+require('href="../../ru/notes/constant-arguments-with-partner/"' in ua_new_article,
+        "UA Article #1 must switch directly to its real RU counterpart")
+require('https://alinahorb.com/about/' in ua_new_article and 'https://alinahorb.com/consultations/' in ua_new_article,
+        "UA-only article must keep approved editorial internal links")
 require('href="../../consultations/#process"' in read("notes/first-consultation/index.html"), "UA first article process link missing")
 require('href="../../consultations/#process"' in read("ru/notes/first-consultation/index.html"), "RU first article process link missing")
 
