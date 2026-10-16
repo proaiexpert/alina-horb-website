@@ -25,6 +25,10 @@ const routes = [
   "/ru/notes/when-coping-stops-helping/",
   "/notes/stress-relocation-and-lost-support/",
   "/ru/notes/stress-relocation-and-lost-support/",
+  "/notes/constant-arguments-with-partner/",
+  "/ru/notes/constant-arguments-with-partner/",
+  "/notes/fear-of-another-panic-attack/",
+  "/ru/notes/fear-of-another-panic-attack/",
   "/privacy/",
   "/ru/privacy/",
   "/404.html"
@@ -32,6 +36,7 @@ const routes = [
 
 const viewports = [
   { name: "mobile", width: 390, height: 844 },
+  { name: "landscape", width: 844, height: 390 },
   { name: "desktop", width: 1440, height: 1000 }
 ];
 
@@ -39,6 +44,7 @@ const critical = [];
 const warnings = [];
 const seen = new Set();
 const pageReports = [];
+const responsiveChecks = [];
 
 const pushViolation = (bucket, viewport, route, violation, node) => {
   const targets = (node.target || []).map((target) => Array.isArray(target) ? target.join(" ") : String(target));
@@ -102,6 +108,39 @@ try {
           }
         }
 
+        if (route.includes("/fear-of-another-panic-attack/")) {
+          const responsive = await page.evaluate(() => ({
+            scrollWidth: document.documentElement.scrollWidth,
+            clientWidth: document.documentElement.clientWidth,
+            menuPresent: Boolean(document.querySelector("[data-menu-toggle]"))
+          }));
+          const overflow = Math.max(0, responsive.scrollWidth - responsive.clientWidth);
+          const screenshotName = `article02-${route.startsWith("/ru/") ? "ru" : "ua"}-${viewport.name}.png`;
+          await page.screenshot({
+            path: path.join(outputDir, screenshotName),
+            fullPage: true,
+            animations: "disabled"
+          });
+          responsiveChecks.push({
+            route,
+            viewport: viewport.name,
+            overflowPixels: overflow,
+            menuPresent: responsive.menuPresent,
+            screenshot: screenshotName
+          });
+          if (overflow > 2 || !responsive.menuPresent) {
+            critical.push({
+              viewport: viewport.name,
+              route,
+              rule: overflow > 2 ? "horizontal-overflow" : "missing-mobile-menu",
+              impact: "serious",
+              help: overflow > 2 ? `Horizontal document overflow: ${overflow}px` : "Missing responsive menu toggle",
+              helpUrl: null,
+              targets: ["html"],
+              html: ""
+            });
+          }
+        }
         pageReports.push({
           viewport: viewport.name,
           route,
@@ -141,6 +180,7 @@ const report = {
   viewports,
   critical,
   warnings,
+  responsiveChecks,
   pages: pageReports
 };
 
