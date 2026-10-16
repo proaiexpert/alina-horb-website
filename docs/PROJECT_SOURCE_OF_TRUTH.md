@@ -186,3 +186,8 @@ Approved homepage content:
 - no public claim of gestalt certification, psychotherapy status, clinical qualification or regular supervision unless separately confirmed.
 
 Responsive requirement: the About section must not overflow at 844 px landscape and must remain readable when the three approach rows are added.
+
+
+## Article #2 — staged TASK 036 (not yet published)
+
+A separate Draft PR adds a sixth article in each language: `notes/fear-of-another-panic-attack/` and `ru/notes/fear-of-another-panic-attack/`. The RU source is TASK 034 plus TASK 035 safety corrections, archived in `content/article02/RU_MASTER_TASK036.md`; the new UA editorial candidate is archived in `content/article02/UA_MASTER_TASK036.md` and requires independent review. Staged six-per-language inventory and 20 sitemap URLs apply to this branch only until Owner-approved merge and publication. All older sections above describe historical production decisions.
