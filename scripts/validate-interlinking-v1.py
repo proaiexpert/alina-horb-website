@@ -50,8 +50,8 @@ ua_articles = {path.parent.name: path for path in (ROOT / "notes").glob("*/index
 ru_articles = {path.parent.name: path for path in (ROOT / "ru/notes").glob("*/index.html")}
 require(ua_articles, "no UA articles found")
 require(set(ua_articles) == set(ru_articles), "All article routes must have real UA/RU pairs")
-require(set(ru_articles) == set(ua_articles) and len(ru_articles) == 5,
-        "All five UA/RU article pairs must be mirrored")
+require(set(ru_articles) == set(ua_articles) and len(ru_articles) == 6,
+        "All six UA/RU article pairs must be mirrored")
 
 for slug in sorted(ru_articles):
     for is_ru, path in ((False, ua_articles[slug]), (True, ru_articles[slug])):
@@ -62,7 +62,7 @@ for slug in sorted(ru_articles):
 
         require(f'href="{prefix}about/"' in text, f"{relative}: author About link missing")
         require((f'href="{prefix}consultations/#contact"' in text or
-             (slug == "constant-arguments-with-partner" and f'href="{prefix}consultations/"' in text)),
+             (slug in {"constant-arguments-with-partner", "fear-of-another-panic-attack"} and f'href="{prefix}consultations/"' in text)),
             f"{relative}: article consultation CTA missing")
         require(absolute_about in text, f"{relative}: structured author URL missing")
         require(f'href="{prefix}#about"' not in text, f"{relative}: stale About anchor remains")

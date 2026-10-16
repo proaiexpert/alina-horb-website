@@ -42,6 +42,8 @@ ROUTES = [
     ('/ru/notes/stress-relocation-and-lost-support/', 'ru/notes/stress-relocation-and-lost-support/index.html', 'ru', True),
     ('/notes/constant-arguments-with-partner/', 'notes/constant-arguments-with-partner/index.html', 'uk', True),
     ('/ru/notes/constant-arguments-with-partner/', 'ru/notes/constant-arguments-with-partner/index.html', 'ru', True),
+    ('/notes/fear-of-another-panic-attack/', 'notes/fear-of-another-panic-attack/index.html', 'uk', True),
+    ('/ru/notes/fear-of-another-panic-attack/', 'ru/notes/fear-of-another-panic-attack/index.html', 'ru', True),
     ('/privacy/', 'privacy/index.html', 'uk', False),
     ('/ru/privacy/', 'ru/privacy/index.html', 'ru', False),
 ]
@@ -318,7 +320,7 @@ def main() -> int:
             if not article:
                 continue
             mandatory = ('headline', 'description', 'mainEntityOfPage', 'image', 'author', 'dateModified')
-            if route in {'/notes/constant-arguments-with-partner/', '/ru/notes/constant-arguments-with-partner/'}:
+            if route in {'/notes/constant-arguments-with-partner/', '/ru/notes/constant-arguments-with-partner/', '/notes/fear-of-another-panic-attack/', '/ru/notes/fear-of-another-panic-attack/'}:
                 mandatory += ('dateCreated',)
             else:
                 mandatory += ('datePublished',)
@@ -327,14 +329,14 @@ def main() -> int:
                     add(critical, 'article-schema', f'Missing Article.{field}', relative)
             if article.get('mainEntityOfPage') != canonical:
                 add(critical, 'article-schema', 'mainEntityOfPage does not match canonical', relative)
-            date_field = 'dateCreated' if route in {'/notes/constant-arguments-with-partner/', '/ru/notes/constant-arguments-with-partner/'} else 'datePublished'
+            date_field = 'dateCreated' if route in {'/notes/constant-arguments-with-partner/', '/ru/notes/constant-arguments-with-partner/', '/notes/fear-of-another-panic-attack/', '/ru/notes/fear-of-another-panic-attack/'} else 'datePublished'
             if not valid_iso_date(article.get(date_field)):
                 add(critical, 'article-schema', f'{date_field} is not an ISO date', relative)
             if not valid_iso_date(article.get('dateModified')):
                 add(critical, 'article-schema', 'dateModified is not an ISO date', relative)
             if article.get(date_field) and article.get('dateModified') and article[date_field] > article['dateModified']:
                 add(critical, 'article-schema', f'{date_field} must not be later than dateModified', relative)
-            if route in {'/notes/constant-arguments-with-partner/', '/ru/notes/constant-arguments-with-partner/'} and article.get('datePublished'):
+            if route in {'/notes/constant-arguments-with-partner/', '/ru/notes/constant-arguments-with-partner/', '/notes/fear-of-another-panic-attack/', '/ru/notes/fear-of-another-panic-attack/'} and article.get('datePublished'):
                 add(critical, 'article-schema', 'Unapproved UA draft must not claim publication date', relative)
             author = article.get('author')
             expected_author_url = f'{BASE}/ru/about/' if language == 'ru' else f'{BASE}/about/'
@@ -346,7 +348,7 @@ def main() -> int:
 
         if route in NOTES_HUB_ROUTES:
             item_list = next((node for node in nodes if node.get('@type') == 'ItemList'), None)
-            expected_items = 5  # Both language hubs carry the fifth genuine article route
+            expected_items = 6  # Both language hubs carry six real article routes
             if not item_list or item_list.get('numberOfItems') != expected_items or len(item_list.get('itemListElement', [])) != expected_items:
                 add(critical, 'collection-schema', f'Notes ItemList must contain exactly {expected_items} articles', relative)
 
