@@ -45,6 +45,7 @@ const warnings = [];
 const seen = new Set();
 const pageReports = [];
 const responsiveChecks = [];
+  const mobileTocChecks = [];
 
 const pushViolation = (bucket, viewport, route, violation, node) => {
   const targets = (node.target || []).map((target) => Array.isArray(target) ? target.join(" ") : String(target));
@@ -115,6 +116,47 @@ try {
             menuPresent: Boolean(document.querySelector("[data-menu-toggle]"))
           }));
           const overflow = Math.max(0, responsive.scrollWidth - responsive.clientWidth);
+          const isCompact = viewport.width <= 900;
+          const disclosure = page.locator(".panic-toc-mobile");
+          const tocCheck = {
+            route, viewport: viewport.name,
+            visible: await disclosure.isVisible(),
+            initiallyClosed: !(await disclosure.evaluate((el) => el.open)),
+            expandedByKeyboard: false,
+            linkCount: await disclosure.locator("ol > li > a").count(),
+            heroImageLoaded: await page.locator(".article-hero-visual img").evaluate(
+              (img) => img.complete && img.naturalWidth > 0
+            ),
+            menuOpensAndCloses: null
+          };
+          if (isCompact && tocCheck.visible && tocCheck.initiallyClosed) {
+            await disclosure.locator("summary").focus();
+            await page.keyboard.press("Enter");
+            tocCheck.expandedByKeyboard = await disclosure.evaluate((el) => el.open);
+            await page.keyboard.press("Enter");
+          }
+          const toggle = page.locator("[data-menu-toggle]");
+          if (isCompact && await toggle.isVisible()) {
+            await toggle.click();
+            const opened = (await toggle.getAttribute("aria-expanded")) === "true";
+            await toggle.click();
+            const closed = (await toggle.getAttribute("aria-expanded")) === "false";
+            tocCheck.menuOpensAndCloses = opened && closed;
+          }
+          mobileTocChecks.push(tocCheck);
+          const tocFailed = tocCheck.linkCount !== 10 ||
+            !tocCheck.heroImageLoaded ||
+            (isCompact && (!tocCheck.visible || !tocCheck.initiallyClosed ||
+              !tocCheck.expandedByKeyboard || tocCheck.menuOpensAndCloses !== true)) ||
+            (!isCompact && tocCheck.visible);
+          if (tocFailed) {
+            critical.push({
+              viewport: viewport.name, route, rule: "article02-interactions",
+              impact: "serious",
+              help: JSON.stringify(tocCheck),
+              helpUrl: null, targets: [".article-toc"], html: ""
+            });
+          }
           const screenshotName = `article02-${route.startsWith("/ru/") ? "ru" : "ua"}-${viewport.name}.png`;
           await page.screenshot({
             path: path.join(outputDir, screenshotName),
@@ -181,6 +223,7 @@ const report = {
   critical,
   warnings,
   responsiveChecks,
+  mobileTocChecks,
   pages: pageReports
 };
 
@@ -204,4 +247,4 @@ const summary = [
 await fs.writeFile(path.join(outputDir, "summary.txt"), summary, "utf8");
 console.log(summary);
 
-if (strict && critical.length) process.exit(1);
+if (strict && (critical.length || warnings.length)) process.exit(1);
