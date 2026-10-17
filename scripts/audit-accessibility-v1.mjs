@@ -125,6 +125,14 @@ try {
             menuPresent: Boolean(document.querySelector("[data-menu-toggle]"))
           }));
           const overflow = Math.max(0, responsive.scrollWidth - responsive.clientWidth);
+          // Capture the clean initial layout BEFORE focus/scroll/menu interaction
+          // to avoid skip-link and sticky-header artefacts in full-page screenshots.
+          const screenshotName = `article02-${route.startsWith("/ru/") ? "ru" : "ua"}-${viewport.name}.png`;
+          await page.screenshot({
+            path: path.join(outputDir, screenshotName),
+            fullPage: true,
+            animations: "disabled"
+          });
           const isCompact = viewport.width <= 900;
           const disclosure = page.locator(".panic-toc-mobile");
           const tocCheck = {
@@ -176,12 +184,6 @@ try {
               helpUrl: null, targets: [".article-toc"], html: ""
             });
           }
-          const screenshotName = `article02-${route.startsWith("/ru/") ? "ru" : "ua"}-${viewport.name}.png`;
-          await page.screenshot({
-            path: path.join(outputDir, screenshotName),
-            fullPage: true,
-            animations: "disabled"
-          });
           responsiveChecks.push({
             route,
             viewport: viewport.name,
