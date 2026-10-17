@@ -138,19 +138,29 @@ try {
             ),
             menuOpensAndCloses: null
           };
+          // Exercise the responsive header before moving keyboard focus to
+          // the in-article TOC: reading-mode intentionally hides it on scroll.
+          const toggle = page.locator("[data-menu-toggle]");
+          if (isCompact) {
+            await page.evaluate(() => window.scrollTo(0, 0));
+            await page.waitForTimeout(150);
+            if (await toggle.isVisible()) {
+              try {
+                await toggle.click({ timeout: 5000 });
+                const opened = (await toggle.getAttribute("aria-expanded")) === "true";
+                await toggle.click({ timeout: 5000 });
+                const closed = (await toggle.getAttribute("aria-expanded")) === "false";
+                tocCheck.menuOpensAndCloses = opened && closed;
+              } catch {
+                tocCheck.menuOpensAndCloses = false;
+              }
+            }
+          }
           if (isCompact && tocCheck.visible && tocCheck.initiallyClosed) {
             await disclosure.locator("summary").focus();
             await page.keyboard.press("Enter");
             tocCheck.expandedByKeyboard = await disclosure.evaluate((el) => el.open);
             await page.keyboard.press("Enter");
-          }
-          const toggle = page.locator("[data-menu-toggle]");
-          if (isCompact && await toggle.isVisible()) {
-            await toggle.click();
-            const opened = (await toggle.getAttribute("aria-expanded")) === "true";
-            await toggle.click();
-            const closed = (await toggle.getAttribute("aria-expanded")) === "false";
-            tocCheck.menuOpensAndCloses = opened && closed;
           }
           mobileTocChecks.push(tocCheck);
           const tocFailed = tocCheck.linkCount !== 10 ||
