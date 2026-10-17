@@ -109,6 +109,15 @@ try {
           }
         }
 
+        // Control images: published Article #1, captured at identical viewports.
+        if (route.includes("/constant-arguments-with-partner/")) {
+          const controlShot = `article01-${route.startsWith("/ru/") ? "ru" : "ua"}-${viewport.name}.png`;
+          await page.screenshot({
+            path: path.join(outputDir, controlShot),
+            fullPage: true,
+            animations: "disabled"
+          });
+        }
         if (route.includes("/fear-of-another-panic-attack/")) {
           const responsive = await page.evaluate(() => ({
             scrollWidth: document.documentElement.scrollWidth,
