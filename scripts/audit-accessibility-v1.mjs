@@ -25,6 +25,10 @@ const routes = [
   "/ru/notes/when-coping-stops-helping/",
   "/notes/stress-relocation-and-lost-support/",
   "/ru/notes/stress-relocation-and-lost-support/",
+  "/notes/constant-arguments-with-partner/",
+  "/ru/notes/constant-arguments-with-partner/",
+  "/notes/fear-of-another-panic-attack/",
+  "/ru/notes/fear-of-another-panic-attack/",
   "/privacy/",
   "/ru/privacy/",
   "/404.html"
@@ -32,6 +36,7 @@ const routes = [
 
 const viewports = [
   { name: "mobile", width: 390, height: 844 },
+  { name: "landscape", width: 844, height: 390 },
   { name: "desktop", width: 1440, height: 1000 }
 ];
 
@@ -39,6 +44,8 @@ const critical = [];
 const warnings = [];
 const seen = new Set();
 const pageReports = [];
+const responsiveChecks = [];
+  const mobileTocChecks = [];
 
 const pushViolation = (bucket, viewport, route, violation, node) => {
   const targets = (node.target || []).map((target) => Array.isArray(target) ? target.join(" ") : String(target));
@@ -102,6 +109,89 @@ try {
           }
         }
 
+        // Control images: published Article #1, captured at identical viewports.
+        if (route.includes("/constant-arguments-with-partner/")) {
+          const controlShot = `article01-${route.startsWith("/ru/") ? "ru" : "ua"}-${viewport.name}.png`;
+          await page.screenshot({
+            path: path.join(outputDir, controlShot),
+            fullPage: true,
+            animations: "disabled"
+          });
+        }
+        if (route.includes("/fear-of-another-panic-attack/")) {
+          const responsive = await page.evaluate(() => ({
+            scrollWidth: document.documentElement.scrollWidth,
+            clientWidth: document.documentElement.clientWidth,
+            menuPresent: Boolean(document.querySelector("[data-menu-toggle]"))
+          }));
+          const overflow = Math.max(0, responsive.scrollWidth - responsive.clientWidth);
+          const isCompact = viewport.width <= 900;
+          const disclosure = page.locator(".panic-toc-mobile");
+          const tocCheck = {
+            route, viewport: viewport.name,
+            visible: await disclosure.isVisible(),
+            initiallyClosed: !(await disclosure.evaluate((el) => el.open)),
+            expandedByKeyboard: false,
+            linkCount: await disclosure.locator("ol > li > a").count(),
+            heroImageLoaded: await page.locator(".article-hero-visual img").evaluate(
+              (img) => img.complete && img.naturalWidth > 0
+            ),
+            menuOpensAndCloses: null
+          };
+          if (isCompact && tocCheck.visible && tocCheck.initiallyClosed) {
+            await disclosure.locator("summary").focus();
+            await page.keyboard.press("Enter");
+            tocCheck.expandedByKeyboard = await disclosure.evaluate((el) => el.open);
+            await page.keyboard.press("Enter");
+          }
+          const toggle = page.locator("[data-menu-toggle]");
+          if (isCompact && await toggle.isVisible()) {
+            await toggle.click();
+            const opened = (await toggle.getAttribute("aria-expanded")) === "true";
+            await toggle.click();
+            const closed = (await toggle.getAttribute("aria-expanded")) === "false";
+            tocCheck.menuOpensAndCloses = opened && closed;
+          }
+          mobileTocChecks.push(tocCheck);
+          const tocFailed = tocCheck.linkCount !== 10 ||
+            !tocCheck.heroImageLoaded ||
+            (isCompact && (!tocCheck.visible || !tocCheck.initiallyClosed ||
+              !tocCheck.expandedByKeyboard || tocCheck.menuOpensAndCloses !== true)) ||
+            (!isCompact && tocCheck.visible);
+          if (tocFailed) {
+            critical.push({
+              viewport: viewport.name, route, rule: "article02-interactions",
+              impact: "serious",
+              help: JSON.stringify(tocCheck),
+              helpUrl: null, targets: [".article-toc"], html: ""
+            });
+          }
+          const screenshotName = `article02-${route.startsWith("/ru/") ? "ru" : "ua"}-${viewport.name}.png`;
+          await page.screenshot({
+            path: path.join(outputDir, screenshotName),
+            fullPage: true,
+            animations: "disabled"
+          });
+          responsiveChecks.push({
+            route,
+            viewport: viewport.name,
+            overflowPixels: overflow,
+            menuPresent: responsive.menuPresent,
+            screenshot: screenshotName
+          });
+          if (overflow > 2 || !responsive.menuPresent) {
+            critical.push({
+              viewport: viewport.name,
+              route,
+              rule: overflow > 2 ? "horizontal-overflow" : "missing-mobile-menu",
+              impact: "serious",
+              help: overflow > 2 ? `Horizontal document overflow: ${overflow}px` : "Missing responsive menu toggle",
+              helpUrl: null,
+              targets: ["html"],
+              html: ""
+            });
+          }
+        }
         pageReports.push({
           viewport: viewport.name,
           route,
@@ -141,6 +231,8 @@ const report = {
   viewports,
   critical,
   warnings,
+  responsiveChecks,
+  mobileTocChecks,
   pages: pageReports
 };
 
@@ -164,4 +256,4 @@ const summary = [
 await fs.writeFile(path.join(outputDir, "summary.txt"), summary, "utf8");
 console.log(summary);
 
-if (strict && critical.length) process.exit(1);
+if (strict && (critical.length || warnings.length)) process.exit(1);
