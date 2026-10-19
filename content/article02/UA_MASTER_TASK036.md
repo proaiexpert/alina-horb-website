@@ -227,6 +227,7 @@
 - **Reading-time rule:** основний текст без бібліографії та SEO / 200 слів за хвилину, округлення вгору
 - **Canonical:** https://alinahorb.com/notes/fear-of-another-panic-attack/
 - **Hreflang:** uk / ru / x-default — лише для реальних двох сторінок
+- **Social share image (OG/Twitter):** `assets/images/social/alina-horb-article02-og.png` (1200 × 630 PNG); source SVG preserved alongside.
 - **Hero alt:** Абстрактні півкола й плавні лінії на світлому фоні — редакційна графіка про тривожне очікування.
 
 # ПЛАН РЕДАКЦІЙНИХ ВІЗУАЛІЗАЦІЙ / НЕ ДЛЯ ПУБЛІКАЦІЇ
