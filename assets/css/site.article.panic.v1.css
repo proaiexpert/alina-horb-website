@@ -563,3 +563,59 @@ body.article-template-v32[data-note="panic"] .panic-toc-mobile { display:none; }
     padding:24px 22px;
   }
 }
+
+
+/* TASK 039 — scoped emergency decision-card hierarchy (UA/RU Article #2). */
+body.article-template-v32[data-note="panic"] .panic-care-block--urgent {
+  border-top:4px solid #53624f;
+  background:#F5EFE6;
+}
+body.article-template-v32[data-note="panic"] .panic-care-block--urgent .panic-urgent-action {
+  margin:0 0 16px;
+  color:#283C2A;
+  font:600 clamp(25px,2.4vw,32px)/1.2 var(--serif);
+  letter-spacing:0;
+}
+body.article-template-v32[data-note="panic"] .panic-care-block--urgent .panic-urgent-guide {
+  margin:0 0 12px;
+  color:#465540;
+  font:700 12px/1.6 var(--sans);
+  letter-spacing:.025em;
+}
+body.article-template-v32[data-note="panic"] .panic-care-block--urgent .panic-urgent-signs {
+  list-style:disc;
+  padding-left:1.35em;
+  margin:0 0 18px;
+}
+body.article-template-v32[data-note="panic"] .panic-care-block--urgent .panic-urgent-signs li {
+  padding:8px 0;
+  margin:0;
+  border-bottom:1px solid #D9D4C8;
+  line-height:1.75;
+}
+body.article-template-v32[data-note="panic"] .panic-care-block--urgent .panic-urgent-signs li strong {
+  color:#29392D;
+  font-weight:700;
+}
+body.article-template-v32[data-note="panic"] .panic-care-block--urgent .panic-care-limit {
+  border-left:3px solid #78866f;
+  padding:10px 0 10px 15px;
+  margin:18px 0;
+  color:#354333;
+}
+body.article-template-v32[data-note="panic"] .panic-care-block--urgent .panic-crisis-routing {
+  border-top:1px solid #D2C9BD;
+  padding-top:15px;
+  margin-top:18px;
+}
+@media(max-width:620px) {
+ body.article-template-v32[data-note="panic"] .panic-care-block--urgent {
+  padding:24px 22px;
+ }
+ body.article-template-v32[data-note="panic"] .panic-urgent-action {
+  overflow-wrap:anywhere;
+ }
+ body.article-template-v32[data-note="panic"] .panic-urgent-signs li {
+  padding-block:9px;
+ }
+}
