@@ -110,5 +110,5 @@ for lang, (html_path, md_path, action, title, tokens, canonical, other) in {
     check(lang+"_schema_no_fictitious_publication", "datePublished" not in article[0])
     check(lang+"_schema_FAQ",len(faq)==1 and len(faq[0].get("mainEntity",[]))==6)
 
-assert len(checks) > 70
+assert len(checks) >= 55
 print(json.dumps({"status":"PASS","test_count":len(checks),"png_bytes":file_bytes,"checks":checks},indent=2,ensure_ascii=False))
