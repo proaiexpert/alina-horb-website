@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="Owner review: спокойная архитектурная композиция мягкого света, оконных рам и теней">
+<defs>
+  <linearGradient id="wall" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F9F5EE"/><stop offset=".6" stop-color="#EEE9E0"/><stop offset="1" stop-color="#E3E1D6"/></linearGradient>
+  <linearGradient id="light" x1=".2" y1="0" x2=".9" y2="1"><stop stop-color="#F9E8CA" stop-opacity=".88"/><stop offset="1" stop-color="#EABFA7" stop-opacity=".32"/></linearGradient>
+  <linearGradient id="shadow" x1="0" y1="0" x2=".7" y2="1"><stop stop-color="#AAB5A3" stop-opacity=".38"/><stop offset="1" stop-color="#748974" stop-opacity=".08"/></linearGradient>
+</defs>
+<rect width="1200" height="900" fill="url(#wall)"/>
+<path d="M164 0H1087V900H164Z" fill="#F6F0E6" opacity=".88"/>
+<path d="M398 0H910L670 900H136Z" fill="url(#light)"/>
+<path d="M852 0H1168L888 900H622Z" fill="url(#shadow)"/>
+<path d="M292 104H987V800H292Z" fill="none" stroke="#ABB4A7" stroke-width="2.5" opacity=".7"/>
+<path d="M642 104V800M292 445H987" stroke="#ADB3A9" stroke-width="2" opacity=".52"/>
+<path d="M293 800C422 745 517 704 637 620C754 537 860 527 984 572" fill="none" stroke="#7B8B78" stroke-width="5" stroke-linecap="round"/>
+<path d="M291 848C427 789 518 750 644 669C762 597 863 598 985 636" fill="none" stroke="#AD7B67" stroke-width="2.8" stroke-linecap="round" opacity=".62"/>
+<circle cx="641" cy="622" r="13" fill="#7B8B78"/>
+<ellipse cx="893" cy="229" rx="117" ry="130" fill="#FAF8F1" opacity=".28"/>
+<path d="M108 154H238M1021 746H1110" stroke="#7B8B78" stroke-width="2" opacity=".47"/>
+</svg>

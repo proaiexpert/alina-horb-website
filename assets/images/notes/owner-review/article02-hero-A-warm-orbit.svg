@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="Owner review: тёплая редакционная абстракция из природных оттенков и плавных линий">
+<defs>
+  <linearGradient id="ground" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F9F3E9"/><stop offset=".58" stop-color="#F1E8DC"/><stop offset="1" stop-color="#E4DED1"/></linearGradient>
+  <linearGradient id="arc" x1="0" y1="0" x2=".8" y2="1"><stop stop-color="#E9BCA3"/><stop offset=".52" stop-color="#C9947A"/><stop offset="1" stop-color="#A9AF9D"/></linearGradient>
+  <linearGradient id="linen" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#F7F1E7"/><stop offset="1" stop-color="#E4E3D6"/></linearGradient>
+</defs>
+<rect width="1200" height="900" fill="url(#ground)"/>
+<path d="M0 730C237 598 365 728 548 626S1010 515 1200 640V900H0Z" fill="#D6DCCA" opacity=".54"/>
+<path d="M550 116C696 31 979 60 1070 281C1141 452 1052 679 903 750C731 830 503 700 472 517C444 354 428 188 550 116Z" fill="url(#arc)" opacity=".8"/>
+<path d="M590 164C707 96 928 133 993 304C1047 447 1000 608 859 663C718 719 552 622 540 470C529 327 498 222 590 164Z" fill="url(#linen)"/>
+<path d="M107 591C265 503 364 548 489 454C623 352 694 287 826 360C954 431 1015 496 1098 417" fill="none" stroke="#596751" stroke-width="6" stroke-linecap="round"/>
+<path d="M90 642C253 569 352 617 506 523C640 442 705 402 847 450C966 490 1022 546 1121 479" fill="none" stroke="#9B7560" stroke-width="3.2" stroke-linecap="round" opacity=".64"/>
+<circle cx="490" cy="454" r="13" fill="#61765B"/><circle cx="490" cy="454" r="30" fill="none" stroke="#61765B" stroke-width="2" opacity=".48"/>
+<path d="M110 115H306M905 779H1090" stroke="#72806C" stroke-width="2" opacity=".45"/>
+</svg>

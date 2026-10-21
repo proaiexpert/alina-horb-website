@@ -1,0 +1,108 @@
+name: QA Cloudflare Owner Preview / Article 02
+
+on:
+  push:
+    branches:
+      - agent/alina-article02-bilingual-premium-v21-r1
+    paths:
+      - 'scripts/build-cloudflare-owner-preview-v1.py'
+      - '.github/workflows/qa-cloudflare-owner-preview-v1.yml'
+      - 'index.html'
+      - 'ru/**'
+      - 'notes/**'
+      - 'about/**'
+      - 'consultations/**'
+      - 'privacy/**'
+      - 'assets/**'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'scripts/build-cloudflare-owner-preview-v1.py'
+      - '.github/workflows/qa-cloudflare-owner-preview-v1.yml'
+      - 'index.html'
+      - 'ru/**'
+      - 'notes/**'
+      - 'about/**'
+      - 'consultations/**'
+      - 'privacy/**'
+      - 'assets/**'
+
+permissions:
+  contents: read
+
+jobs:
+  isolated-preview-preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Checkout exact candidate commit
+        uses: actions/checkout@v4
+        with:
+          persist-credentials: false
+          ref: ${{ github.event.pull_request.head.sha || github.sha }}
+
+      - name: Build strictly noindex Pages output
+        env:
+          CF_PAGES_BRANCH: agent/alina-article02-bilingual-premium-v21-r1
+          PREVIEW_SOURCE_SHA: ${{ github.event.pull_request.head.sha || github.sha }}
+        run: |
+          python3 scripts/build-cloudflare-owner-preview-v1.py
+          grep -Fx '  X-Robots-Tag: noindex, nofollow, noarchive' cloudflare-owner-preview-dist/_headers
+          grep -Fx 'Disallow: /' cloudflare-owner-preview-dist/robots.txt
+
+      - name: Verify Preview assets over local HTTP and Chromium
+        env:
+          AUDIT_BASE_URL: http://127.0.0.1:4177
+        run: |
+          set -euo pipefail
+          python3 -m http.server 4177 --directory cloudflare-owner-preview-dist >/tmp/task045-preview-http.log 2>&1 &
+          SERVER_PID=$!
+          trap 'kill "$SERVER_PID" || true' EXIT
+          python3 - <<'PY'
+          import json, time, urllib.request
+          base = "http://127.0.0.1:4177"
+          targets = (
+              "/", "/notes/fear-of-another-panic-attack/",
+              "/ru/notes/fear-of-another-panic-attack/",
+              "/notes/", "/ru/notes/",
+              "/assets/css/site.article.panic.v1.css",
+              "/assets/js/site.article.reading.v2.js",
+              "/assets/js/site.navigation.v1.js",
+              "/assets/images/notes/alina-horb-article02-hero-4x3.webp",
+              "/assets/images/notes/alina-horb-article02-home-card-800x500.webp",
+              "/assets/images/notes/alina-horb-article02-notes-card-800x600.webp",
+              "/assets/images/social/alina-horb-article02-og.png",
+              "/robots.txt", "/preview-build-info.json",
+          )
+          for target in targets:
+              for attempt in range(15):
+                  try:
+                      with urllib.request.urlopen(base + target, timeout=5) as r:
+                          body = r.read()
+                          assert r.status == 200 and body
+                          if target.endswith("/") and "/notes/" in target:
+                              assert b'content="noindex, nofollow, noarchive"' in body
+                      break
+                  except Exception:
+                      if attempt == 14:
+                          raise
+                      time.sleep(.4)
+          with urllib.request.urlopen(base + "/preview-build-info.json") as response:
+              obj = json.load(response)
+          assert len(obj["commit_sha"]) == 40
+          print("TASK 045: 14/14 staged HTTP resources PASS; SHA:", obj["commit_sha"])
+          PY
+          npm install --no-save playwright
+          npx playwright install --with-deps chromium
+          AUDIT_LANGUAGE_OUTPUT_DIR=qa/task045-preview-links node scripts/qa-article02-language-switch.mjs
+
+      - name: Upload safe staging artifact and navigation QA
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: task045-cloudflare-preview-preflight
+          path: |
+            cloudflare-owner-preview-dist/
+            qa/task045-preview-links/
+          retention-days: 7
+          if-no-files-found: warn

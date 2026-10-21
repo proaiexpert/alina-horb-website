@@ -1,7 +1,7 @@
 /* TASK 028: conflict article only. Passive, rAF-batched reading mode. */
 (() => {
   "use strict";
-  if (!document.body.matches('.article-template-v32[data-note="conflict"]')) return;
+  if (!document.body.matches('.article-template-v32[data-note="conflict"], .article-template-v32[data-note="panic"]')) return;
   const header = document.querySelector(".site-header--canonical.inner-page-header");
   const menu = document.querySelector(".mobile-navigation");
   const toggle = document.querySelector("[data-menu-toggle]");
