@@ -320,8 +320,10 @@ def main() -> int:
             if not article:
                 continue
             mandatory = ('headline', 'description', 'mainEntityOfPage', 'image', 'author', 'dateModified')
-            if route in {'/notes/constant-arguments-with-partner/', '/ru/notes/constant-arguments-with-partner/', '/notes/fear-of-another-panic-attack/', '/ru/notes/fear-of-another-panic-attack/'}:
+            if route in {'/notes/constant-arguments-with-partner/', '/ru/notes/constant-arguments-with-partner/'}:
                 mandatory += ('dateCreated',)
+            elif route in {'/notes/fear-of-another-panic-attack/', '/ru/notes/fear-of-another-panic-attack/'}:
+                mandatory += ('dateCreated', 'datePublished')
             else:
                 mandatory += ('datePublished',)
             for field in mandatory:
@@ -329,14 +331,14 @@ def main() -> int:
                     add(critical, 'article-schema', f'Missing Article.{field}', relative)
             if article.get('mainEntityOfPage') != canonical:
                 add(critical, 'article-schema', 'mainEntityOfPage does not match canonical', relative)
-            date_field = 'dateCreated' if route in {'/notes/constant-arguments-with-partner/', '/ru/notes/constant-arguments-with-partner/', '/notes/fear-of-another-panic-attack/', '/ru/notes/fear-of-another-panic-attack/'} else 'datePublished'
+            date_field = 'dateCreated' if route in {'/notes/constant-arguments-with-partner/', '/ru/notes/constant-arguments-with-partner/'} else 'datePublished'
             if not valid_iso_date(article.get(date_field)):
                 add(critical, 'article-schema', f'{date_field} is not an ISO date', relative)
             if not valid_iso_date(article.get('dateModified')):
                 add(critical, 'article-schema', 'dateModified is not an ISO date', relative)
             if article.get(date_field) and article.get('dateModified') and article[date_field] > article['dateModified']:
                 add(critical, 'article-schema', f'{date_field} must not be later than dateModified', relative)
-            if route in {'/notes/constant-arguments-with-partner/', '/ru/notes/constant-arguments-with-partner/', '/notes/fear-of-another-panic-attack/', '/ru/notes/fear-of-another-panic-attack/'} and article.get('datePublished'):
+            if route in {'/notes/constant-arguments-with-partner/', '/ru/notes/constant-arguments-with-partner/'} and article.get('datePublished'):
                 add(critical, 'article-schema', 'Unapproved UA draft must not claim publication date', relative)
             author = article.get('author')
             expected_author_url = f'{BASE}/ru/about/' if language == 'ru' else f'{BASE}/about/'
