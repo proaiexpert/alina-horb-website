@@ -22,6 +22,9 @@ on:
       - 'scripts/apply-social-favicon-v3-3.py'
       - 'scripts/apply-indexing-launch-v3-2.py'
       - 'scripts/audit-seo-launch-v1.py'
+      - 'scripts/validate-article02-task039.py'
+      - 'assets/images/social/alina-horb-article02-og.png'
+      - 'content/article02/**'
       - 'scripts/validate-release-readiness.py'
       - 'scripts/validate-privacy-intake.py'
       - 'scripts/validate-consultations-pages-v1.py'
@@ -49,6 +52,9 @@ on:
       - 'scripts/apply-social-favicon-v3-3.py'
       - 'scripts/apply-indexing-launch-v3-2.py'
       - 'scripts/audit-seo-launch-v1.py'
+      - 'scripts/validate-article02-task039.py'
+      - 'assets/images/social/alina-horb-article02-og.png'
+      - 'content/article02/**'
       - 'scripts/validate-release-readiness.py'
       - 'scripts/validate-privacy-intake.py'
       - 'scripts/validate-consultations-pages-v1.py'
@@ -85,6 +91,7 @@ jobs:
           python3 scripts/validate-release-readiness.py
           python3 scripts/validate-privacy-intake.py
           python3 scripts/validate-consultations-pages-v1.py
+          python3 scripts/validate-article02-task039.py
 
       - name: Upload SEO report
         if: always()

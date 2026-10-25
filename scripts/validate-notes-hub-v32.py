@@ -12,6 +12,7 @@ ROUTES = [
     "how-to-start-the-conversation/",
     "when-coping-stops-helping/",
     "stress-relocation-and-lost-support/",
+    "fear-of-another-panic-attack/",
 ]
 
 HUBS = {
@@ -90,12 +91,14 @@ def validate_hub(path: Path, expected: dict[str, str]) -> None:
         if marker not in text:
             fail(f"Missing {marker!r} in {rel}")
 
-    expected_cards = 4  # Five article routes total, one featured plus four supporting cards in each locale
+    expected_cards = 5  # Six article routes total, one featured plus five supporting cards
     if len(re.findall(r'class="notes-hub-card"', text)) != expected_cards:
         fail(f"Expected {expected_cards} supporting cards in {rel}")
     new_route = "constant-arguments-with-partner/"
     if text.count('id="conflict-article"') != 1 or new_route not in text:
         fail(f"{rel}: bilingual Article #1 card must exist exactly once")
+    if text.count('id="panic-article"') != 1 or "fear-of-another-panic-attack/" not in text:
+        fail(f"{rel}: new Article #2 card missing or duplicated")
     if len(re.findall(r'class="notes-hub-feature"', text)) != 1:
         fail(f"Expected one featured story in {rel}")
     if "alina-horb-note-first-consultation-v3.webp" not in text:
@@ -136,12 +139,14 @@ def validate_home(path: Path, expected: dict[str, str]) -> None:
         fail(f"Expected one V3.2 Notes section in {rel}")
     if text.count('class="home-note-feature"') != 1:
         fail(f"Expected one homepage featured story in {rel}")
-    expected_entries = 4  # Both homepages advertise all five articles
+    expected_entries = 5  # Both homepages advertise all six articles
     if text.count('class="home-note-entry"') != expected_entries:
         fail(f"Expected {expected_entries} homepage supporting stories in {rel}")
     new_route = "constant-arguments-with-partner/"
     if text.count('href="notes/' + new_route + '"') < 1:
         fail(f"{rel}: Article #1 homepage teaser missing")
+    if text.count('href="notes/fear-of-another-panic-attack/"') < 1:
+        fail(f"{rel}: Article #2 homepage teaser missing")
     if "alina-horb-note-first-consultation-v3.webp" not in text:
         fail(f"Static homepage featured photography missing in {rel}")
     if 'class="note-featured"' in text or 'class="notes-compact"' in text:

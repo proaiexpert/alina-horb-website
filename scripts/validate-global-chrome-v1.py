@@ -26,7 +26,7 @@ def production_pages() -> list[Path]:
     articles = sorted((ROOT / "notes").glob("*/index.html")) + sorted((ROOT / "ru/notes").glob("*/index.html"))
     pages = fixed + articles
     require(all(path.is_file() for path in pages), "one or more production HTML files are missing")
-    require(len(pages) == 20, f"expected 20 staged HTML files (18 baseline + 2 Article #1 UA/RU), found {len(pages)}")
+    require(len(pages) == 22, f"expected 22 staged HTML files (10 fixed routes + 12 bilingual articles), found {len(pages)}")
     return pages
 
 
@@ -121,7 +121,7 @@ for token in (
 
 ua_articles = {path.parent.name for path in (ROOT / "notes").glob("*/index.html")}
 ru_articles = {path.parent.name for path in (ROOT / "ru/notes").glob("*/index.html")}
-require(ru_articles == ua_articles and len(ru_articles) == 5,
-        "All five approved routes must have real UA/RU counterparts")
+require(ru_articles == ua_articles and len(ru_articles) == 6,
+        "All six approved routes must have real UA/RU counterparts")
 
 print("Static global chrome and direct navigation validation passed.")

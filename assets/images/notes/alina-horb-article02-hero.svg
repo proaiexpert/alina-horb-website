@@ -1,0 +1,12 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="900" viewBox="0 0 1200 900" role="img" aria-label="Абстрактная редакционная композиция о тревожном ожидании — плавные линии и формы">
+<rect width="1200" height="900" fill="#FAF7F1"/>
+<rect x="66" y="67.5" width="1068" height="765" rx="22.5" fill="#E8DED3" opacity=".35"/>
+<ellipse cx="792" cy="441" rx="330" ry="310.5" fill="#D2C8BB" opacity=".75"/>
+<ellipse cx="744" cy="423" rx="282" ry="261" fill="#FAF7F1"/>
+<path d="M 96 603 C 348 144, 444 765, 624 441 S 936 135, 1092 495.00000000000006" fill="none" stroke="#66705F" stroke-width="4.08" stroke-linecap="round" opacity=".78"/>
+<path d="M 132 675 C 408.00000000000006 279, 540 837, 780 477 S 948 252.00000000000003, 1080 522" fill="none" stroke="#929D88" stroke-width="3.1199999999999997" stroke-linecap="round" opacity=".58"/>
+<circle cx="600" cy="450" r="19" fill="#66705F"/><circle cx="600" cy="450" r="34" fill="none" stroke="#929D88" stroke-width="2" opacity=".52"/>
+<circle cx="120" cy="702" r="4" fill="#66705F" opacity=".28"/><circle cx="276" cy="710" r="4" fill="#66705F" opacity=".28"/><circle cx="432" cy="702" r="4" fill="#66705F" opacity=".28"/><circle cx="588" cy="710" r="4" fill="#66705F" opacity=".28"/><circle cx="744" cy="702" r="4" fill="#66705F" opacity=".28"/><circle cx="900" cy="710" r="4" fill="#66705F" opacity=".28"/><circle cx="1056" cy="702" r="4" fill="#66705F" opacity=".28"/>
+<path d="M 108 144 H 288" stroke="#66705F" stroke-width="2" opacity=".35"/>
+<path d="M 924 738 H 1092" stroke="#66705F" stroke-width="2" opacity=".35"/>
+</svg>

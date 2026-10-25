@@ -11,6 +11,7 @@ on:
       - 'assets/css/**'
       - 'assets/js/**'
       - 'scripts/audit-final-ux-v1.mjs'
+      - 'scripts/qa-article02-language-switch.mjs'
       - '.github/workflows/audit-final-ux-v1.yml'
   workflow_dispatch:
 
@@ -55,11 +56,18 @@ jobs:
           AUDIT_STRICT: '1'
         run: node scripts/audit-final-ux-v1.mjs
 
+      - name: Verify Article #2 UA/RU header and footer clicks in Chromium
+        env:
+          AUDIT_BASE_URL: http://127.0.0.1:4173
+        run: node scripts/qa-article02-language-switch.mjs
+
       - name: Upload audit report
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: final-ux-audit-v1
-          path: qa/final-ux
+          path: |
+            qa/final-ux
+            qa/article02-language-switch
           retention-days: 14
           if-no-files-found: warn
