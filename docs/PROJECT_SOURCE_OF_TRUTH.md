@@ -1,6 +1,6 @@
 # Alina Horb Website — Project Source of Truth
 
-Last updated: 2026-07-14
+Last updated: 2026-10-24
 
 ## Current approved language architecture
 
@@ -88,7 +88,7 @@ The adopted article evidence and safety standard is:
 - Ukrainian and Russian privacy-policy pages are deployed and disclose the production form/provider handling.
 - The production form uses minimal data collection, validation, clear success/error states, provider disclosure, and retention/privacy language.
 - The form warns users not to submit sensitive medical, crisis, emergency, document, or payment information.
-- The 16 public UA/RU routes are indexable with `index, follow, max-image-preview:large`; the two privacy-policy routes remain `noindex, follow`.
+- The 20 public UA/RU routes are indexable with `index, follow, max-image-preview:large`; the two privacy-policy routes remain `noindex, follow`.
 
 ## Portrait decisions for V3.1
 
@@ -122,7 +122,7 @@ The adopted article evidence and safety standard is:
 - The former GitHub Pages project URL redirects to `alinahorb.com`.
 - GitHub Pages DNS and HTTPS are active.
 - GitHub Pages deployment must use repository files directly and must not depend on Google Drive or ZIP files.
-- The project is publicly accessible and the 16 public search routes are technically indexable. Actual Google coverage, canonical selection, and indexing must be verified separately in Google Search Console.
+- The project is publicly accessible and the 20 public search routes are technically indexable. Actual Google coverage, canonical selection, and indexing must be verified separately in Google Search Console.
 
 ## Editorial article system
 
@@ -188,6 +188,6 @@ Approved homepage content:
 Responsive requirement: the About section must not overflow at 844 px landscape and must remain readable when the three approach rows are added.
 
 
-## Article #2 — staged TASK 036 (not yet published)
+## Article #2 — published 2026-10-24
 
-A separate Draft PR adds a sixth article in each language: `notes/fear-of-another-panic-attack/` and `ru/notes/fear-of-another-panic-attack/`. The RU source is TASK 034 plus TASK 035 safety corrections, archived in `content/article02/RU_MASTER_TASK036.md`; the new UA editorial candidate is archived in `content/article02/UA_MASTER_TASK036.md` and requires independent review. Staged six-per-language inventory and 20 sitemap URLs apply to this branch only until Owner-approved merge and publication. All older sections above describe historical production decisions.
+Owner-approved PR #109 was independently accepted in TASK 047 and squash-merged into `main` as `25818efd01002a44f42a8680cf80ae2666c6a086`. The paired sixth articles are live at `notes/fear-of-another-panic-attack/` and `ru/notes/fear-of-another-panic-attack/`; both share the approved arched Hero image, responsive five-stage map, and retained safety disclaimers. The reviewed editorial masters remain archived in `content/article02/UA_MASTER_TASK036.md` and `content/article02/RU_MASTER_TASK036.md`. Production now has 20 indexable routes and two noindex privacy routes; the sitemap contains 20 indexable URLs. Earlier counts in this document are historical.

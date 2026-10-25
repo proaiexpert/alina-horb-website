@@ -12,7 +12,7 @@ A calm, human-first bilingual website for psychologist **Alina Horb**, designed 
 
 The project translates a personal psychology practice into a restrained editorial digital experience rather than a generic clinic template. The site helps visitors understand Alina’s approach, consultation format, areas of support, professional boundaries, educational materials, and available contact paths without using pressure-based conversion tactics.
 
-The production domain is live with HTTPS. The 16 public UA/RU routes are indexable with `index, follow, max-image-preview:large`; the two privacy-policy routes remain intentionally `noindex, follow`.
+The production domain is live with HTTPS. The 20 public UA/RU routes are indexable with `index, follow, max-image-preview:large`; the two privacy-policy routes remain intentionally `noindex, follow`.
 
 ## Business and user goals
 
