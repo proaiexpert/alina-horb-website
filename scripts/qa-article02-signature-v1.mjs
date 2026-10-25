@@ -57,6 +57,12 @@ try{
      overflow:Math.max(0,document.documentElement.scrollWidth-innerWidth),
      heroLoaded:!!hero?.complete&&hero.naturalWidth===1200&&hero.naturalHeight===900,
      hero:box(hero),caption:box(sel(".article-hero-label")),h1:box(sel(".article-hero--v32 h1")),
+     picture:box(sel(".article-hero-visual picture")),
+     topArch:sel(".article-hero-visual picture")?getComputedStyle(sel(".article-hero-visual picture")).borderTopLeftRadius:"",
+     bottomCorner:sel(".article-hero-visual picture")?getComputedStyle(sel(".article-hero-visual picture")).borderBottomLeftRadius:"",
+     overlayAfter:getComputedStyle(sel(".article-hero-visual"),"::after").content,
+     captionBackground:getComputedStyle(sel(".article-hero-label")).backgroundColor,
+     tocRegion:box(sel(".article-toc")),
      imageFit:hero?getComputedStyle(hero).objectFit:null,
      railHidden:!sel(".article-hero-grid > .editorial-rail")||getComputedStyle(sel(".article-hero-grid > .editorial-rail")).display==="none",
      stages:stages.map(e=>e.dataset.step),stageRects:stages.map(box),
@@ -72,6 +78,12 @@ try{
    verify(d.overflow<=1,"horizontal overflow "+d.overflow);
    verify(d.heroLoaded&&d.hero?.w>250&&d.hero?.h>180,"Hero unloaded or cropped to invisible");
    verify(d.caption&&d.caption.y>=d.hero.bottom-2,"photo caption overlaps Hero");
+   verify(d.picture?.w>250&&Math.abs(d.picture.w/d.picture.h-4/3)<.035,"arch loses 4:3 composition");
+   verify(d.topArch?.includes("%")&&parseFloat(d.topArch)>=40,"arch silhouette missing");
+   verify(parseFloat(d.bottomCorner)<=5,"arch lower corners no longer restrained");
+   verify(d.overlayAfter==="none","Notes global ::after overlay tints figure or caption");
+   verify(["transparent","rgba(0, 0, 0, 0)"].includes(d.captionBackground),"caption has unintended gray panel");
+   if(vp.w<=430)verify(d.tocRegion?.y-d.caption.bottom<150,"mobile caption-to-TOC gap excessive");
    verify(d.h1?.w>Math.min(320,vp.w*.36)&&d.h1?.h>40&&d.h1?.h<900,"Hero headline collapsed into a narrow/vertical column");
    verify(d.imageFit==="cover","Hero image object fit invalid");
    verify(d.railHidden,"Desktop hydrated editorial rail overlays Hero composition");
