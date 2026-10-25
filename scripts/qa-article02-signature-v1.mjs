@@ -8,7 +8,10 @@ const live=process.env.TASK046_LIVE==="1";
 const output=process.env.TASK046_OUTPUT_DIR||"qa/task046-signature";
 const expected=process.env.TASK046_EXPECTED_SHA||"";
 const specs=[{lang:"ua",route:"/notes/fear-of-another-panic-attack/"},{lang:"ru",route:"/ru/notes/fear-of-another-panic-attack/"}];
-const viewports=[{w:390,h:844},{w:430,h:932},{w:768,h:1024},{w:1024,h:768},{w:1440,h:1000}];
+// TASK 046B: test both sides of the content-driven 1120px layout switch.
+const viewports=[{w:390,h:844},{w:430,h:932},{w:768,h:1024},
+  {w:800,h:1000},{w:820,h:1000},{w:880,h:1000},{w:900,h:1000},
+  {w:1024,h:768},{w:1119,h:900},{w:1120,h:900},{w:1440,h:1000}];
 const results=[],failures=[];
 const pause=ms=>new Promise(resolve=>setTimeout(resolve,ms));
 function verify(ok,message){if(!ok)throw Error(message);}
@@ -53,6 +56,22 @@ try{
     const box=e=>{if(!e)return null;let r=e.getBoundingClientRect();return{x:r.x,y:r.y,w:r.width,h:r.height,bottom:r.bottom};};
     let hero=sel(".article-hero-visual img");
     let stages=[...document.querySelectorAll(".panic-steps li[data-step]")];
+    const styleSize=s=>{const e=sel(s);return e?parseFloat(getComputedStyle(e).fontSize):null;};
+    const clipped=e=>!!e&&e.scrollWidth>e.clientWidth+2;
+    const typographicOverflow=[
+      ".article-hero--v32 h1",".article-hero--v32 .article-meta",
+      ".article-date-line",".article-hero-label",
+      ".panic-map-heading h3",...stages.map((_,i)=>".panic-steps li:nth-child("+(i+1)+") strong")
+    ].filter(s=>clipped(sel(s)));
+    const visualLabels={captionPx:styleSize(".article-hero-label"),
+      metaPx:styleSize(".article-hero--v32 .article-meta"),
+      breadcrumbPx:styleSize(".article-breadcrumbs"),
+      datePx:styleSize(".article-hero--v32 .article-date-line"),
+      mapDescPx:styleSize(".panic-steps li p"),
+      mapTitlePx:styleSize(".panic-steps li strong"),
+      mapIndexPx:styleSize(".panic-map-index"),
+      tocCountPx:styleSize(".panic-toc-count")};
+
     return {
      overflow:Math.max(0,document.documentElement.scrollWidth-innerWidth),
      heroLoaded:!!hero?.complete&&hero.naturalWidth===1200&&hero.naturalHeight===900,
@@ -67,6 +86,8 @@ try{
      railHidden:!sel(".article-hero-grid > .editorial-rail")||getComputedStyle(sel(".article-hero-grid > .editorial-rail")).display==="none",
      stages:stages.map(e=>e.dataset.step),stageRects:stages.map(box),
      mapMode:getComputedStyle(sel(".panic-steps ol")).display,
+     mapColumns:getComputedStyle(sel(".panic-steps ol")).gridTemplateColumns,
+     visualLabels,typographicOverflow,
      mapTitle:!!sel(".panic-map-heading h3"),noninevitable:!!sel(".panic-noninevitable"),
      faq:document.querySelectorAll("details.article-qa").length,
      toc:document.querySelectorAll(".article-toc > ol > li").length,
@@ -86,6 +107,14 @@ try{
    if(vp.w<=430)verify(d.tocRegion?.y-d.caption.bottom<150,"mobile caption-to-TOC gap excessive");
    verify(d.h1?.w>Math.min(320,vp.w*.36)&&d.h1?.h>40&&d.h1?.h<900,"Hero headline collapsed into a narrow/vertical column");
    verify(d.imageFit==="cover","Hero image object fit invalid");
+   verify(d.visualLabels.captionPx>=13 && d.visualLabels.captionPx<=14.5,
+     "caption too small or oversized: "+d.visualLabels.captionPx);
+   verify(d.visualLabels.metaPx>=12 && d.visualLabels.breadcrumbPx>=12 &&
+     d.visualLabels.datePx>=12,"Hero microtype undersized: "+JSON.stringify(d.visualLabels));
+   verify(d.visualLabels.mapDescPx>=16 && d.visualLabels.mapTitlePx>=25,
+     "Step descriptions/title undersized: "+JSON.stringify(d.visualLabels));
+   verify(d.visualLabels.mapIndexPx>=13,"Map index font undersized");
+   verify(d.typographicOverflow.length===0,"Microtype or heading clipping: "+d.typographicOverflow.join(", "));
    verify(d.railHidden,"Desktop hydrated editorial rail overlays Hero composition");
    if(vp.w>=1120){
     verify(d.hero.w<vp.w*.65&&d.hero.x>d.h1.x+d.h1.w*.6,"Desktop columns or portrait composition broken");
@@ -94,8 +123,17 @@ try{
    verify(d.mapTitle&&d.noninevitable&&d.faq===6&&d.cta&&d.toc===10,"editorial module/FAQ/CTA missing");
    verify(d.noindex,"staged page without noindex");
    verify(d.stageRects.every(x=>x.w>165&&x.h>40),"map stage too narrow");
-   if(vp.w>=1024)verify(d.mapMode==="grid","desktop map not two-track");
-   if(vp.w<=768)verify(d.mapMode==="block","small viewport map not linear");
+   if(vp.w>=1120) {
+     verify(d.mapMode==="grid","wide desktop map not two-track");
+     const [a,b]=d.stageRects;
+     verify(b.x>a.x+80,"chess layout missing left/right alternation");
+   } else {
+     verify(d.mapMode==="block","map must linearize below 1120px");
+     verify(d.stageRects.every(x=>Math.abs(x.x-d.stageRects[0].x)<2),
+       "map step tracks are not aligned to a single column");
+   }
+   verify(d.stageRects.every((x,i)=>i===0||x.y>=d.stageRects[i-1].y+d.stageRects[i-1].h-1),
+     "map stage vertical ordering/collision broken");
    if(vp.w<=768){
      const menu=page.locator("[data-menu-toggle]").first();
      if(await menu.isVisible()){
@@ -105,7 +143,7 @@ try{
        verify(await menu.getAttribute("aria-expanded")==="false","Mobile menu does not close");
      }
    }
-   if([390,768,1440].includes(vp.w)){
+   if([390,768,900,1024,1120,1440].includes(vp.w)){
     await page.locator(".article-hero--v32").screenshot({path:path.join(output,spec.lang+"-"+vp.w+"-hero.png"),timeout:20000});
     // For a clean diagnostic crop only, remove sticky global chrome and focused skip link.
     // Functional header/focus tests run in independent GitHub audits.
@@ -115,13 +153,13 @@ try{
    const faq=page.locator("details.article-qa").first();
    await faq.locator("summary").click({timeout:12000});
    verify(await faq.evaluate(e=>e.open),"FAQ toggle");
-   if(vp.w<=768){const toc=page.locator(".panic-toc-mobile");await toc.locator("summary").click({timeout:12000});verify(await toc.evaluate(e=>e.open),"mobile TOC");}
+   if(vp.w<=900){const toc=page.locator(".panic-toc-mobile");await toc.locator("summary").click({timeout:12000});verify(await toc.evaluate(e=>e.open),"mobile TOC");}
    results.push({lang:spec.lang,width:vp.w,status:"PASS",...d});
   }catch(e){failures.push({lang:spec.lang,width:vp.w,error:String(e.stack||e)});}
   finally{await page.close();}
  }
 }finally{await browser.close();}
 await fs.writeFile(path.join(output,"report.json"),JSON.stringify({mode:live?"cloudflare-live":"local-stage",base,expectedSHA:expected,status:failures.length?"FAIL":"PASS",results,failures},null,2)+"\n");
-console.log("TASK 046 signature:",results.length+"/10 PASS; failures="+failures.length+"; "+(live?"Cloudflare LIVE":"staged local"));
+console.log("TASK 046B signature typography/map:",results.length+"/"+(specs.length*viewports.length)+" PASS; failures="+failures.length+"; "+(live?"Cloudflare LIVE":"staged local"));
 for(const f of failures)console.error(JSON.stringify(f));
 if(failures.length)process.exitCode=1;
