@@ -438,7 +438,12 @@ body.article-template-v32[data-note="panic"] .article-hero-grid.has-editorial-ra
     grid-column:1;grid-row:2;min-width:0;
   }
 }
-body.article-template-v32[data-note="panic"] .article-hero-visual::before {display:none;}
+/* Override both article-template and Notes-image pseudo overlays.
+   The figure extends below the image for its caption; overlays must never tint it. */
+body.article-template-v32[data-note="panic"] .article-hero-visual::before,
+body.article-template-v32[data-note="panic"] .article-hero-visual::after {
+  content:none;display:none;background:none;box-shadow:none;
+}
 
 body.article-template-v32[data-note="panic"] .article-hero-copy {
   min-width:0;max-width:760px;padding:0;
@@ -465,25 +470,32 @@ body.article-template-v32[data-note="panic"] .article-hero-visual {
   width:100%;min-width:0;height:auto;min-height:0;max-height:none;
   aspect-ratio:auto;align-self:center;margin:0;padding:0;border:0;
   border-radius:0;overflow:visible;box-shadow:none;background:transparent;
+  isolation:auto;
 }
+/* A true architectural arch in a 4:3 photographic frame.
+   Bottom corners stay almost square; the arch and photo share one clip. */
 body.article-template-v32[data-note="panic"] .article-hero-visual picture {
   display:block;width:100%;height:auto;min-height:0;aspect-ratio:4/3;
-  overflow:hidden;border:1px solid #CCD0C6;background:#DDD7CC;
+  overflow:hidden;background:#DDD7CC;
+  border:1px solid rgba(81,99,82,.31);
+  border-radius:49% 49% 3px 3px / 23% 23% 3px 3px;
+  box-shadow:0 17px 28px -27px rgba(44,59,48,.30);
 }
 body.article-template-v32[data-note="panic"] .article-hero-visual img {
   display:block;width:100%;height:100%;aspect-ratio:4/3;
   object-fit:cover;object-position:center;transform:none;border-radius:0;
+  filter:none;
 }
 body.article-template-v32[data-note="panic"] .article-hero-label {
   position:static;inset:auto;display:flex;align-items:center;
-  width:100%;max-width:none;min-height:0;margin:0;padding:15px 0 0;
-  background:none;backdrop-filter:none;box-shadow:none;border:0;
-  font:500 12px/1.6 var(--sans);letter-spacing:.035em;
-  color:#4B5D4F;text-align:left;
+  width:100%;max-width:none;min-height:0;margin:0;padding:19px 0 0;
+  background:transparent!important;backdrop-filter:none;box-shadow:none;border:0;
+  font:500 12px/1.55 var(--sans);letter-spacing:.025em;
+  color:#425545;text-align:left;
 }
 body.article-template-v32[data-note="panic"] .article-hero-label::before {
-  content:"";display:block;flex:0 0 34px;height:1px;
-  margin-right:14px;background:#9E705D;
+  content:"";display:block;flex:0 0 41px;height:1px;
+  margin-right:14px;background:#A47461;
 }
 @media(min-width:1120px) {
   body.article-template-v32[data-note="panic"] .article-hero-grid.has-editorial-rail {
@@ -501,7 +513,7 @@ body.article-template-v32[data-note="panic"] .article-hero-label::before {
 }
 @media(max-width:767px) {
   body.article-template-v32[data-note="panic"] .article-hero-grid.has-editorial-rail {
-    gap:27px;padding-block:28px 52px;
+    gap:26px;padding-block:28px 29px;
   }
   body.article-template-v32[data-note="panic"] .article-hero-copy {padding:0;}
   body.article-template-v32[data-note="panic"] .article-breadcrumbs {margin-bottom:27px;}
@@ -515,7 +527,12 @@ body.article-template-v32[data-note="panic"] .article-hero-label::before {
   body.article-template-v32[data-note="panic"] .article-hero-visual {
     width:100%;justify-self:stretch;margin:0;
   }
-  body.article-template-v32[data-note="panic"] .article-hero-label {font-size:11px;padding-top:13px;}
+  body.article-template-v32[data-note="panic"] .article-hero-label {
+    font-size:11px;padding-top:17px;padding-bottom:0;max-width:none;
+  }
+  body.article-template-v32[data-note="panic"] .article-layout--v32 {
+    padding-top:clamp(35px,8vw,50px);
+  }
 }
 @media(max-width:430px) {
   body.article-template-v32[data-note="panic"] .article-hero--v32 h1 {
