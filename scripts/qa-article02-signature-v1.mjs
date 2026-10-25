@@ -84,6 +84,15 @@ try{
    verify(d.stageRects.every(x=>x.w>165&&x.h>40),"map stage too narrow");
    if(vp.w>=1024)verify(d.mapMode==="grid","desktop map not two-track");
    if(vp.w<=768)verify(d.mapMode==="block","small viewport map not linear");
+   if(vp.w<=768){
+     const menu=page.locator("[data-menu-toggle]").first();
+     if(await menu.isVisible()){
+       await menu.click({timeout:12000});
+       verify(await menu.getAttribute("aria-expanded")==="true","Mobile menu does not open");
+       await menu.click({timeout:12000});
+       verify(await menu.getAttribute("aria-expanded")==="false","Mobile menu does not close");
+     }
+   }
    if([390,768,1440].includes(vp.w)){
     await page.locator(".article-hero--v32").screenshot({path:path.join(output,spec.lang+"-"+vp.w+"-hero.png"),timeout:20000});
     // For a clean diagnostic crop only, remove sticky global chrome and focused skip link.
