@@ -416,7 +416,10 @@ body.article-template-v32[data-note="panic"] .article-hero-grid.has-editorial-ra
   display:grid;grid-template-columns:minmax(0,1fr);align-items:center;
   gap:clamp(28px,5vw,66px);padding-block:clamp(36px,5vw,78px) clamp(47px,6vw,92px);
 }
-body.article-template-v32[data-note="panic"] .article-hero-grid .editorial-rail-placeholder {display:none;}
+/* The JS replaces the rail placeholder with hydrated navigation on desktop.
+   The signature Hero intentionally uses header navigation + article TOC instead. */
+body.article-template-v32[data-note="panic"] .article-hero-grid.has-editorial-rail > .editorial-rail {display:none!important;}
+
 /* The global navigation stylesheet places the copy/photo in columns 2/3.
    Reset the explicit grid positions after removing the empty rail. */
 @media (min-width:1120px) {
