@@ -331,10 +331,15 @@ body.article-template-v32[data-note="panic"] .article-process .conflict-cycle li
 body.article-template-v32[data-note="panic"] .conflict-recurrence {
   margin-top:25px; background:#F2F1EB; border-left:3px solid #929D88;
 }
+/* Final chapter: deliberate, quiet graphite-sage editorial plane. */
 body.article-template-v32[data-note="panic"] .article-cta-band--v21 {
-  border-top:1px solid #CBD1C4; border-bottom:1px solid #CBD1C4;
-  background:#66705F; color:#FAF7F1;
-  padding-block:clamp(52px,7vw,84px);
+  position:relative;overflow:hidden;
+  border-block:1px solid #435748;
+  background:#354A3E;color:#FAF7F1;
+  padding-block:clamp(72px,8vw,110px);
+}
+body.article-template-v32[data-note="panic"] .article-cta-band--v21::before {
+  content:"";position:absolute;inset-block:0;left:0;width:5px;background:#A9826C;
 }
 body.article-template-v32[data-note="panic"] .article-cta-band--v21 .article-cta-inner {
   grid-template-columns:minmax(0,1fr) minmax(205px,270px); gap:clamp(26px,5vw,70px);
@@ -343,9 +348,9 @@ body.article-template-v32[data-note="panic"] .article-cta-band--v21 .section-kic
   color:#F4EFE7; letter-spacing:.11em;
 }
 body.article-template-v32[data-note="panic"] .article-cta-band--v21 h2 {
-  font:500 clamp(40px,4.2vw,61px)/1.06 var(--serif);
-  letter-spacing:-.018em; color:#FAF7F1;
-  max-width:16ch; margin-bottom:22px;
+  font:500 clamp(42px,4.5vw,66px)/1.06 var(--serif);
+  letter-spacing:-.02em; color:#FAF7F1;
+  max-width:17ch; margin-bottom:24px;
 }
 body.article-template-v32[data-note="panic"] .article-cta-band--v21 p:not(.section-kicker) {
   max-width:63ch; font-size:15px; line-height:1.8; color:#F4EFE7;
@@ -653,9 +658,6 @@ body.article-template-v32[data-note="panic"] .panic-care-block p {
 body.article-template-v32[data-note="panic"] .panic-care-disclaimer {
   font:500 13px/1.7 var(--sans);color:#4A4B44;
   margin:14px 0 28px;
-}
-body.article-template-v32[data-note="panic"] .article-cta-band--v21 {
-  background:#66705F;
 }
 @media (max-width:900px) {
  body.article-template-v32[data-note="panic"] .panic-care-grid {grid-template-columns:minmax(0,1fr);}
