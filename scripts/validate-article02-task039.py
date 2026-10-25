@@ -107,7 +107,7 @@ for lang, (html_path, md_path, action, title, tokens, canonical, other) in {
     article=[node for node in graph if node.get("@type")=="Article"]
     faq=[node for node in graph if node.get("@type")=="FAQPage"]
     check(lang+"_schema_article",len(article)==1 and article[0].get("image")==IMAGE)
-    check(lang+"_schema_no_fictitious_publication", "datePublished" not in article[0])
+    check(lang+"_schema_publication_date", article[0].get("datePublished")=="2026-10-24" and article[0].get("dateModified")=="2026-10-24" and article[0].get("dateCreated")=="2026-10-15")
     check(lang+"_schema_FAQ",len(faq)==1 and len(faq[0].get("mainEntity",[]))==6)
 
 assert len(checks) >= 55
