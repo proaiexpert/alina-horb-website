@@ -417,6 +417,26 @@ body.article-template-v32[data-note="panic"] .article-hero-grid.has-editorial-ra
   gap:clamp(28px,5vw,66px);padding-block:clamp(36px,5vw,78px) clamp(47px,6vw,92px);
 }
 body.article-template-v32[data-note="panic"] .article-hero-grid .editorial-rail-placeholder {display:none;}
+/* The global navigation stylesheet places the copy/photo in columns 2/3.
+   Reset the explicit grid positions after removing the empty rail. */
+@media (min-width:1120px) {
+  body.article-template-v32[data-note="panic"] .article-hero-grid.has-editorial-rail > .article-hero-copy {
+    grid-column:1;grid-row:1;min-width:0;
+  }
+  body.article-template-v32[data-note="panic"] .article-hero-grid.has-editorial-rail > .article-hero-visual {
+    grid-column:2;grid-row:1;min-width:0;
+  }
+}
+@media (max-width:1119px) {
+  body.article-template-v32[data-note="panic"] .article-hero-grid.has-editorial-rail > .article-hero-copy {
+    grid-column:1;grid-row:1;min-width:0;
+  }
+  body.article-template-v32[data-note="panic"] .article-hero-grid.has-editorial-rail > .article-hero-visual {
+    grid-column:1;grid-row:2;min-width:0;
+  }
+}
+body.article-template-v32[data-note="panic"] .article-hero-visual::before {display:none;}
+
 body.article-template-v32[data-note="panic"] .article-hero-copy {
   min-width:0;max-width:760px;padding:0;
 }
