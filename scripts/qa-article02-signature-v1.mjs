@@ -71,7 +71,11 @@ try{
    verify(d.overflow<=1,"horizontal overflow "+d.overflow);
    verify(d.heroLoaded&&d.hero?.w>250&&d.hero?.h>180,"Hero unloaded or cropped to invisible");
    verify(d.caption&&d.caption.y>=d.hero.bottom-2,"photo caption overlaps Hero");
-   verify(d.h1?.h>40&&d.imageFit==="cover","Hero hierarchy or fit invalid");
+   verify(d.h1?.w>Math.min(320,vp.w*.36)&&d.h1?.h>40&&d.h1?.h<900,"Hero headline collapsed into a narrow/vertical column");
+   verify(d.imageFit==="cover","Hero image object fit invalid");
+   if(vp.w>=1120){
+    verify(d.hero.w<vp.w*.65&&d.hero.x>d.h1.x+d.h1.w*.6,"Desktop columns or portrait composition broken");
+   }
    verify(JSON.stringify(d.stages)===JSON.stringify(["01","02","03","04","05"]),"five-step order changed");
    verify(d.mapTitle&&d.noninevitable&&d.faq===6&&d.cta&&d.toc===10,"editorial module/FAQ/CTA missing");
    verify(d.noindex,"staged page without noindex");
