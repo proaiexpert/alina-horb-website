@@ -544,7 +544,7 @@ body.article-template-v32[data-note="panic"] .panic-map-index {
   display:block;padding-top:8px;color:#50654E;
   font:600 12px/1.5 var(--sans);letter-spacing:.13em;
 }
-body.article-template-v32[data-note="panic"] .panic-map-heading h3 {
+body.article-template-v32[data-note="panic"] .article-body--v32 .panic-steps .panic-map-heading h3 {
   margin:0;color:#293B2F;
   font:500 clamp(32px,3.8vw,48px)/1.12 var(--serif);
   letter-spacing:-.02em;text-wrap:balance;
