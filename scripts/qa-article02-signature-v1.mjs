@@ -58,6 +58,7 @@ try{
      heroLoaded:!!hero?.complete&&hero.naturalWidth===1200&&hero.naturalHeight===900,
      hero:box(hero),caption:box(sel(".article-hero-label")),h1:box(sel(".article-hero--v32 h1")),
      imageFit:hero?getComputedStyle(hero).objectFit:null,
+     railHidden:!sel(".article-hero-grid > .editorial-rail")||getComputedStyle(sel(".article-hero-grid > .editorial-rail")).display==="none",
      stages:stages.map(e=>e.dataset.step),stageRects:stages.map(box),
      mapMode:getComputedStyle(sel(".panic-steps ol")).display,
      mapTitle:!!sel(".panic-map-heading h3"),noninevitable:!!sel(".panic-noninevitable"),
@@ -73,6 +74,7 @@ try{
    verify(d.caption&&d.caption.y>=d.hero.bottom-2,"photo caption overlaps Hero");
    verify(d.h1?.w>Math.min(320,vp.w*.36)&&d.h1?.h>40&&d.h1?.h<900,"Hero headline collapsed into a narrow/vertical column");
    verify(d.imageFit==="cover","Hero image object fit invalid");
+   verify(d.railHidden,"Desktop hydrated editorial rail overlays Hero composition");
    if(vp.w>=1120){
     verify(d.hero.w<vp.w*.65&&d.hero.x>d.h1.x+d.h1.w*.6,"Desktop columns or portrait composition broken");
    }
