@@ -84,6 +84,9 @@ try{
    if(vp.w<=768)verify(d.mapMode==="block","small viewport map not linear");
    if([390,768,1440].includes(vp.w)){
     await page.locator(".article-hero--v32").screenshot({path:path.join(output,spec.lang+"-"+vp.w+"-hero.png"),timeout:20000});
+    // For a clean diagnostic crop only, remove sticky global chrome and focused skip link.
+    // Functional header/focus tests run in independent GitHub audits.
+    await page.addStyleTag({content:".site-header--canonical, .skip-link, a[href='#main-content']:focus {visibility:hidden!important}"});
     await page.locator(".panic-steps").screenshot({path:path.join(output,spec.lang+"-"+vp.w+"-map.png"),timeout:20000});
    }
    const faq=page.locator("details.article-qa").first();
