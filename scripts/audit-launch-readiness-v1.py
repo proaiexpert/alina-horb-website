@@ -34,6 +34,8 @@ ROUTES = [
     "/notes/how-to-start-the-conversation/", "/ru/notes/how-to-start-the-conversation/",
     "/notes/when-coping-stops-helping/", "/ru/notes/when-coping-stops-helping/",
     "/notes/stress-relocation-and-lost-support/", "/ru/notes/stress-relocation-and-lost-support/",
+    "/notes/constant-arguments-with-partner/", "/ru/notes/constant-arguments-with-partner/",
+    "/notes/fear-of-another-panic-attack/", "/ru/notes/fear-of-another-panic-attack/",
     "/privacy/", "/ru/privacy/",
 ]
 NOINDEX_ROUTES = {"/privacy/", "/ru/privacy/"}
