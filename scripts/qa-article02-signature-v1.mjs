@@ -26,7 +26,7 @@ if(live){
   await pause(8000);
  }
  verify(manifest?.commit_sha===expected,"Cloudflare has not deployed commit: "+issue);
- for(const u of ["/","/assets/images/notes/alina-horb-article02-hero-4x3.webp","/assets/images/notes/alina-horb-article02-home-card-800x500.webp","/assets/images/notes/alina-horb-article02-notes-card-800x600.webp","/assets/images/social/alina-horb-article02-og.png",...specs.map(x=>x.route)]){
+ for(const u of ["/","/assets/images/notes/alina-horb-article02-hero-4x3.webp","/assets/images/notes/alina-horb-article02-home-card-800x500.webp","/assets/images/notes/alina-horb-article02-notes-card-800x600.webp","/assets/images/social/alina-horb-article02-og.png","/assets/css/site.article.panic.v1.css","/assets/js/site.navigation.v1.js","/assets/js/site.article.reading.v2.js",...specs.map(x=>x.route)]){
   const r=await fetch(base+u,{signal:AbortSignal.timeout(15000)});
   verify(r.status===200,"Cloudflare HTTP "+r.status+": "+u);
   verify(/\bnoindex\b/i.test(r.headers.get("x-robots-tag")||""),"Missing X-Robots-Tag on "+u);
